@@ -1,7 +1,8 @@
-[gd_scene load_steps=3 format=3 uid="uid://cud0aqm12mait"]
+[gd_scene load_steps=4 format=3 uid="uid://cud0aqm12mait"]
 
 [ext_resource type="Script" path="res://field.cs" id="1_rtkyj"]
 [ext_resource type="Texture2D" uid="uid://smv6boj2434i" path="res://images/resources/FieldPoint.png" id="2_ygbsf"]
+[ext_resource type="PackedScene" uid="uid://db6m60oqtm1ui" path="res://resources_holder.tscn" id="3_nye2p"]
 
 [node name="Field" type="Node2D"]
 script = ExtResource("1_rtkyj")
@@ -9,3 +10,5 @@ script = ExtResource("1_rtkyj")
 [node name="Sprite2D" type="Sprite2D" parent="."]
 scale = Vector2(0.641827, 0.486875)
 texture = ExtResource("2_ygbsf")
+
+[node name="ResourcesHolder" parent="." instance=ExtResource("3_nye2p")]

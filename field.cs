@@ -10,12 +10,15 @@ public partial class field : Node2D
 	[Export] public string TypeName = "Default"; // Set in Inspector
 	public fieldType type { get; private set; }
 	private Godot.Sprite2D sprite{ get;  set; }
+	[Export] public ResourcesHolder resourcesHolder{ get; set; }
 
 	public override void _Ready()
 	{
 		type = FieldTypeManager.GetFieldType(TypeName);
 		sprite = GetNode<Godot.Sprite2D>("Sprite2D"); // Get the child Sprite2D
 		sprite.Scale = new Vector2(0.8f, 0.8f);
+		resourcesHolder = GetNode<ResourcesHolder>("ResourcesHolder");
+		resourcesHolder.setResourcesBasedOnType(this.type.FieldTypeEnum);
 	}
 	public void AddNeighbor(field node)
 	{

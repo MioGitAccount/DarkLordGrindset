@@ -19,8 +19,9 @@ public partial class map : Node2D
 
 	private field selectedField = null;
 	private unit selectedUnit = null;
-	private Label fieldInfoLabel; // Reference to UI Label
-	private TextureRect fieldImage;
+	//private Label fieldInfoLabel; // Reference to UI Label
+	//private TextureRect fieldImage;
+	private UIManager uIManager;
 	// Called when the node enters the scene tree for the first time.
 	public override void _Ready()
 	{
@@ -28,18 +29,19 @@ public partial class map : Node2D
 		List<Node> listOfNodes = new List<Node>(GetChildren());
 		foreach (Node node in listOfNodes)
 		{
-			if(node is field)
-				fields.Add(node.Name,(field)node);
+			if (node is field)
+				fields.Add(node.Name, (field)node);
 		}
 		ConnectAllNodes();
 		unitManager = GetNode<UnitManager>("UnitManager");
 		units = unitManager.findAllUnits();
 		unitManager.setUnitLocation(units, fields["Field"]);
-		GD.Print("There are "+ fields.Count + " fields on map");
+		GD.Print("There are " + fields.Count + " fields on map");
 		QueueRedraw();
-		fieldInfoLabel = GetNode<Label>("../UI/BigHContainer/RightVContainer/FieldLabel");
-		fieldImage = GetNode<TextureRect>("../UI/BigHContainer/RightVContainer/Panel/FieldImage");
-		fieldImage.CustomMinimumSize = new Vector2(156, 282);
+		uIManager = GetNode<UIManager>("../UIManager");
+		//fieldInfoLabel = GetNode<Label>("../UI/BigHContainer/RightVContainer/FieldLabel");
+		//fieldImage = GetNode<TextureRect>("../UI/BigHContainer/RightVContainer/Panel/FieldImage");
+		//fieldImage.CustomMinimumSize = new Vector2(156, 282);
 	}
 	public override void _Draw()
 	{
@@ -103,7 +105,7 @@ public partial class map : Node2D
 			}
 			selectedField = (field)clickedNode;
 			selectedField.Select();
-			UpdateSelectionInfo();
+			uIManager.UpdateSelectionInfo(selectedField);
 		}
 		else if(clickedNode is unit){
 			// Deselect the previous unit
@@ -114,7 +116,7 @@ public partial class map : Node2D
 			// Select the new node
 			GD.Print(clickedNode.Name + " is selected");
 			unitManager.SelectUnit((unit)clickedNode);	
-			UpdateUnitSelectionInfo();
+			uIManager.UpdateUnitSelectionInfo((unit)clickedNode);
 		}
 	}
 	private void OnNodeRightClicked(Node2D node){
@@ -122,40 +124,7 @@ public partial class map : Node2D
 		unitManager.MoveSelectedUnitTo((field)node);
 		GD.Print("right click on: " + node);
 	}
-	 private void UpdateSelectionInfo()
-	{
-		if (selectedField != null)
-		{
-			fieldInfoLabel.Text = $"Selected Node: {selectedField.Name}";
-			if(selectedField.type != null){
-				fieldInfoLabel.Text += $"\nType: {selectedField.type.Name}";
-				fieldImage.Texture = selectedField.type.FieldImage;
-			}
-
-		}
-		else
-		{
-			fieldInfoLabel.Text = "No node selected";
-			fieldImage.Texture = null;
-		}
-	}
-	private void UpdateUnitSelectionInfo()
-	{
-		if (selectedField != null)
-		{
-			fieldInfoLabel.Text = $"Selected Node: {selectedField.Name}";
-			if(selectedField.type != null){
-				fieldInfoLabel.Text += $"\nType: {selectedField.type.Name}";
-				fieldImage.Texture = selectedField.type.FieldImage;
-			}
-
-		}
-		else
-		{
-			fieldInfoLabel.Text = "No node selected";
-			fieldImage.Texture = null;
-		}
-	}
+	 
 	private void ConnectAllNodes()
 	{
 		foreach(String key in fields.Keys)

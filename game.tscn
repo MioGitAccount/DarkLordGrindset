@@ -1,4 +1,4 @@
-[gd_scene load_steps=8 format=3 uid="uid://bmw3037w1kmrt"]
+[gd_scene load_steps=9 format=3 uid="uid://bmw3037w1kmrt"]
 
 [ext_resource type="PackedScene" uid="uid://var6frhqr00x" path="res://map.tscn" id="1_h6xol"]
 [ext_resource type="Texture2D" uid="uid://b2e6tho8b0ct4" path="res://images/resources/DeathLandMap.jpg" id="1_xcb63"]
@@ -7,6 +7,7 @@
 [ext_resource type="PackedScene" uid="uid://slm0fvupu3uq" path="res://unit.tscn" id="4_63g25"]
 [ext_resource type="Script" path="res://UnitManager.cs" id="4_lus3e"]
 [ext_resource type="PackedScene" uid="uid://d2oqmhsdb8fn3" path="res://scenes/UI.tscn" id="5_n8336"]
+[ext_resource type="Script" path="res://UIManager.cs" id="8_4ybq1"]
 
 [node name="Game" type="Node2D"]
 
@@ -83,3 +84,6 @@ scale = Vector2(0.913249, 0.854191)
 TypeName = "SpringForest"
 
 [node name="UI" parent="." instance=ExtResource("5_n8336")]
+
+[node name="UIManager" type="Node" parent="."]
+script = ExtResource("8_4ybq1")
