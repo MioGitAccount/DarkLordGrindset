@@ -1,0 +1,96 @@
+[gd_scene load_steps=6 format=3 uid="uid://d2oqmhsdb8fn3"]
+
+[ext_resource type="Texture2D" uid="uid://bqep5x4vfa77c" path="res://images/Cave.png" id="1_psass"]
+[ext_resource type="PackedScene" uid="uid://ykx71v7jaffu" path="res://gold_panel.tscn" id="3_ip3t1"]
+[ext_resource type="PackedScene" uid="uid://xpqe4k100als" path="res://wood_panel.tscn" id="4_2mwso"]
+[ext_resource type="PackedScene" uid="uid://dgd7ebhu4fh0b" path="res://battle_ground.tscn" id="4_2tdiq"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_jv2aq"]
+bg_color = Color(0.0980392, 0.0980392, 0.0980392, 1)
+
+[node name="Ui" type="CanvasLayer"]
+
+[node name="BigHContainer" type="HBoxContainer" parent="."]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="RightVContainer" type="VBoxContainer" parent="BigHContainer"]
+custom_minimum_size = Vector2(300, 0)
+layout_mode = 2
+size_flags_horizontal = 10
+
+[node name="Resources" type="HBoxContainer" parent="BigHContainer/RightVContainer"]
+custom_minimum_size = Vector2(100, 40)
+layout_mode = 2
+size_flags_horizontal = 8
+size_flags_vertical = 8
+
+[node name="GoldPanel" parent="BigHContainer/RightVContainer/Resources" instance=ExtResource("3_ip3t1")]
+custom_minimum_size = Vector2(120, 40)
+layout_mode = 2
+size_flags_horizontal = 4
+
+[node name="WoodPanel" parent="BigHContainer/RightVContainer/Resources" instance=ExtResource("4_2mwso")]
+custom_minimum_size = Vector2(120, 40)
+layout_mode = 2
+
+[node name="Panel" type="Panel" parent="BigHContainer/RightVContainer"]
+custom_minimum_size = Vector2(300, 500)
+layout_mode = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_jv2aq")
+
+[node name="FieldImage" type="TextureRect" parent="BigHContainer/RightVContainer/Panel"]
+custom_minimum_size = Vector2(280, 460)
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -140.0
+offset_top = -230.0
+offset_right = 140.0
+offset_bottom = 230.0
+grow_horizontal = 2
+grow_vertical = 2
+size_flags_horizontal = 4
+texture = ExtResource("1_psass")
+expand_mode = 1
+
+[node name="FieldLabel" type="Label" parent="BigHContainer/RightVContainer"]
+layout_mode = 2
+
+[node name="HBoxContainer" type="HBoxContainer" parent="."]
+custom_minimum_size = Vector2(500, 40)
+offset_right = 500.0
+offset_bottom = 40.0
+size_flags_horizontal = 0
+size_flags_vertical = 0
+alignment = 1
+
+[node name="GoldPanel" parent="HBoxContainer" instance=ExtResource("3_ip3t1")]
+custom_minimum_size = Vector2(120, 0)
+layout_mode = 2
+
+[node name="WoodPanel" parent="HBoxContainer" instance=ExtResource("4_2mwso")]
+custom_minimum_size = Vector2(120, 0)
+layout_mode = 2
+
+[node name="Panel" type="Panel" parent="."]
+anchors_preset = 3
+anchor_left = 1.0
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = -476.0
+offset_top = -266.0
+grow_horizontal = 0
+grow_vertical = 0
+size_flags_vertical = 8
+
+[node name="BattleGround" parent="Panel" instance=ExtResource("4_2tdiq")]
+position = Vector2(11, -4)
+scale = Vector2(0.4, 0.4)

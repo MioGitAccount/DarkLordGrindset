@@ -1,0 +1,6 @@
+[gd_scene load_steps=2 format=3 uid="uid://db6m60oqtm1ui"]
+
+[ext_resource type="Script" path="res://ResourcesHolder.cs" id="1_272ml"]
+
+[node name="ResourcesHolder" type="Node2D"]
+script = ExtResource("1_272ml")

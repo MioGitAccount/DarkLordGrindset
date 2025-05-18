@@ -1,0 +1,31 @@
+[gd_scene load_steps=3 format=3 uid="uid://lrhnerqp23xf"]
+
+[ext_resource type="Script" path="res://BattleUnit.cs" id="1_mr3yw"]
+[ext_resource type="Texture2D" uid="uid://c41npyuyjjqth" path="res://images/Units/Imp.png" id="1_pl8xk"]
+
+[node name="BattleUnit" type="Node2D"]
+script = ExtResource("1_mr3yw")
+
+[node name="VBoxContainer" type="VBoxContainer" parent="."]
+offset_right = 445.0
+offset_bottom = 496.0
+
+[node name="Label" type="Label" parent="VBoxContainer"]
+custom_minimum_size = Vector2(0, 60)
+layout_mode = 2
+text = "Djavo"
+horizontal_alignment = 1
+
+[node name="Control" type="Control" parent="VBoxContainer"]
+custom_minimum_size = Vector2(200, 400)
+layout_mode = 2
+
+[node name="Sprite2D" type="Sprite2D" parent="VBoxContainer/Control"]
+position = Vector2(209, 197)
+texture = ExtResource("1_pl8xk")
+
+[node name="ProgressBar" type="ProgressBar" parent="VBoxContainer"]
+layout_mode = 2
+theme_override_colors/font_outline_color = Color(0.647059, 0, 0.0823529, 1)
+step = 1.0
+value = 70.0

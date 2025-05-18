@@ -1,0 +1,26 @@
+[gd_scene load_steps=2 format=3 uid="uid://dvwm1u0yxbaqq"]
+
+[ext_resource type="Texture2D" uid="uid://b0gygbitc8vij" path="res://images/resources/wood.png" id="1_nmj03"]
+
+[node name="ResourcePanel" type="Panel"]
+offset_left = 1.0
+offset_top = 1.0
+offset_right = 116.0
+offset_bottom = 41.0
+
+[node name="Label" type="Label" parent="."]
+layout_mode = 2
+offset_left = 43.0
+offset_top = 8.0
+offset_right = 71.0
+offset_bottom = 31.0
+size_flags_horizontal = 4
+text = "100"
+
+[node name="TextureRect" type="TextureRect" parent="."]
+layout_mode = 2
+offset_left = 75.0
+offset_right = 115.0
+offset_bottom = 40.0
+size_flags_vertical = 4
+texture = ExtResource("1_nmj03")

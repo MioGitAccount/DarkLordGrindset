@@ -1,0 +1,85 @@
+[gd_scene load_steps=8 format=3 uid="uid://bmw3037w1kmrt"]
+
+[ext_resource type="PackedScene" uid="uid://var6frhqr00x" path="res://map.tscn" id="1_h6xol"]
+[ext_resource type="Texture2D" uid="uid://b2e6tho8b0ct4" path="res://images/resources/DeathLandMap.jpg" id="1_xcb63"]
+[ext_resource type="Script" path="res://CameraController.cs" id="2_r28mm"]
+[ext_resource type="PackedScene" uid="uid://cud0aqm12mait" path="res://field.tscn" id="3_fsomy"]
+[ext_resource type="PackedScene" uid="uid://slm0fvupu3uq" path="res://unit.tscn" id="4_63g25"]
+[ext_resource type="Script" path="res://UnitManager.cs" id="4_lus3e"]
+[ext_resource type="PackedScene" uid="uid://d2oqmhsdb8fn3" path="res://scenes/UI.tscn" id="5_n8336"]
+
+[node name="Game" type="Node2D"]
+
+[node name="Background2" type="Sprite2D" parent="."]
+position = Vector2(1526, 452)
+scale = Vector2(1.73858, 1.54497)
+texture = ExtResource("1_xcb63")
+metadata/_edit_lock_ = true
+
+[node name="CameraController" type="Camera2D" parent="."]
+offset = Vector2(570, 325)
+script = ExtResource("2_r28mm")
+
+[node name="Map" parent="." instance=ExtResource("1_h6xol")]
+
+[node name="UnitList" type="Node" parent="Map"]
+
+[node name="Imp" parent="Map/UnitList" instance=ExtResource("4_63g25")]
+position = Vector2(446, 278)
+
+[node name="UnitManager" type="Node" parent="Map"]
+script = ExtResource("4_lus3e")
+
+[node name="Field" parent="Map" instance=ExtResource("3_fsomy")]
+position = Vector2(401, 324)
+TypeName = "AutumnForest"
+
+[node name="Field2" parent="Map" instance=ExtResource("3_fsomy")]
+position = Vector2(529, 334)
+TypeName = "AutumnForest"
+
+[node name="Field3" parent="Map" instance=ExtResource("3_fsomy")]
+position = Vector2(634, 385)
+scale = Vector2(1, 0.987588)
+TypeName = "SpringForest"
+
+[node name="Field4" parent="Map" instance=ExtResource("3_fsomy")]
+position = Vector2(739, 384)
+TypeName = "GrassPlains"
+
+[node name="Field5" parent="Map" instance=ExtResource("3_fsomy")]
+position = Vector2(791, 325)
+scale = Vector2(1.07, 1)
+TypeName = "GrassPlains"
+
+[node name="Field6" parent="Map" instance=ExtResource("3_fsomy")]
+position = Vector2(747, 253)
+scale = Vector2(0.913249, 0.854191)
+TypeName = "Village"
+
+[node name="Field7" parent="Map" instance=ExtResource("3_fsomy")]
+position = Vector2(858, 258)
+scale = Vector2(0.913249, 0.854191)
+TypeName = "GrassPlains"
+
+[node name="Field8" parent="Map" instance=ExtResource("3_fsomy")]
+position = Vector2(939, 272)
+scale = Vector2(1.14, 1)
+TypeName = "SpringForest"
+
+[node name="Field9" parent="Map" instance=ExtResource("3_fsomy")]
+position = Vector2(1021, 277)
+scale = Vector2(0.913249, 0.854191)
+TypeName = "Bridge"
+
+[node name="Field10" parent="Map" instance=ExtResource("3_fsomy")]
+position = Vector2(750, 454)
+scale = Vector2(0.913249, 0.854191)
+TypeName = "GrassPlains"
+
+[node name="Field11" parent="Map" instance=ExtResource("3_fsomy")]
+position = Vector2(835, 465)
+scale = Vector2(0.913249, 0.854191)
+TypeName = "SpringForest"
+
+[node name="UI" parent="." instance=ExtResource("5_n8336")]
