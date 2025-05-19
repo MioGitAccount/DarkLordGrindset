@@ -13,9 +13,16 @@ public partial class BattleUnit : Node2D
 	public bool isLeftSide() { return leftSide; }
 	public bool isAlive() { return alive; }
 
+	private ProgressBar healthBar;
+	private Label damangeLabel;
+
 	public override void _Ready()
 	{
-		battleStats = new BattleStats(5, 2, 15);
+		battleStats = new BattleStats(5, 2, 15, 15);
+		healthBar = GetNode<ProgressBar>("VBoxContainer/ProgressBar");
+		healthBar.Value = battleStats.getCurrentHeathInProcent();
+		damangeLabel = GetNode<Label>("VBoxContainer/Control/DamangeLabel");
+		
 	}
 
 	// Called every frame. 'delta' is the elapsed time since the previous frame.
@@ -34,13 +41,22 @@ public partial class BattleUnit : Node2D
 	public bool takeDamange(int damange)
 	{
 		this.battleStats.health -= damange;
-		GD.Print("Unit takes " + damange + " damange");
 		if (this.battleStats.health <= 0)
 		{
 			this.battleStats.health = 0;
+			healthBar.Value = battleStats.getCurrentHeathInProcent();
+			damangeLabel.Text = damange.ToString();
 			return true;
 		}
+		healthBar.Value = battleStats.getCurrentHeathInProcent();
+		damangeLabel.Text = damange.ToString();
+		GD.Print("Current health: " + battleStats.getCurrentHeathInProcent());
 		return false;
+	}
+	
+	public void resetDamange()
+	{
+		damangeLabel.Text = "";
 	}
 
 }

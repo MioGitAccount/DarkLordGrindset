@@ -12,7 +12,7 @@ public partial class map : Node2D
 		("Field","Field2"),("Field2","Field3"),("Field3","Field4"),
 		("Field4","Field5"),("Field4","Field10"),("Field5","Field6"),
 		("Field5","Field7"),("Field7","Field8"),("Field8","Field9"),
-		("Field10","Field11")
+		("Field10","Field11"),("Field11","Field12")
 	};
 	private List<unit> units = new List<unit>();
 	UnitManager unitManager;
@@ -39,9 +39,7 @@ public partial class map : Node2D
 		GD.Print("There are " + fields.Count + " fields on map");
 		QueueRedraw();
 		uIManager = GetNode<UIManager>("../UIManager");
-		//fieldInfoLabel = GetNode<Label>("../UI/BigHContainer/RightVContainer/FieldLabel");
-		//fieldImage = GetNode<TextureRect>("../UI/BigHContainer/RightVContainer/Panel/FieldImage");
-		//fieldImage.CustomMinimumSize = new Vector2(156, 282);
+
 	}
 	public override void _Draw()
 	{

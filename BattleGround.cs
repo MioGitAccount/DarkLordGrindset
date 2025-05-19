@@ -37,20 +37,22 @@ public partial class BattleGround : Node2D
 					{
 						BattleUnit attackedUnit = battleUnitsRight[0];
 						unit.Position += new Vector2(100, 0);
-						await ToSignal(GetTree().CreateTimer(1.0f), "timeout");
-						unit.Position -= new Vector2(100, 0);
 						int damange = unit.AttackAction(attackedUnit);
 						attackedUnit.takeDamange(damange);
+						await ToSignal(GetTree().CreateTimer(1.0f), "timeout");
+						unit.Position -= new Vector2(100, 0);
+						attackedUnit.resetDamange();
 
 					}
 					else
 					{
 						BattleUnit attackedUnit = battleUnitsLeft[0];
 						unit.Position += new Vector2(100, 0);
-						await ToSignal(GetTree().CreateTimer(1.0f), "timeout");
-						unit.Position -= new Vector2(100, 0);
 						int damange = unit.AttackAction(attackedUnit);
 						attackedUnit.takeDamange(damange);
+						await ToSignal(GetTree().CreateTimer(1.0f), "timeout");
+						unit.Position -= new Vector2(100, 0);
+						attackedUnit.resetDamange();
 
 					}
 					await ToSignal(GetTree().CreateTimer(1.0f), "timeout");

@@ -83,7 +83,13 @@ position = Vector2(835, 465)
 scale = Vector2(0.913249, 0.854191)
 TypeName = "SpringForest"
 
+[node name="Field12" parent="Map" instance=ExtResource("3_fsomy")]
+position = Vector2(919, 468)
+scale = Vector2(0.834024, 0.729642)
+TypeName = "GrassPlains"
+
 [node name="UI" parent="." instance=ExtResource("5_n8336")]
+visible = false
 
 [node name="UIManager" type="Node" parent="."]
 script = ExtResource("8_4ybq1")
