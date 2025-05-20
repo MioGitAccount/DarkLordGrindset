@@ -89,7 +89,6 @@ scale = Vector2(0.834024, 0.729642)
 TypeName = "GrassPlains"
 
 [node name="UI" parent="." instance=ExtResource("5_n8336")]
-visible = false
 
 [node name="UIManager" type="Node" parent="."]
 script = ExtResource("8_4ybq1")
