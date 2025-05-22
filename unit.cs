@@ -5,7 +5,8 @@ using System.Collections.Generic;
 public partial class unit : Node2D
 {
 	[Export] public string UnitType = "Warrior";  // Type of unit
-	private Godot.Sprite2D sprite{ get;  set; }
+	[Export] public BattleStats battleStats;
+	private Godot.Sprite2D sprite { get; set; }
 	private bool isSelected;
 	private float radius = 20f; // Set a radius for detection
 	public field currentField{ get; set; }

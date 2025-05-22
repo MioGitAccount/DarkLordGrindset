@@ -1,9 +1,10 @@
-[gd_scene load_steps=6 format=3 uid="uid://d2oqmhsdb8fn3"]
+[gd_scene load_steps=7 format=3 uid="uid://d2oqmhsdb8fn3"]
 
 [ext_resource type="Texture2D" uid="uid://bqep5x4vfa77c" path="res://images/Cave.png" id="1_psass"]
 [ext_resource type="PackedScene" uid="uid://ykx71v7jaffu" path="res://gold_panel.tscn" id="3_ip3t1"]
 [ext_resource type="PackedScene" uid="uid://xpqe4k100als" path="res://wood_panel.tscn" id="4_2mwso"]
 [ext_resource type="PackedScene" uid="uid://dgd7ebhu4fh0b" path="res://battle_ground.tscn" id="4_2tdiq"]
+[ext_resource type="Texture2D" uid="uid://c41npyuyjjqth" path="res://images/Units/Imp.png" id="5_ancib"]
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_jv2aq"]
 bg_color = Color(0.0980392, 0.0980392, 0.0980392, 1)
@@ -85,15 +86,15 @@ anchor_left = 1.0
 anchor_top = 1.0
 anchor_right = 1.0
 anchor_bottom = 1.0
-offset_left = -476.0
-offset_top = -266.0
+offset_left = -590.0
+offset_top = -339.0
 grow_horizontal = 0
 grow_vertical = 0
 size_flags_vertical = 8
 
 [node name="BattleGround" parent="Panel" instance=ExtResource("4_2tdiq")]
-position = Vector2(11, -4)
-scale = Vector2(0.4, 0.4)
+position = Vector2(5, 8)
+scale = Vector2(0.5, 0.5)
 
 [node name="UnitVContainer" type="VBoxContainer" parent="."]
 anchors_preset = 2
@@ -104,6 +105,18 @@ offset_right = 227.0
 grow_vertical = 0
 size_flags_horizontal = 0
 size_flags_vertical = 8
+alignment = 1
 
 [node name="Panel" type="Panel" parent="UnitVContainer"]
 layout_mode = 2
+size_flags_vertical = 3
+
+[node name="TextureRect" type="TextureRect" parent="UnitVContainer/Panel"]
+custom_minimum_size = Vector2(200, 200)
+layout_mode = 0
+offset_left = 13.0
+offset_top = 22.0
+offset_right = 213.0
+offset_bottom = 222.0
+texture = ExtResource("5_ancib")
+expand_mode = 1

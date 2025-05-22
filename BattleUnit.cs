@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 public partial class BattleUnit : Node2D
 {
 	// Called when the node enters the scene tree for the first time.
-	BattleStats battleStats;
+	[Export] BattleStats battleStats;
 	[Export] public int battlePosition;
 	[Export] public bool leftSide;
 	[Export] public bool alive;
@@ -19,8 +19,8 @@ public partial class BattleUnit : Node2D
 
 	public override void _Ready()
 	{
-		battleStats = new BattleStats(5, 2, 15, 15);
 		healthBar = GetNode<ProgressBar>("VBoxContainer/ProgressBar");
+		if(alive)
 		healthBar.Value = battleStats.getCurrentHeathInProcent();
 		damangeLabel = GetNode<Label>("VBoxContainer/Control/DamangeLabel");
 		

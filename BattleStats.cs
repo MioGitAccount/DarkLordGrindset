@@ -1,13 +1,16 @@
 using Godot;
 using System;
 
-public class BattleStats
+[GlobalClass]
+public partial class BattleStats : Resource
 {
-	public int attack { get; set; }
-	public int defence { get; set; }
-	public int health { get; set; }
-	public int maxHealth { get; set; }
+	
+	[Export] public int attack { get; set; }
+	[Export] public int defence { get; set; }
+	[Export] public int health { get; set; }
+	[Export] public int maxHealth { get; set; }
 
+ 	public BattleStats() { }
 	public BattleStats(int Attack, int Defence, int Health, int MaxHealth)
 	{
 		this.attack = Attack;

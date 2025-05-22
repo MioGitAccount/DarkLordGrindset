@@ -1,5 +1,6 @@
 using Godot;
 using System;
+using System.Collections;
 using System.Collections.Generic;
 
 public partial class field : Node2D
@@ -11,7 +12,8 @@ public partial class field : Node2D
 	public fieldType type { get; private set; }
 	private Godot.Sprite2D sprite{ get;  set; }
 	[Export] public ResourcesHolder resourcesHolder{ get; set; }
-
+	public Godot.Collections.Array<unit> presentPlayerUnits = new();
+	[Export] public Godot.Collections.Array<unit> presentNeutralUnits = new();
 	public override void _Ready()
 	{
 		type = FieldTypeManager.GetFieldType(TypeName);

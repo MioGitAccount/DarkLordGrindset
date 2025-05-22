@@ -1,8 +1,44 @@
-[gd_scene load_steps=4 format=3 uid="uid://dgd7ebhu4fh0b"]
+[gd_scene load_steps=10 format=3 uid="uid://dgd7ebhu4fh0b"]
 
 [ext_resource type="Script" path="res://BattleGround.cs" id="1_447mj"]
 [ext_resource type="Script" path="res://BattleUIControler.cs" id="2_d8o16"]
 [ext_resource type="PackedScene" uid="uid://lrhnerqp23xf" path="res://battle_unit.tscn" id="2_x6jbc"]
+[ext_resource type="Script" path="res://BattleStats.cs" id="4_hlgf8"]
+
+[sub_resource type="Resource" id="Resource_dbmps"]
+script = ExtResource("4_hlgf8")
+attack = 4
+defence = 2
+health = 15
+maxHealth = 15
+
+[sub_resource type="Resource" id="Resource_i3nxr"]
+script = ExtResource("4_hlgf8")
+attack = 1
+defence = 4
+health = 15
+maxHealth = 15
+
+[sub_resource type="Resource" id="Resource_g0th6"]
+script = ExtResource("4_hlgf8")
+attack = 6
+defence = 0
+health = 15
+maxHealth = 20
+
+[sub_resource type="Resource" id="Resource_shmxu"]
+script = ExtResource("4_hlgf8")
+attack = 2
+defence = 6
+health = 14
+maxHealth = 14
+
+[sub_resource type="Resource" id="Resource_6ey3f"]
+script = ExtResource("4_hlgf8")
+attack = 7
+defence = 1
+health = 19
+maxHealth = 20
 
 [node name="BattleGround" type="Node2D"]
 script = ExtResource("1_447mj")
@@ -144,6 +180,7 @@ text = "Attack"
 [node name="BattleUnit" parent="BattleUnitListLeft" instance=ExtResource("2_x6jbc")]
 position = Vector2(299, 210)
 scale = Vector2(0.28, 0.28)
+battleStats = SubResource("Resource_dbmps")
 battlePosition = 3
 leftSide = true
 alive = true
@@ -151,6 +188,7 @@ alive = true
 [node name="BattleUnit2" parent="BattleUnitListLeft" instance=ExtResource("2_x6jbc")]
 position = Vector2(300, 355)
 scale = Vector2(0.28, 0.28)
+battleStats = SubResource("Resource_i3nxr")
 battlePosition = 4
 leftSide = true
 alive = true
@@ -158,6 +196,7 @@ alive = true
 [node name="BattleUnit3" parent="BattleUnitListLeft" instance=ExtResource("2_x6jbc")]
 position = Vector2(300, 495)
 scale = Vector2(0.28, 0.28)
+battleStats = SubResource("Resource_g0th6")
 battlePosition = 5
 leftSide = true
 alive = true
@@ -167,11 +206,13 @@ alive = true
 [node name="BattleUnit2" parent="BattleUnitListRight" instance=ExtResource("2_x6jbc")]
 position = Vector2(749, 349)
 scale = Vector2(0.28, 0.28)
+battleStats = SubResource("Resource_shmxu")
 battlePosition = 4
 alive = true
 
 [node name="BattleUnit3" parent="BattleUnitListRight" instance=ExtResource("2_x6jbc")]
 position = Vector2(748, 203)
 scale = Vector2(0.28, 0.28)
+battleStats = SubResource("Resource_6ey3f")
 battlePosition = 3
 alive = true
