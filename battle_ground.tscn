@@ -162,6 +162,22 @@ battlePosition = 5
 leftSide = true
 alive = true
 
+[node name="BattleUnit4" parent="BattleUnitListLeft" instance=ExtResource("2_x6jbc")]
+position = Vector2(131, 284)
+scale = Vector2(0.28, 0.28)
+battlePosition = 1
+leftSide = true
+alive = true
+initiative = 10
+
+[node name="BattleUnit5" parent="BattleUnitListLeft" instance=ExtResource("2_x6jbc")]
+position = Vector2(128, 434)
+scale = Vector2(0.28, 0.28)
+battlePosition = 2
+leftSide = true
+alive = true
+initiative = 10
+
 [node name="BattleUnitListRight" type="Node2D" parent="."]
 
 [node name="BattleUnit2" parent="BattleUnitListRight" instance=ExtResource("2_x6jbc")]
@@ -174,4 +190,24 @@ alive = true
 position = Vector2(748, 203)
 scale = Vector2(0.28, 0.28)
 battlePosition = 3
+alive = true
+
+[node name="BattleUnit4" parent="BattleUnitListRight" instance=ExtResource("2_x6jbc")]
+position = Vector2(907, 278)
+scale = Vector2(0.28, 0.28)
+battlePosition = 1
+alive = true
+initiative = 12
+
+[node name="BattleUnit5" parent="BattleUnitListRight" instance=ExtResource("2_x6jbc")]
+position = Vector2(910, 420)
+scale = Vector2(0.28, 0.28)
+battlePosition = 2
+alive = true
+initiative = 13
+
+[node name="BattleUnit6" parent="BattleUnitListRight" instance=ExtResource("2_x6jbc")]
+position = Vector2(754, 494)
+scale = Vector2(0.28, 0.28)
+battlePosition = 5
 alive = true

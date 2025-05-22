@@ -10,9 +10,11 @@ public partial class BattleUnit : Node2D
 	[Export] public int battlePosition;
 	[Export] public bool leftSide;
 	[Export] public bool alive;
+	[Export] public int initiative;
 	public bool isLeftSide() { return leftSide; }
 	public bool isAlive() { return alive; }
 	public int BattlePosition() { return battlePosition; }
+	public int GetInitiative() { return initiative; }
 
 	private ProgressBar healthBar;
 	private Label damangeLabel;
@@ -49,7 +51,6 @@ public partial class BattleUnit : Node2D
 		}
 		healthBar.Value = battleStats.getCurrentHeathInProcent();
 		damangeLabel.Text = damange.ToString();
-		GD.Print("Current health: " + battleStats.getCurrentHeathInProcent());
 	}
 	
 	public void resetDamange()
