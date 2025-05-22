@@ -13,7 +13,7 @@ public partial class field : Node2D
 	private Godot.Sprite2D sprite{ get;  set; }
 	[Export] public ResourcesHolder resourcesHolder{ get; set; }
 	public Godot.Collections.Array<unit> presentPlayerUnits = new();
-	[Export] public Godot.Collections.Array<unit> presentNeutralUnits = new();
+	[Export] public Godot.Collections.Array<NeutralUnit> presentNeutralUnits = new();
 	public override void _Ready()
 	{
 		type = FieldTypeManager.GetFieldType(TypeName);

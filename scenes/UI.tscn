@@ -64,6 +64,9 @@ expand_mode = 1
 [node name="FieldLabel" type="Label" parent="BigHContainer/RightVContainer"]
 layout_mode = 2
 
+[node name="HBoxContainer" type="HBoxContainer" parent="BigHContainer/RightVContainer"]
+layout_mode = 2
+
 [node name="HBoxContainer" type="HBoxContainer" parent="."]
 custom_minimum_size = Vector2(500, 40)
 offset_right = 500.0
@@ -81,6 +84,7 @@ custom_minimum_size = Vector2(120, 0)
 layout_mode = 2
 
 [node name="Panel" type="Panel" parent="."]
+visible = false
 anchors_preset = 3
 anchor_left = 1.0
 anchor_top = 1.0

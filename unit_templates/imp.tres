@@ -1,0 +1,18 @@
+[gd_resource type="Resource" script_class="UnitTemplate" load_steps=5 format=3 uid="uid://cwtq0y8xsda4m"]
+
+[ext_resource type="Script" path="res://BattleStats.cs" id="1_e1v2y"]
+[ext_resource type="Script" path="res://UnitTemplate.cs" id="1_y4khv"]
+[ext_resource type="Texture2D" uid="uid://c41npyuyjjqth" path="res://images/Units/Imp.png" id="2_vajrq"]
+
+[sub_resource type="Resource" id="Resource_geemo"]
+script = ExtResource("1_e1v2y")
+attack = 5
+defence = 2
+health = 15
+maxHealth = 15
+
+[resource]
+script = ExtResource("1_y4khv")
+Name = "Imp"
+Icon = ExtResource("2_vajrq")
+DefaultStats = SubResource("Resource_geemo")
