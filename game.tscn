@@ -1,4 +1,4 @@
-[gd_scene load_steps=11 format=3 uid="uid://bmw3037w1kmrt"]
+[gd_scene load_steps=10 format=3 uid="uid://bmw3037w1kmrt"]
 
 [ext_resource type="PackedScene" uid="uid://var6frhqr00x" path="res://map.tscn" id="1_h6xol"]
 [ext_resource type="Texture2D" uid="uid://b2e6tho8b0ct4" path="res://images/resources/DeathLandMap.jpg" id="1_xcb63"]
@@ -6,16 +6,9 @@
 [ext_resource type="PackedScene" uid="uid://cud0aqm12mait" path="res://field.tscn" id="3_fsomy"]
 [ext_resource type="PackedScene" uid="uid://slm0fvupu3uq" path="res://unit.tscn" id="4_63g25"]
 [ext_resource type="Script" path="res://UnitManager.cs" id="4_lus3e"]
-[ext_resource type="Script" path="res://BattleStats.cs" id="5_0cf8s"]
+[ext_resource type="Resource" uid="uid://cwtq0y8xsda4m" path="res://unit_templates/imp.tres" id="5_buf6p"]
 [ext_resource type="PackedScene" uid="uid://d2oqmhsdb8fn3" path="res://scenes/UI.tscn" id="5_n8336"]
 [ext_resource type="Script" path="res://UIManager.cs" id="8_4ybq1"]
-
-[sub_resource type="Resource" id="Resource_6r4cu"]
-script = ExtResource("5_0cf8s")
-attack = 4
-defence = 3
-health = 12
-maxHealth = 12
 
 [node name="Game" type="Node2D"]
 
@@ -35,7 +28,7 @@ script = ExtResource("2_r28mm")
 
 [node name="Imp" parent="Map/UnitList" instance=ExtResource("4_63g25")]
 position = Vector2(446, 278)
-battleStats = SubResource("Resource_6r4cu")
+Template = ExtResource("5_buf6p")
 
 [node name="UnitManager" type="Node" parent="Map"]
 script = ExtResource("4_lus3e")

@@ -14,7 +14,7 @@ public partial class UIManager : Node
 		fieldInfoLabel = GetNode<Label>("../UI/BigHContainer/RightVContainer/FieldLabel");
 		fieldImage = GetNode<TextureRect>("../UI/BigHContainer/RightVContainer/Panel/FieldImage");
 		fieldImage.CustomMinimumSize = new Vector2(156, 282); //wtf?
-		fieldNeutralUnits = GetNode<TextureRect>("../UI/BigHContainer/RightVContainer/PanelContainerForNeutrals");
+		//fieldNeutralUnits = GetNode<TextureRect>("../UI/BigHContainer/RightVContainer/PanelContainerForNeutrals");
 
 		unitImage = GetNode<TextureRect>("../UI/UnitVContainer/Panel/TextureRect");
 		
