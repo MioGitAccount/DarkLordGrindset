@@ -40,7 +40,7 @@ battleStats = SubResource("Resource_6r4cu")
 [node name="UnitManager" type="Node" parent="Map"]
 script = ExtResource("4_lus3e")
 
-[node name="Field" parent="Map" node_paths=PackedStringArray("presentNeutralUnits") instance=ExtResource("3_fsomy")]
+[node name="Field" parent="Map" instance=ExtResource("3_fsomy")]
 position = Vector2(401, 324)
 TypeName = "AutumnForest"
 presentNeutralUnits = [null]

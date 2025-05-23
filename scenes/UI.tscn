@@ -64,8 +64,82 @@ expand_mode = 1
 [node name="FieldLabel" type="Label" parent="BigHContainer/RightVContainer"]
 layout_mode = 2
 
-[node name="HBoxContainer" type="HBoxContainer" parent="BigHContainer/RightVContainer"]
+[node name="PanelContainerForNeutrals" type="PanelContainer" parent="BigHContainer/RightVContainer"]
+custom_minimum_size = Vector2(0, 60)
 layout_mode = 2
+
+[node name="HBoxContainer" type="HBoxContainer" parent="BigHContainer/RightVContainer/PanelContainerForNeutrals"]
+layout_mode = 2
+
+[node name="Panel" type="Panel" parent="BigHContainer/RightVContainer/PanelContainerForNeutrals/HBoxContainer"]
+custom_minimum_size = Vector2(50, 50)
+layout_mode = 2
+size_flags_horizontal = 4
+size_flags_vertical = 4
+
+[node name="TextureRect" type="TextureRect" parent="BigHContainer/RightVContainer/PanelContainerForNeutrals/HBoxContainer/Panel"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="Panel2" type="Panel" parent="BigHContainer/RightVContainer/PanelContainerForNeutrals/HBoxContainer"]
+custom_minimum_size = Vector2(50, 50)
+layout_mode = 2
+size_flags_horizontal = 4
+size_flags_vertical = 4
+
+[node name="TextureRect" type="TextureRect" parent="BigHContainer/RightVContainer/PanelContainerForNeutrals/HBoxContainer/Panel2"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="Panel3" type="Panel" parent="BigHContainer/RightVContainer/PanelContainerForNeutrals/HBoxContainer"]
+custom_minimum_size = Vector2(50, 50)
+layout_mode = 2
+size_flags_horizontal = 4
+size_flags_vertical = 4
+
+[node name="TextureRect" type="TextureRect" parent="BigHContainer/RightVContainer/PanelContainerForNeutrals/HBoxContainer/Panel3"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="Panel4" type="Panel" parent="BigHContainer/RightVContainer/PanelContainerForNeutrals/HBoxContainer"]
+custom_minimum_size = Vector2(50, 50)
+layout_mode = 2
+size_flags_horizontal = 4
+size_flags_vertical = 4
+
+[node name="TextureRect" type="TextureRect" parent="BigHContainer/RightVContainer/PanelContainerForNeutrals/HBoxContainer/Panel4"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="Panel5" type="Panel" parent="BigHContainer/RightVContainer/PanelContainerForNeutrals/HBoxContainer"]
+custom_minimum_size = Vector2(50, 50)
+layout_mode = 2
+size_flags_horizontal = 4
+size_flags_vertical = 4
+
+[node name="TextureRect" type="TextureRect" parent="BigHContainer/RightVContainer/PanelContainerForNeutrals/HBoxContainer/Panel5"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
 
 [node name="HBoxContainer" type="HBoxContainer" parent="."]
 custom_minimum_size = Vector2(500, 40)

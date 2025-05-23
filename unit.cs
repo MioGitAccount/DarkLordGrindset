@@ -5,6 +5,7 @@ using System.Collections.Generic;
 public partial class unit : Node2D
 {
 	[Export] public string UnitType = "Warrior";  // Type of unit
+	[Export] public UnitTemplate Template;
 	[Export] public BattleStats battleStats;
 	private Godot.Sprite2D sprite { get; set; }
 	private bool isSelected;
@@ -27,6 +28,10 @@ public partial class unit : Node2D
 		
 		
 	}
+	public Texture2D GetIcon()
+	{
+		return Template?.Icon;
+	}
 	public override void _Process(double delta)
 	{
 		if (!isMoving) return;
@@ -40,7 +45,7 @@ public partial class unit : Node2D
 		// If movement to current target is complete
 		if (t >= 1f)
 		{
-			currentField = path[pathIndex]; 
+			currentField = path[pathIndex];
 			pathIndex++;
 			MoveToNextNode(); // Go to next node
 		}
