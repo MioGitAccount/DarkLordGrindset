@@ -42,13 +42,7 @@ public partial class BattleGround : Node2D
 							battleFinished = true;
 							break;
 						}
-						unit.Position += new Vector2(100, 0);
-						int damange = unit.AttackAction(attackedUnit);
-						attackedUnit.takeDamange(damange);
-						await ToSignal(GetTree().CreateTimer(1.0f), "timeout");
-						unit.Position -= new Vector2(100, 0);
-						attackedUnit.resetDamange();
-
+						await AttackMovement(unit, attackedUnit);
 					}
 					else
 					{
@@ -58,15 +52,10 @@ public partial class BattleGround : Node2D
 							battleFinished = true;
 							break;
 						}
-						unit.Position += new Vector2(-100, 0);
-						int damange = unit.AttackAction(attackedUnit);
-						attackedUnit.takeDamange(damange);
-						await ToSignal(GetTree().CreateTimer(1.0f), "timeout");
-						unit.Position -= new Vector2(-100, 0);
-						attackedUnit.resetDamange();
-
+						await AttackMovement(unit, attackedUnit);
 					}
-					await ToSignal(GetTree().CreateTimer(1.0f), "timeout");
+					await Task.Delay(1000);
+					//await ToSignal(GetTree().CreateTimer(1.0f), "timeout");
 				}
 			}
 
@@ -218,6 +207,35 @@ public partial class BattleGround : Node2D
 		}
 		return null;
 	}
+	public async Task AttackMovement(BattleUnit attacker, BattleUnit defender)
+	{
+		// save original position of attacker if needed to reset
+		Vector2 originalPosition = attacker.Position;
+		// Raise attacker to be on top of everyone
+		int originalZ = attacker.ZIndex;
+		attacker.ZIndex = 100;
+		if (!attacker.isRangeUnit())
+		{
+			// move closer to perform melee attack
+			attacker.Position = defender.Position + new Vector2(attacker.isLeftSide() ? -200 : 200, 0);
+			await Task.Delay(700);
+		}
+		attacker.Position += new Vector2(attacker.isLeftSide() ? 30 : -30, 0);
+		int damange = attacker.AttackAction(defender);
+		defender.takeDamange(damange);
+		// await ToSignal(GetTree().CreateTimer(1.0f), "timeout");
+		await Task.Delay(1000);
+		attacker.Position -= new Vector2(attacker.isLeftSide() ? 30 : -30, 0);
+		defender.resetDamange();
+		if (!attacker.isRangeUnit())
+		{
+			// move back to the original position
+			await Task.Delay(700);
+			attacker.Position = originalPosition;
+		}
+		// Restore ZIndex
+		attacker.ZIndex = originalZ;
+	} 
 	public void LoadUnits()
 	{
 		for (int i=0; i<5; i++)
