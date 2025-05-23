@@ -36,37 +36,26 @@ public partial class BattleGround : Node2D
 				{
 					if (unit.isLeftSide())
 					{
-						BattleUnit attackedUnit = PickUnitToAttack(1,battleUnitsRight);
+						BattleUnit attackedUnit = PickUnitToAttack(unit.BattlePosition(),battleUnitsRight);
 						if(attackedUnit is null)
 						{
 							battleFinished = true;
 							break;
 						}
-						unit.Position += new Vector2(100, 0);
-						int damange = unit.AttackAction(attackedUnit);
-						attackedUnit.takeDamange(damange);
-						await ToSignal(GetTree().CreateTimer(1.0f), "timeout");
-						unit.Position -= new Vector2(100, 0);
-						attackedUnit.resetDamange();
-
+						await AttackMovement(unit, attackedUnit);
 					}
 					else
 					{
-						BattleUnit attackedUnit = PickUnitToAttack(1,battleUnitsLeft);
+						BattleUnit attackedUnit = PickUnitToAttack(unit.BattlePosition(),battleUnitsLeft);
 						if(attackedUnit is null)
 						{
 							battleFinished = true;
 							break;
 						}
-						unit.Position += new Vector2(-100, 0);
-						int damange = unit.AttackAction(attackedUnit);
-						attackedUnit.takeDamange(damange);
-						await ToSignal(GetTree().CreateTimer(1.0f), "timeout");
-						unit.Position -= new Vector2(-100, 0);
-						attackedUnit.resetDamange();
-
+						await AttackMovement(unit, attackedUnit);
 					}
-					await ToSignal(GetTree().CreateTimer(1.0f), "timeout");
+					await Task.Delay(1000);
+					//await ToSignal(GetTree().CreateTimer(1.0f), "timeout");
 				}
 			}
 
@@ -74,23 +63,179 @@ public partial class BattleGround : Node2D
 	}
 	public BattleUnit PickUnitToAttack(int position, List<BattleUnit> enemyUnits)
 	{
-		foreach (BattleUnit unit in enemyUnits)
-		{
-			if(unit is null) continue;
-			if (unit.isAlive()) return unit;
-		}
-		// switch(position)
+		// foreach (BattleUnit unit in enemyUnits)
 		// {
-		// 	case 1:
-		// 	case 3:
-		// 		if(enemyUnits[0] != null && enemyUnits[0].isAlive())
-		// 		{
-		// 			if (enemyUnits[2])
-		// 		}
-		// 		break;
+		// 	if(unit is null) continue;
+		// 	if (unit.isAlive()) return unit;
 		// }
+		switch(position)
+		{
+			case 1:
+			case 3:
+				// these are units on top
+				// check if 1. in front line is alive, cause then you cant attack 1. in back line
+				if (enemyUnits[2] != null && enemyUnits[2].isAlive())
+				{
+					// check if you can attack 2. in back line
+					if (enemyUnits[1] != null && enemyUnits[1].isAlive())
+					{
+						// its alive, but you must check 2. and 3. in front
+						if ((enemyUnits[3] == null || !enemyUnits[3].isAlive()) && (enemyUnits[4] == null || !enemyUnits[4].isAlive()))
+						{
+							// attack 2. in back
+							return enemyUnits[1];
+						}
+					}
+					// if you cant attack 2. in back, then attack 1. in front
+					return enemyUnits[2];
+				}
+				// check if 2. in front line is alive, cause then you cant attack 1. and 2. in back line
+				if (enemyUnits[3] != null && enemyUnits[3].isAlive())
+				{
+					// attack 2. in front
+					return enemyUnits[3];
+				}
+				// cause there are no 1. and 2. in front line, you can attack 1. in back
+				if (enemyUnits[0] != null && enemyUnits[0].isAlive())
+				{
+					// attack 1. in back
+					return enemyUnits[0];
+				}
+				// check if 3. in front is alive
+				if (enemyUnits[4] != null && enemyUnits[4].isAlive())
+				{
+					// attack 3. in front
+					return enemyUnits[4];
+				}
+				// check if 2. in back is alive
+				if (enemyUnits[1] != null && enemyUnits[1].isAlive())
+				{
+					// attack 2. in back
+					return enemyUnits[1];
+				}
+				// there is no one to attack
+				break;
+			case 2:
+			case 5:
+				// these are units on bottom
+				// check if 3. in front line is alive, cause then you cant attack 2. in back line
+				if (enemyUnits[4] != null && enemyUnits[4].isAlive())
+				{
+					// check if you can attack 1. in back line
+					if (enemyUnits[0] != null && enemyUnits[0].isAlive())
+					{
+						// its alive, but you must check 1. and 2. in front
+						if ((enemyUnits[3] == null || !enemyUnits[3].isAlive()) && (enemyUnits[2] == null || !enemyUnits[2].isAlive()))
+						{
+							// attack 1. in back
+							return enemyUnits[0];
+						}
+					}
+					// if you cant attack 1. in back, then attack 3. in front
+					return enemyUnits[4];
+				}
+				// check if 2. in front line is alive, cause then you cant attack 1. and 2. in back line
+				if (enemyUnits[3] != null && enemyUnits[3].isAlive())
+				{
+					// attack 2. in front
+					return enemyUnits[3];
+				}
+				// cause there are no 2. and 3. in front line, you can attack 2. in back
+				if (enemyUnits[1] != null && enemyUnits[1].isAlive())
+				{
+					// attack 2. in back
+					return enemyUnits[1];
+				}
+				// check if 1. in front is alive
+				if (enemyUnits[2] != null && enemyUnits[2].isAlive())
+				{
+					// attack 1. in front
+					return enemyUnits[2];
+				}
+				// check if 1. in back is alive
+				if (enemyUnits[0] != null && enemyUnits[0].isAlive())
+				{
+					// attack 1. in back
+					return enemyUnits[0];
+				}
+				// there is no one to attack
+				break;
+			case 4:
+				// this is unit in middle
+				// check if 2. in front line is alive
+				if (enemyUnits[3] != null && enemyUnits[3].isAlive())
+				{
+					// attack 2. in front
+					return enemyUnits[3];
+				}
+				// check if 3. in front line is alive, cause then you cant attack 2. in back line
+				if (enemyUnits[4] != null && enemyUnits[4].isAlive())
+				{
+					// check if you can attack 1. in back line
+					if (enemyUnits[0] != null && enemyUnits[0].isAlive())
+					{
+						// its alive, but you must check 1. in front
+						if (enemyUnits[2] == null || !enemyUnits[2].isAlive())
+						{
+							// attack 1. in back
+							return enemyUnits[0];
+						}
+					}
+					// if you cant attack 1. in back, then attack 3. in front
+					return enemyUnits[4];
+				}
+				// cause there are no 2. and 3. in front line, you can attack 2. in back
+				if (enemyUnits[1] != null && enemyUnits[1].isAlive())
+				{
+					// attack 2. in back
+					return enemyUnits[1];
+				}
+				// check if 1. in front is alive
+				if (enemyUnits[2] != null && enemyUnits[2].isAlive())
+				{
+					// attack 1. in front
+					return enemyUnits[2];
+				}
+				// check if 1. in back is alive
+				if (enemyUnits[0] != null && enemyUnits[0].isAlive())
+				{
+					// attack 1. in back
+					return enemyUnits[0];
+				}
+				// there is no one to attack
+				break;
+		}
 		return null;
 	}
+	public async Task AttackMovement(BattleUnit attacker, BattleUnit defender)
+	{
+		// save original position of attacker if needed to reset
+		Vector2 originalPosition = attacker.Position;
+		// Raise attacker to be on top of everyone
+		int originalZ = attacker.ZIndex;
+		attacker.ZIndex = 100;
+		if (!attacker.isRangeUnit())
+		{
+			// move closer to perform melee attack
+			attacker.Position = defender.Position + new Vector2(attacker.isLeftSide() ? -200 : 200, 0);
+			await Task.Delay(700);
+		}
+		attacker.Position += new Vector2(attacker.isLeftSide() ? 30 : -30, 0);
+		int damange = attacker.AttackAction(defender);
+		defender.takeDamange(damange);
+		// await ToSignal(GetTree().CreateTimer(1.0f), "timeout");
+		await Task.Delay(1000);
+		attacker.Position -= new Vector2(attacker.isLeftSide() ? 30 : -30, 0);
+		defender.resetDamange();
+		if (!attacker.isRangeUnit())
+		{
+			// move back to the original position
+			await Task.Delay(700);
+			attacker.Position = originalPosition;
+		}
+		// Restore ZIndex
+		attacker.ZIndex = originalZ;
+	} 
 	public void LoadUnits()
 	{
 		for (int i=0; i<5; i++)
@@ -120,5 +265,7 @@ public partial class BattleGround : Node2D
 					allBattleUnits.Add(unit);
 				}
 		}
+		// sort units by initiative
+		allBattleUnits.Sort((a, b) => b.GetInitiative().CompareTo(a.GetInitiative()));
 	}
 }

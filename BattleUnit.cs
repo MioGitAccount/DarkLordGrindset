@@ -10,12 +10,17 @@ public partial class BattleUnit : Node2D
 	[Export] public int battlePosition;
 	[Export] public bool leftSide;
 	[Export] public bool alive;
+	[Export] public int initiative;
+	[Export] public bool rangeUnit;
 	public bool isLeftSide() { return leftSide; }
 	public bool isAlive() { return alive; }
 	public int BattlePosition() { return battlePosition; }
+	public int GetInitiative() { return initiative; }
+	public bool isRangeUnit() { return rangeUnit; }
 
 	private ProgressBar healthBar;
 	private Label damangeLabel;
+	private Godot.Sprite2D unitImage;
 
 	public override void _Ready()
 	{
@@ -23,7 +28,7 @@ public partial class BattleUnit : Node2D
 		if(alive)
 		healthBar.Value = battleStats.getCurrentHeathInProcent();
 		damangeLabel = GetNode<Label>("VBoxContainer/Control/DamangeLabel");
-		
+		unitImage = GetNode<Godot.Sprite2D>("VBoxContainer/Control/Sprite2D");
 	}
 
 	// Called every frame. 'delta' is the elapsed time since the previous frame.
@@ -46,15 +51,23 @@ public partial class BattleUnit : Node2D
 		{
 			this.battleStats.health = 0;
 			alive = false;
+			UpdateVisualState();
 		}
 		healthBar.Value = battleStats.getCurrentHeathInProcent();
 		damangeLabel.Text = damange.ToString();
-		GD.Print("Current health: " + battleStats.getCurrentHeathInProcent());
 	}
 	
 	public void resetDamange()
 	{
 		damangeLabel.Text = "";
+	}
+
+	public void UpdateVisualState()
+	{
+		if (alive)
+			unitImage.Modulate = new Color(1, 1, 1, 1); // resurected
+		else
+			unitImage.Modulate = new Color(0.5f, 0.5f, 0.5f, 0.5f); // died
 	}
 
 }
