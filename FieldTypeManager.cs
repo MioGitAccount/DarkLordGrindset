@@ -19,6 +19,7 @@ public class FieldTypeManager
 		FieldTypes["Bridge"] = new fieldType("Bridge", "res://images/Bridge.jpg", FieldTypeEnum.Bridge);
 		FieldTypes["GrassPlains"] = new fieldType("Grass Plains", "res://images/GrassPlains.png", FieldTypeEnum.GrassPlains);
 		FieldTypes["Village"] = new fieldType("Village", "res://images/Village.png", FieldTypeEnum.Village);
+		FieldTypes["GrassCrossRoads"] = new fieldType("GrassCrossRoads", "res://images/GrassCrossRoads.png", FieldTypeEnum.GrassCrossRoads);
 	}
 
 	public static fieldType GetFieldType(string typeName)

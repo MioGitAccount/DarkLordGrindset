@@ -1,5 +1,6 @@
 using Godot;
 using System;
+using System.Collections.Generic;
 
 public partial class UIManager : Node
 {
@@ -14,8 +15,7 @@ public partial class UIManager : Node
 		fieldInfoLabel = GetNode<Label>("../UI/BigHContainer/RightVContainer/FieldLabel");
 		fieldImage = GetNode<TextureRect>("../UI/BigHContainer/RightVContainer/Panel/FieldImage");
 		fieldImage.CustomMinimumSize = new Vector2(156, 282); //wtf?
-		//fieldNeutralUnits = GetNode<TextureRect>("../UI/BigHContainer/RightVContainer/PanelContainerForNeutrals");
-
+		fieldNeutralUnits = GetNode<Control>("../UI/BigHContainer/RightVContainer/Panel/PanelContainerForNeutrals/HBoxContainer");
 		unitImage = GetNode<TextureRect>("../UI/UnitVContainer/Panel/TextureRect");
 		
 	}
@@ -24,6 +24,7 @@ public partial class UIManager : Node
 		if (selectedField != null)
 		{
 			fieldInfoLabel.Text = $"Selected Node: {selectedField.Name}";
+			UpdateNeutralUnitsInfo(selectedField);
 
 			if (selectedField.type != null)
 			{
@@ -49,6 +50,25 @@ public partial class UIManager : Node
 	}
 	public void UpdateNeutralUnitsInfo(field selectedField)
 	{
+		Godot.Collections.Array<NeutralUnit> neutrals = selectedField.presentNeutralUnits;
+		List<Node> panels = new List<Node>(fieldNeutralUnits.GetChildren());
+		for (int i = 0; i < neutrals.Count; i++)
+		{
+			if (panels[i] is Panel)
+			{
+				TextureRect image = panels[i].GetChild<TextureRect>(0);
+				image.Texture = neutrals[i].GetIcon();
+			}
+		}
+		for(int i=neutrals.Count; i <5; i++)
+		{
+			if (panels[i] is Panel)
+			{
+				TextureRect image = panels[i].GetChild<TextureRect>(0);
+				image.Texture = null;
+			}
+		}
+
 
 	}
 	public void UpdateUnitSelectionInfo(unit selectedUnit)

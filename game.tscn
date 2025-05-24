@@ -1,4 +1,4 @@
-[gd_scene load_steps=10 format=3 uid="uid://bmw3037w1kmrt"]
+[gd_scene load_steps=18 format=3 uid="uid://bmw3037w1kmrt"]
 
 [ext_resource type="PackedScene" uid="uid://var6frhqr00x" path="res://map.tscn" id="1_h6xol"]
 [ext_resource type="Texture2D" uid="uid://b2e6tho8b0ct4" path="res://images/resources/DeathLandMap.jpg" id="1_xcb63"]
@@ -8,7 +8,30 @@
 [ext_resource type="Script" path="res://UnitManager.cs" id="4_lus3e"]
 [ext_resource type="Resource" uid="uid://cwtq0y8xsda4m" path="res://unit_templates/imp.tres" id="5_buf6p"]
 [ext_resource type="PackedScene" uid="uid://d2oqmhsdb8fn3" path="res://scenes/UI.tscn" id="5_n8336"]
+[ext_resource type="Resource" uid="uid://bewribr222x3c" path="res://unit_templates/orc.tres" id="6_5s4c6"]
 [ext_resource type="Script" path="res://UIManager.cs" id="8_4ybq1"]
+[ext_resource type="Script" path="res://NeutralUnit.cs" id="9_ge3sk"]
+[ext_resource type="Resource" uid="uid://cbo6rewdq70yj" path="res://unit_templates/neutral_unit_templates/wolf.tres" id="10_rafuh"]
+
+[sub_resource type="Resource" id="Resource_jw1ln"]
+script = ExtResource("9_ge3sk")
+Template = ExtResource("5_buf6p")
+
+[sub_resource type="Resource" id="Resource_qleos"]
+script = ExtResource("9_ge3sk")
+Template = ExtResource("10_rafuh")
+
+[sub_resource type="Resource" id="Resource_o4fsw"]
+script = ExtResource("9_ge3sk")
+Template = ExtResource("10_rafuh")
+
+[sub_resource type="Resource" id="Resource_qlny6"]
+script = ExtResource("9_ge3sk")
+Template = ExtResource("10_rafuh")
+
+[sub_resource type="Resource" id="Resource_30i42"]
+script = ExtResource("9_ge3sk")
+Template = ExtResource("10_rafuh")
 
 [node name="Game" type="Node2D"]
 
@@ -30,6 +53,10 @@ script = ExtResource("2_r28mm")
 position = Vector2(446, 278)
 Template = ExtResource("5_buf6p")
 
+[node name="Orc" parent="Map/UnitList" instance=ExtResource("4_63g25")]
+position = Vector2(406, 295)
+Template = ExtResource("6_5s4c6")
+
 [node name="UnitManager" type="Node" parent="Map"]
 script = ExtResource("4_lus3e")
 
@@ -49,7 +76,7 @@ TypeName = "SpringForest"
 
 [node name="Field4" parent="Map" instance=ExtResource("3_fsomy")]
 position = Vector2(739, 384)
-TypeName = "GrassPlains"
+TypeName = "GrassCrossRoads"
 
 [node name="Field5" parent="Map" instance=ExtResource("3_fsomy")]
 position = Vector2(791, 325)
@@ -60,11 +87,12 @@ TypeName = "GrassPlains"
 position = Vector2(747, 253)
 scale = Vector2(0.913249, 0.854191)
 TypeName = "Village"
+presentNeutralUnits = [SubResource("Resource_jw1ln")]
 
 [node name="Field7" parent="Map" instance=ExtResource("3_fsomy")]
 position = Vector2(858, 258)
 scale = Vector2(0.913249, 0.854191)
-TypeName = "GrassPlains"
+TypeName = "GrassCrossRoads"
 
 [node name="Field8" parent="Map" instance=ExtResource("3_fsomy")]
 position = Vector2(939, 272)
@@ -85,6 +113,7 @@ TypeName = "GrassPlains"
 position = Vector2(835, 465)
 scale = Vector2(0.913249, 0.854191)
 TypeName = "SpringForest"
+presentNeutralUnits = [SubResource("Resource_qleos"), SubResource("Resource_o4fsw"), SubResource("Resource_qlny6"), SubResource("Resource_30i42")]
 
 [node name="Field12" parent="Map" instance=ExtResource("3_fsomy")]
 position = Vector2(919, 468)
@@ -100,14 +129,39 @@ position = Vector2(555, 176)
 TypeName = "GrassPlains"
 
 [node name="Field15" parent="Map" instance=ExtResource("3_fsomy")]
-position = Vector2(878, 184)
-TypeName = "GrassPlains"
+position = Vector2(897, 174)
+TypeName = "GrassCrossRoads"
 
 [node name="Field16" parent="Map" instance=ExtResource("3_fsomy")]
-position = Vector2(824, 146)
+position = Vector2(811, 136)
+TypeName = "SpringForest"
+
+[node name="Field17" parent="Map" instance=ExtResource("3_fsomy")]
+position = Vector2(738, 106)
+TypeName = "GrassPlains"
+
+[node name="Field18" parent="Map" instance=ExtResource("3_fsomy")]
+position = Vector2(768, 34)
+TypeName = "GrassPlains"
+
+[node name="Field19" parent="Map" instance=ExtResource("3_fsomy")]
+position = Vector2(853, -6)
+TypeName = "SpringForest"
+
+[node name="Field20" parent="Map" instance=ExtResource("3_fsomy")]
+position = Vector2(940, 27)
+TypeName = "GrassPlains"
+
+[node name="Field21" parent="Map" instance=ExtResource("3_fsomy")]
+position = Vector2(930, -49)
+TypeName = "Village"
+
+[node name="Field22" parent="Map" instance=ExtResource("3_fsomy")]
+position = Vector2(950, 106)
 TypeName = "GrassPlains"
 
 [node name="UI" parent="." instance=ExtResource("5_n8336")]
+visible = false
 
 [node name="UIManager" type="Node" parent="."]
 script = ExtResource("8_4ybq1")

@@ -25,6 +25,7 @@ public partial class unit : Node2D
 	{
 		sprite = GetNode<Godot.Sprite2D>("Sprite2D");
 		sprite.Scale = new Vector2(0.08f, 0.08f);
+		sprite.Texture = GetIcon();
 		
 		
 	}

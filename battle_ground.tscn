@@ -28,7 +28,7 @@ maxHealth = 20
 
 [sub_resource type="Resource" id="Resource_shmxu"]
 script = ExtResource("4_hlgf8")
-attack = 2
+attack = 6
 defence = 3
 health = 14
 maxHealth = 14
@@ -178,10 +178,10 @@ text = "Attack"
 [node name="BattleUnitListLeft" type="Node2D" parent="."]
 
 [node name="BattleUnit" parent="BattleUnitListLeft" instance=ExtResource("2_x6jbc")]
-position = Vector2(299, 210)
+position = Vector2(128, 276)
 scale = Vector2(0.28, 0.28)
 battleStats = SubResource("Resource_dbmps")
-battlePosition = 3
+battlePosition = 1
 leftSide = true
 alive = true
 
@@ -215,4 +215,19 @@ position = Vector2(748, 203)
 scale = Vector2(0.28, 0.28)
 battleStats = SubResource("Resource_6ey3f")
 battlePosition = 3
+alive = true
+
+[node name="BattleUnit4" parent="BattleUnitListRight" instance=ExtResource("2_x6jbc")]
+position = Vector2(910, 277)
+scale = Vector2(0.28, 0.28)
+battleStats = SubResource("Resource_shmxu")
+battlePosition = 1
+alive = true
+rangeUnit = true
+
+[node name="BattleUnit5" parent="BattleUnitListRight" instance=ExtResource("2_x6jbc")]
+position = Vector2(911, 405)
+scale = Vector2(0.28, 0.28)
+battleStats = SubResource("Resource_shmxu")
+battlePosition = 2
 alive = true

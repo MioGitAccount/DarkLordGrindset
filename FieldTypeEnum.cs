@@ -3,11 +3,12 @@ using System;
 
 public enum FieldTypeEnum
 {
-		SpringForest,
-		Cave,
-		AutumnForest,
-		OreMine,
-		Bridge,
-		GrassPlains,
-		Village
+	SpringForest,
+	Cave,
+	AutumnForest,
+	OreMine,
+	Bridge,
+	GrassPlains,
+	Village,
+	GrassCrossRoads
 }
