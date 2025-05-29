@@ -10,13 +10,11 @@ public partial class BattleUnit : Node2D
 	[Export] public int battlePosition;
 	[Export] public bool leftSide;
 	[Export] public bool alive;
-	[Export] public int initiative;
-	[Export] public bool rangeUnit;
 	public bool isLeftSide() { return leftSide; }
 	public bool isAlive() { return alive; }
 	public int BattlePosition() { return battlePosition; }
-	public int GetInitiative() { return initiative; }
-	public bool isRangeUnit() { return rangeUnit; }
+	public int GetInitiative() { return battleStats.initiative; }
+	public bool isRangeUnit() { return battleStats.rangeUnit; }
 
 	private ProgressBar healthBar;
 	private Label damangeLabel;
@@ -38,7 +36,8 @@ public partial class BattleUnit : Node2D
 
 	public int AttackAction(BattleUnit attackedUnit)
 	{
-		int damange = this.battleStats.attack - attackedUnit.battleStats.defence;
+		Random rand = new Random();
+		int damange = rand.Next(this.battleStats.attack/2, this.battleStats.attack+1) - rand.Next(0,attackedUnit.battleStats.defence+1);
 		if (damange < 0) damange = 0;
 		return damange;
 

@@ -6,9 +6,9 @@
 [ext_resource type="PackedScene" uid="uid://cud0aqm12mait" path="res://field.tscn" id="3_fsomy"]
 [ext_resource type="PackedScene" uid="uid://slm0fvupu3uq" path="res://unit.tscn" id="4_63g25"]
 [ext_resource type="Script" path="res://UnitManager.cs" id="4_lus3e"]
-[ext_resource type="Resource" uid="uid://cwtq0y8xsda4m" path="res://unit_templates/imp.tres" id="5_buf6p"]
+[ext_resource type="Resource" uid="uid://xnvrer7iccup" path="res://unit_templates/imp.tres" id="5_buf6p"]
 [ext_resource type="PackedScene" uid="uid://d2oqmhsdb8fn3" path="res://scenes/UI.tscn" id="5_n8336"]
-[ext_resource type="Resource" uid="uid://bewribr222x3c" path="res://unit_templates/orc.tres" id="6_5s4c6"]
+[ext_resource type="Resource" uid="uid://pdif65t3knfq" path="res://unit_templates/orc.tres" id="6_5s4c6"]
 [ext_resource type="Script" path="res://UIManager.cs" id="8_4ybq1"]
 [ext_resource type="Script" path="res://NeutralUnit.cs" id="9_ge3sk"]
 [ext_resource type="Resource" uid="uid://cbo6rewdq70yj" path="res://unit_templates/neutral_unit_templates/wolf.tres" id="10_rafuh"]
@@ -161,7 +161,6 @@ position = Vector2(950, 106)
 TypeName = "GrassPlains"
 
 [node name="UI" parent="." instance=ExtResource("5_n8336")]
-visible = false
 
 [node name="UIManager" type="Node" parent="."]
 script = ExtResource("8_4ybq1")

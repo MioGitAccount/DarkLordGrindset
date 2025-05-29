@@ -1,0 +1,8 @@
+[gd_scene load_steps=2 format=3 uid="uid://b7ddrpwpe2ryu"]
+
+[ext_resource type="Script" path="res://BattlePositionPanel.cs" id="1_7gbjg"]
+
+[node name="BattlePositionPanel" type="Panel"]
+custom_minimum_size = Vector2(100, 100)
+anchors_preset = -1
+script = ExtResource("1_7gbjg")

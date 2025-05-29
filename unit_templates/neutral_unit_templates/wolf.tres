@@ -10,6 +10,8 @@ attack = 4
 defence = 2
 health = 10
 maxHealth = 10
+initiative = 0
+rangeUnit = false
 
 [resource]
 script = ExtResource("1_fw6kh")

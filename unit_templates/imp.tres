@@ -1,4 +1,4 @@
-[gd_resource type="Resource" script_class="UnitTemplate" load_steps=5 format=3 uid="uid://cwtq0y8xsda4m"]
+[gd_resource type="Resource" script_class="UnitTemplate" load_steps=5 format=3 uid="uid://xnvrer7iccup"]
 
 [ext_resource type="Script" path="res://BattleStats.cs" id="1_e1v2y"]
 [ext_resource type="Script" path="res://UnitTemplate.cs" id="1_y4khv"]
@@ -10,6 +10,8 @@ attack = 5
 defence = 2
 health = 15
 maxHealth = 15
+initiative = 0
+rangeUnit = false
 
 [resource]
 script = ExtResource("1_y4khv")

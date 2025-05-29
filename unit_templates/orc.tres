@@ -1,4 +1,4 @@
-[gd_resource type="Resource" script_class="UnitTemplate" load_steps=5 format=3 uid="uid://bewribr222x3c"]
+[gd_resource type="Resource" script_class="UnitTemplate" load_steps=5 format=3 uid="uid://pdif65t3knfq"]
 
 [ext_resource type="Script" path="res://BattleStats.cs" id="1_4tidt"]
 [ext_resource type="Texture2D" uid="uid://2emeyiwasn81" path="res://images/Units/orcIcon.png" id="1_jx0do"]
@@ -10,6 +10,8 @@ attack = 4
 defence = 3
 health = 20
 maxHealth = 20
+initiative = 0
+rangeUnit = false
 
 [resource]
 script = ExtResource("1_on788")

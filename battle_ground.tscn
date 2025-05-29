@@ -1,8 +1,9 @@
-[gd_scene load_steps=10 format=3 uid="uid://dgd7ebhu4fh0b"]
+[gd_scene load_steps=13 format=3 uid="uid://dgd7ebhu4fh0b"]
 
 [ext_resource type="Script" path="res://BattleGround.cs" id="1_447mj"]
 [ext_resource type="Script" path="res://BattleUIControler.cs" id="2_d8o16"]
 [ext_resource type="PackedScene" uid="uid://lrhnerqp23xf" path="res://battle_unit.tscn" id="2_x6jbc"]
+[ext_resource type="PackedScene" uid="uid://b7ddrpwpe2ryu" path="res://battle_position_panel.tscn" id="3_sf3il"]
 [ext_resource type="Script" path="res://BattleStats.cs" id="4_hlgf8"]
 
 [sub_resource type="Resource" id="Resource_dbmps"]
@@ -11,13 +12,17 @@ attack = 4
 defence = 2
 health = 15
 maxHealth = 15
+initiative = 7
+rangeUnit = true
 
 [sub_resource type="Resource" id="Resource_i3nxr"]
 script = ExtResource("4_hlgf8")
-attack = 2
+attack = 6
 defence = 2
 health = 15
 maxHealth = 15
+initiative = 3
+rangeUnit = false
 
 [sub_resource type="Resource" id="Resource_g0th6"]
 script = ExtResource("4_hlgf8")
@@ -25,6 +30,8 @@ attack = 6
 defence = 0
 health = 15
 maxHealth = 20
+initiative = 3
+rangeUnit = false
 
 [sub_resource type="Resource" id="Resource_shmxu"]
 script = ExtResource("4_hlgf8")
@@ -32,6 +39,8 @@ attack = 6
 defence = 3
 health = 14
 maxHealth = 14
+initiative = 3
+rangeUnit = false
 
 [sub_resource type="Resource" id="Resource_6ey3f"]
 script = ExtResource("4_hlgf8")
@@ -39,6 +48,26 @@ attack = 7
 defence = 1
 health = 19
 maxHealth = 20
+initiative = 1
+rangeUnit = false
+
+[sub_resource type="Resource" id="Resource_2dlsb"]
+script = ExtResource("4_hlgf8")
+attack = 5
+defence = 1
+health = 5
+maxHealth = 5
+initiative = 0
+rangeUnit = false
+
+[sub_resource type="Resource" id="Resource_22mf0"]
+script = ExtResource("4_hlgf8")
+attack = 4
+defence = 2
+health = 7
+maxHealth = 7
+initiative = 0
+rangeUnit = false
 
 [node name="BattleGround" type="Node2D"]
 script = ExtResource("1_447mj")
@@ -55,115 +84,106 @@ offset_top = 160.0
 offset_right = 581.0
 offset_bottom = 650.0
 
-[node name="Panel" type="Panel" parent="Panel/PanelContainerLeft"]
-custom_minimum_size = Vector2(100, 100)
-layout_mode = 2
-offset_left = 136.0
-offset_top = 156.0
-offset_right = 236.0
-offset_bottom = 256.0
-size_flags_horizontal = 0
-size_flags_vertical = 0
-
-[node name="Panel2" type="Panel" parent="Panel/PanelContainerLeft"]
-custom_minimum_size = Vector2(100, 100)
+[node name="BattlePositionPanel" parent="Panel/PanelContainerLeft" instance=ExtResource("3_sf3il")]
 layout_mode = 0
+anchors_preset = 0
+offset_left = 133.0
+offset_top = 154.0
+offset_right = 133.0
+offset_bottom = 154.0
+PanelIndex = 1
+
+[node name="BattlePositionPanel2" parent="Panel/PanelContainerLeft" instance=ExtResource("3_sf3il")]
+layout_mode = 0
+anchors_preset = 0
 offset_left = 135.0
-offset_top = 286.0
-offset_right = 235.0
-offset_bottom = 386.0
-size_flags_horizontal = 0
-size_flags_vertical = 0
+offset_top = 285.0
+offset_right = 135.0
+offset_bottom = 285.0
+PanelIndex = 2
 
-[node name="Panel3" type="Panel" parent="Panel/PanelContainerLeft"]
-custom_minimum_size = Vector2(100, 100)
+[node name="BattlePositionPanel3" parent="Panel/PanelContainerLeft" instance=ExtResource("3_sf3il")]
 layout_mode = 0
+anchors_preset = 0
 offset_left = 310.0
-offset_top = 77.0
-offset_right = 410.0
-offset_bottom = 177.0
-size_flags_horizontal = 0
-size_flags_vertical = 0
+offset_top = 78.0
+offset_right = 310.0
+offset_bottom = 78.0
+PanelIndex = 3
 
-[node name="Panel4" type="Panel" parent="Panel/PanelContainerLeft"]
-custom_minimum_size = Vector2(100, 100)
+[node name="BattlePositionPanel4" parent="Panel/PanelContainerLeft" instance=ExtResource("3_sf3il")]
 layout_mode = 0
-offset_left = 310.0
-offset_top = 221.0
-offset_right = 410.0
-offset_bottom = 321.0
-size_flags_horizontal = 0
-size_flags_vertical = 0
+anchors_preset = 0
+offset_left = 306.0
+offset_top = 222.0
+offset_right = 306.0
+offset_bottom = 222.0
+PanelIndex = 4
 
-[node name="Panel5" type="Panel" parent="Panel/PanelContainerLeft"]
-custom_minimum_size = Vector2(100, 100)
+[node name="BattlePositionPanel5" parent="Panel/PanelContainerLeft" instance=ExtResource("3_sf3il")]
 layout_mode = 0
+anchors_preset = 0
 offset_left = 309.0
 offset_top = 357.0
-offset_right = 409.0
-offset_bottom = 457.0
-size_flags_horizontal = 0
-size_flags_vertical = 0
+offset_right = 309.0
+offset_bottom = 357.0
+PanelIndex = 5
 
-[node name="PanelContainerLeft2" type="Panel" parent="Panel"]
+[node name="PanelContainerRight" type="Panel" parent="Panel"]
 layout_mode = 0
-offset_left = 582.0
-offset_top = 158.0
+offset_left = 579.0
+offset_top = 157.0
 offset_right = 1157.0
 offset_bottom = 650.0
 
-[node name="Panel" type="Panel" parent="Panel/PanelContainerLeft2"]
-custom_minimum_size = Vector2(100, 100)
-layout_mode = 2
-offset_left = 335.0
-offset_top = 150.0
-offset_right = 435.0
-offset_bottom = 250.0
-size_flags_horizontal = 0
-size_flags_vertical = 0
-
-[node name="Panel2" type="Panel" parent="Panel/PanelContainerLeft2"]
-custom_minimum_size = Vector2(100, 100)
+[node name="BattlePositionPanel" parent="Panel/PanelContainerRight" instance=ExtResource("3_sf3il")]
 layout_mode = 0
-offset_left = 334.0
+anchors_preset = 0
+offset_left = 340.0
+offset_top = 152.0
+offset_right = 340.0
+offset_bottom = 152.0
+PanelIndex = 1
+
+[node name="BattlePositionPanel2" parent="Panel/PanelContainerRight" instance=ExtResource("3_sf3il")]
+layout_mode = 0
+anchors_preset = 0
+offset_left = 333.0
 offset_top = 280.0
-offset_right = 434.0
-offset_bottom = 380.0
-size_flags_horizontal = 0
-size_flags_vertical = 0
+offset_right = 333.0
+offset_bottom = 280.0
+PanelIndex = 2
 
-[node name="Panel3" type="Panel" parent="Panel/PanelContainerLeft2"]
-custom_minimum_size = Vector2(100, 100)
+[node name="BattlePositionPanel3" parent="Panel/PanelContainerRight" instance=ExtResource("3_sf3il")]
 layout_mode = 0
-offset_left = 178.0
-offset_top = 74.0
-offset_right = 278.0
-offset_bottom = 174.0
-size_flags_horizontal = 0
-size_flags_vertical = 0
+anchors_preset = 0
+offset_left = 176.0
+offset_top = 73.0
+offset_right = 176.0
+offset_bottom = 73.0
+PanelIndex = 3
 
-[node name="Panel4" type="Panel" parent="Panel/PanelContainerLeft2"]
-custom_minimum_size = Vector2(100, 100)
+[node name="BattlePositionPanel4" parent="Panel/PanelContainerRight" instance=ExtResource("3_sf3il")]
 layout_mode = 0
-offset_left = 178.0
+anchors_preset = 0
+offset_left = 176.0
 offset_top = 218.0
-offset_right = 278.0
-offset_bottom = 318.0
-size_flags_horizontal = 0
-size_flags_vertical = 0
+offset_right = 176.0
+offset_bottom = 218.0
+PanelIndex = 4
 
-[node name="Panel5" type="Panel" parent="Panel/PanelContainerLeft2"]
-custom_minimum_size = Vector2(100, 100)
+[node name="BattlePositionPanel5" parent="Panel/PanelContainerRight" instance=ExtResource("3_sf3il")]
 layout_mode = 0
-offset_left = 177.0
+anchors_preset = 0
+offset_left = 178.0
 offset_top = 354.0
-offset_right = 277.0
-offset_bottom = 454.0
-size_flags_horizontal = 0
-size_flags_vertical = 0
+offset_right = 178.0
+offset_bottom = 354.0
+PanelIndex = 5
 
 [node name="HBoxContainer" type="HBoxContainer" parent="Panel"]
 layout_mode = 0
+offset_left = 1026.0
 offset_right = 1150.0
 offset_bottom = 150.0
 alignment = 2
@@ -175,10 +195,56 @@ size_flags_horizontal = 4
 size_flags_vertical = 4
 text = "Attack"
 
+[node name="PanelContainerAbove" type="Panel" parent="Panel"]
+layout_mode = 0
+offset_top = 5.0
+offset_right = 1019.0
+offset_bottom = 160.0
+
+[node name="BattlePositionPanel" parent="Panel/PanelContainerAbove" instance=ExtResource("3_sf3il")]
+layout_mode = 0
+anchors_preset = 0
+offset_left = 31.0
+offset_top = 26.0
+offset_right = 31.0
+offset_bottom = 26.0
+
+[node name="BattlePositionPanel2" parent="Panel/PanelContainerAbove" instance=ExtResource("3_sf3il")]
+layout_mode = 0
+anchors_preset = 0
+offset_left = 163.0
+offset_top = 26.0
+offset_right = 163.0
+offset_bottom = 26.0
+
+[node name="BattlePositionPanel3" parent="Panel/PanelContainerAbove" instance=ExtResource("3_sf3il")]
+layout_mode = 0
+anchors_preset = 0
+offset_left = 301.0
+offset_top = 26.0
+offset_right = 301.0
+offset_bottom = 26.0
+
+[node name="BattlePositionPanel4" parent="Panel/PanelContainerAbove" instance=ExtResource("3_sf3il")]
+layout_mode = 0
+anchors_preset = 0
+offset_left = 439.0
+offset_top = 26.0
+offset_right = 439.0
+offset_bottom = 26.0
+
+[node name="BattlePositionPanel5" parent="Panel/PanelContainerAbove" instance=ExtResource("3_sf3il")]
+layout_mode = 0
+anchors_preset = 0
+offset_left = 574.0
+offset_top = 26.0
+offset_right = 574.0
+offset_bottom = 26.0
+
 [node name="BattleUnitListLeft" type="Node2D" parent="."]
 
 [node name="BattleUnit" parent="BattleUnitListLeft" instance=ExtResource("2_x6jbc")]
-position = Vector2(128, 276)
+position = Vector2(125, 287)
 scale = Vector2(0.28, 0.28)
 battleStats = SubResource("Resource_dbmps")
 battlePosition = 1
@@ -186,7 +252,7 @@ leftSide = true
 alive = true
 
 [node name="BattleUnit2" parent="BattleUnitListLeft" instance=ExtResource("2_x6jbc")]
-position = Vector2(300, 355)
+position = Vector2(298, 355)
 scale = Vector2(0.28, 0.28)
 battleStats = SubResource("Resource_i3nxr")
 battlePosition = 4
@@ -204,7 +270,7 @@ alive = true
 [node name="BattleUnitListRight" type="Node2D" parent="."]
 
 [node name="BattleUnit2" parent="BattleUnitListRight" instance=ExtResource("2_x6jbc")]
-position = Vector2(749, 349)
+position = Vector2(754, 348)
 scale = Vector2(0.28, 0.28)
 battleStats = SubResource("Resource_shmxu")
 battlePosition = 4
@@ -220,14 +286,13 @@ alive = true
 [node name="BattleUnit4" parent="BattleUnitListRight" instance=ExtResource("2_x6jbc")]
 position = Vector2(910, 277)
 scale = Vector2(0.28, 0.28)
-battleStats = SubResource("Resource_shmxu")
+battleStats = SubResource("Resource_2dlsb")
 battlePosition = 1
 alive = true
-rangeUnit = true
 
 [node name="BattleUnit5" parent="BattleUnitListRight" instance=ExtResource("2_x6jbc")]
 position = Vector2(911, 405)
 scale = Vector2(0.28, 0.28)
-battleStats = SubResource("Resource_shmxu")
+battleStats = SubResource("Resource_22mf0")
 battlePosition = 2
 alive = true

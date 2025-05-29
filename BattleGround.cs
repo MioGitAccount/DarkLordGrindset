@@ -11,7 +11,7 @@ public partial class BattleGround : Node2D
 	public List<BattleUnit> allBattleUnits = new List<BattleUnit>();
 	public override void _Ready()
 	{
-		LoadUnits();
+		
 	}
 
 	// Called every frame. 'delta' is the elapsed time since the previous frame.
@@ -210,61 +210,50 @@ public partial class BattleGround : Node2D
 	public async Task AttackMovement(BattleUnit attacker, BattleUnit defender)
 	{
 		// save original position of attacker if needed to reset
-		Vector2 originalPosition = attacker.Position;
+		Vector2 originalPosition = attacker.GlobalPosition;
 		// Raise attacker to be on top of everyone
 		int originalZ = attacker.ZIndex;
 		attacker.ZIndex = 100;
 		if (!attacker.isRangeUnit())
 		{
 			// move closer to perform melee attack
-			attacker.Position = defender.Position + new Vector2(attacker.isLeftSide() ? -200 : 200, 0);
+			attacker.GlobalPosition = defender.GlobalPosition + new Vector2(attacker.isLeftSide() ? -200 : 200, 0);
 			await Task.Delay(700);
 		}
-		attacker.Position += new Vector2(attacker.isLeftSide() ? 30 : -30, 0);
+		attacker.GlobalPosition += new Vector2(attacker.isLeftSide() ? 30 : -30, 0);
 		int damange = attacker.AttackAction(defender);
 		defender.takeDamange(damange);
 		// await ToSignal(GetTree().CreateTimer(1.0f), "timeout");
 		await Task.Delay(1000);
-		attacker.Position -= new Vector2(attacker.isLeftSide() ? 30 : -30, 0);
+		attacker.GlobalPosition -= new Vector2(attacker.isLeftSide() ? 30 : -30, 0);
 		defender.resetDamange();
 		if (!attacker.isRangeUnit())
 		{
 			// move back to the original position
 			await Task.Delay(700);
-			attacker.Position = originalPosition;
+			attacker.GlobalPosition = originalPosition;
 		}
 		// Restore ZIndex
 		attacker.ZIndex = originalZ;
 	} 
-	public void LoadUnits()
+	public void LoadUnits(List<BattleUnit> leftUnits, List<BattleUnit> rightUnits)
 	{
 		for (int i=0; i<5; i++)
 		{
 			battleUnitsLeft.Add(null);
 			battleUnitsRight.Add(null);
 		}
-		Node nodeParent = GetNode<Node>("BattleUnitListLeft");
-		List<Node> listOfNodes = new List<Node>(nodeParent.GetChildren());
-		foreach (Node node in listOfNodes)
+		foreach (BattleUnit unit in leftUnits)
 		{
-			if (node is BattleUnit)
-			{
-				BattleUnit unit = (BattleUnit)node;
-				battleUnitsLeft[unit.BattlePosition()-1] = unit;
-				allBattleUnits.Add(unit);
-			}
+			battleUnitsLeft[unit.BattlePosition()-1] = unit;
+			allBattleUnits.Add(unit);
 		}
-		Node nodeParentR = GetNode<Node>("BattleUnitListRight");
-		List<Node> listOfNodesR = new List<Node>(nodeParentR.GetChildren());
-		foreach (Node node in listOfNodesR)
+		foreach (BattleUnit unit in rightUnits)
 		{
-				if (node is BattleUnit)
-				{
-					BattleUnit unit = (BattleUnit)node;
-					battleUnitsRight[unit.BattlePosition()-1] = unit;
-					allBattleUnits.Add(unit);
-				}
+			battleUnitsRight[unit.BattlePosition()-1] = unit;
+			allBattleUnits.Add(unit);
 		}
+		
 		// sort units by initiative
 		allBattleUnits.Sort((a, b) => b.GetInitiative().CompareTo(a.GetInitiative()));
 	}
