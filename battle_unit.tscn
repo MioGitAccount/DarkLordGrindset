@@ -8,8 +8,9 @@ position = Vector2(7, -81)
 script = ExtResource("1_mr3yw")
 
 [node name="VBoxContainer" type="VBoxContainer" parent="."]
-offset_right = 445.0
-offset_bottom = 496.0
+offset_left = -4.0
+offset_right = 415.0
+offset_bottom = 518.0
 
 [node name="Label" type="Label" parent="VBoxContainer"]
 custom_minimum_size = Vector2(0, 60)
@@ -21,9 +22,11 @@ horizontal_alignment = 1
 [node name="Control" type="Control" parent="VBoxContainer"]
 custom_minimum_size = Vector2(200, 400)
 layout_mode = 2
+mouse_filter = 2
 
 [node name="Sprite2D" type="Sprite2D" parent="VBoxContainer/Control"]
-position = Vector2(209, 197)
+position = Vector2(207, 199)
+scale = Vector2(1.01, 1)
 texture = ExtResource("1_pl8xk")
 
 [node name="DamangeLabel" type="Label" parent="VBoxContainer/Control"]

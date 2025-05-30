@@ -38,7 +38,7 @@ public partial class BattlePositionPanel : Panel
 		if (unit != null)
 		{
 			AddChild(unit);
-			unit.Position = Vector2.Zero;
+			unit.Position = Vector2.Zero + new Vector2(0, -25);
 			unit.battlePosition = PanelIndex;
 		}
 	}

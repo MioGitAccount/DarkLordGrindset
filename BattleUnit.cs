@@ -23,7 +23,6 @@ public partial class BattleUnit : Node2D
 	public override void _Ready()
 	{
 		healthBar = GetNode<ProgressBar>("VBoxContainer/ProgressBar");
-		if(alive)
 		healthBar.Value = battleStats.getCurrentHeathInProcent();
 		damangeLabel = GetNode<Label>("VBoxContainer/Control/DamangeLabel");
 		unitImage = GetNode<Godot.Sprite2D>("VBoxContainer/Control/Sprite2D");

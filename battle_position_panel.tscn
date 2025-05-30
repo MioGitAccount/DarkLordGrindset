@@ -3,6 +3,7 @@
 [ext_resource type="Script" path="res://BattlePositionPanel.cs" id="1_7gbjg"]
 
 [node name="BattlePositionPanel" type="Panel"]
-custom_minimum_size = Vector2(100, 100)
-anchors_preset = -1
+custom_minimum_size = Vector2(115, 115)
+offset_right = 115.0
+offset_bottom = 114.0
 script = ExtResource("1_7gbjg")
