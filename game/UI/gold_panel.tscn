@@ -1,0 +1,10 @@
+[gd_scene load_steps=3 format=3 uid="uid://ykx71v7jaffu"]
+
+[ext_resource type="PackedScene" uid="uid://dvwm1u0yxbaqq" path="res://game/UI/resource_panel.tscn" id="1_xv5p0"]
+[ext_resource type="Texture2D" uid="uid://dukydt8s8rika" path="res://images/resources/gold.png" id="2_5ksrp"]
+
+[node name="GoldPanel" instance=ExtResource("1_xv5p0")]
+
+[node name="TextureRect" parent="." index="1"]
+offset_right = 121.0
+texture = ExtResource("2_5ksrp")

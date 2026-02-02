@@ -1,0 +1,14 @@
+[gd_scene load_steps=2 format=3 uid="uid://d07r7c7njqtd6"]
+
+[ext_resource type="Script" path="res://game/UI/unitsUI/UnitEntry.cs" id="1_qalx4"]
+
+[node name="UnitEntry" type="Panel"]
+custom_minimum_size = Vector2(50, 50)
+script = ExtResource("1_qalx4")
+
+[node name="IconRect" type="TextureRect" parent="."]
+custom_minimum_size = Vector2(50, 50)
+layout_mode = 0
+offset_right = 40.0
+offset_bottom = 40.0
+expand_mode = 4

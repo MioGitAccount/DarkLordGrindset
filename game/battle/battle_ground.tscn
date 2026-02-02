@@ -1,40 +1,40 @@
 [gd_scene load_steps=10 format=3 uid="uid://dgd7ebhu4fh0b"]
 
-[ext_resource type="Script" path="res://BattleGround.cs" id="1_447mj"]
-[ext_resource type="Script" path="res://BattleUIControler.cs" id="2_d8o16"]
-[ext_resource type="PackedScene" uid="uid://lrhnerqp23xf" path="res://battle_unit.tscn" id="2_x6jbc"]
-[ext_resource type="Script" path="res://BattleStats.cs" id="4_hlgf8"]
+[ext_resource type="Script" path="res://game/battle/BattleGround.cs" id="1_447mj"]
+[ext_resource type="Script" path="res://game/battle/BattleUIControler.cs" id="2_d8o16"]
+[ext_resource type="PackedScene" uid="uid://lrhnerqp23xf" path="res://game/battle/battle_unit.tscn" id="2_x6jbc"]
+[ext_resource type="Script" path="res://game/units/BattleStats.cs" id="4_5oj21"]
 
 [sub_resource type="Resource" id="Resource_dbmps"]
-script = ExtResource("4_hlgf8")
+script = ExtResource("4_5oj21")
 attack = 4
 defence = 2
 health = 15
 maxHealth = 15
 
 [sub_resource type="Resource" id="Resource_i3nxr"]
-script = ExtResource("4_hlgf8")
+script = ExtResource("4_5oj21")
 attack = 2
 defence = 2
 health = 15
 maxHealth = 15
 
 [sub_resource type="Resource" id="Resource_g0th6"]
-script = ExtResource("4_hlgf8")
+script = ExtResource("4_5oj21")
 attack = 6
 defence = 0
 health = 15
 maxHealth = 20
 
 [sub_resource type="Resource" id="Resource_shmxu"]
-script = ExtResource("4_hlgf8")
+script = ExtResource("4_5oj21")
 attack = 6
 defence = 3
 health = 14
 maxHealth = 14
 
 [sub_resource type="Resource" id="Resource_6ey3f"]
-script = ExtResource("4_hlgf8")
+script = ExtResource("4_5oj21")
 attack = 7
 defence = 1
 health = 19

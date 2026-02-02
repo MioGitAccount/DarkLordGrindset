@@ -9,6 +9,9 @@ public partial class UIManager : Node
 	private TextureRect fieldImage;
 	private TextureRect unitImage;
 	private Control fieldNeutralUnits;
+	[Export] public PackedScene UnitEntryScene;
+
+	private Control fieldPlayerUnits;
 	public override void _Ready()
 	{
 		fieldGoldLabel = GetNode<Label>("../UI/BigHContainer/RightVContainer/Resources/GoldPanel/Label");
@@ -17,7 +20,8 @@ public partial class UIManager : Node
 		fieldImage.CustomMinimumSize = new Vector2(156, 282); //wtf?
 		fieldNeutralUnits = GetNode<Control>("../UI/BigHContainer/RightVContainer/Panel/PanelContainerForNeutrals/HBoxContainer");
 		unitImage = GetNode<TextureRect>("../UI/UnitVContainer/Panel/TextureRect");
-		
+		fieldPlayerUnits = GetNode<Control>("../UI/BigHContainer/RightVContainer/PanelContainerForPlayerUnits/HBoxContainer");
+
 	}
 	public void UpdateSelectionInfo(field selectedField)
 	{
@@ -25,6 +29,7 @@ public partial class UIManager : Node
 		{
 			fieldInfoLabel.Text = $"Selected Node: {selectedField.Name}";
 			UpdateNeutralUnitsInfo(selectedField);
+			UpdatePlayerUnitsInfo(selectedField);
 
 			if (selectedField.type != null)
 			{
@@ -52,23 +57,18 @@ public partial class UIManager : Node
 	{
 		Godot.Collections.Array<NeutralUnit> neutrals = selectedField.presentNeutralUnits;
 		List<Node> panels = new List<Node>(fieldNeutralUnits.GetChildren());
-		for (int i = 0; i < neutrals.Count; i++)
-		{
-			if (panels[i] is Panel)
-			{
-				TextureRect image = panels[i].GetChild<TextureRect>(0);
-				image.Texture = neutrals[i].GetIcon();
-			}
-		}
-		for(int i=neutrals.Count; i <5; i++)
-		{
-			if (panels[i] is Panel)
-			{
-				TextureRect image = panels[i].GetChild<TextureRect>(0);
-				image.Texture = null;
-			}
-		}
+		var panel = GetNode<PanelContainerForNeutrals>("../UI/BigHContainer/RightVContainer/Panel/PanelContainerForNeutrals");
+		panel.ShowUnits(neutrals);
 
+
+	}
+	
+	public void UpdatePlayerUnitsInfo(field selectedField)
+	{
+		Godot.Collections.Array<unit> playerUnits = selectedField.presentPlayerUnits;
+		List<Node> panels = new List<Node>(fieldPlayerUnits.GetChildren());
+		var panel = GetNode<PanelContainerForPlayerUnits>("../UI/BigHContainer/RightVContainer/PanelContainerForPlayerUnits");
+		panel.ShowUnits(playerUnits);
 
 	}
 	public void UpdateUnitSelectionInfo(unit selectedUnit)
@@ -76,9 +76,12 @@ public partial class UIManager : Node
 		if (selectedUnit != null)
 		{
 			Texture2D icon = selectedUnit.GetIcon();
-			if(icon != null)
+			if (icon != null)
 				unitImage.Texture = icon;
 
 		}
 	}
+	
 }
+
+

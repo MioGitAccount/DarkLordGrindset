@@ -1,17 +1,33 @@
-[gd_scene load_steps=18 format=3 uid="uid://bmw3037w1kmrt"]
+[gd_scene load_steps=22 format=3 uid="uid://bmw3037w1kmrt"]
 
-[ext_resource type="PackedScene" uid="uid://var6frhqr00x" path="res://map.tscn" id="1_h6xol"]
+[ext_resource type="Script" path="res://game/main/game.cs" id="1_64kao"]
+[ext_resource type="PackedScene" uid="uid://var6frhqr00x" path="res://game/map/map.tscn" id="1_h6xol"]
 [ext_resource type="Texture2D" uid="uid://b2e6tho8b0ct4" path="res://images/resources/DeathLandMap.jpg" id="1_xcb63"]
-[ext_resource type="Script" path="res://CameraController.cs" id="2_r28mm"]
-[ext_resource type="PackedScene" uid="uid://cud0aqm12mait" path="res://field.tscn" id="3_fsomy"]
-[ext_resource type="PackedScene" uid="uid://slm0fvupu3uq" path="res://unit.tscn" id="4_63g25"]
-[ext_resource type="Script" path="res://UnitManager.cs" id="4_lus3e"]
+[ext_resource type="Script" path="res://game/map/CameraController.cs" id="2_r28mm"]
+[ext_resource type="PackedScene" uid="uid://cud0aqm12mait" path="res://game/map/field.tscn" id="3_fsomy"]
+[ext_resource type="PackedScene" uid="uid://slm0fvupu3uq" path="res://game/units/unit.tscn" id="4_63g25"]
+[ext_resource type="Script" path="res://game/main/UnitManager.cs" id="4_lus3e"]
 [ext_resource type="Resource" uid="uid://cwtq0y8xsda4m" path="res://unit_templates/imp.tres" id="5_buf6p"]
-[ext_resource type="PackedScene" uid="uid://d2oqmhsdb8fn3" path="res://scenes/UI.tscn" id="5_n8336"]
+[ext_resource type="PackedScene" uid="uid://d2oqmhsdb8fn3" path="res://game/UI/UI.tscn" id="5_n8336"]
 [ext_resource type="Resource" uid="uid://bewribr222x3c" path="res://unit_templates/orc.tres" id="6_5s4c6"]
-[ext_resource type="Script" path="res://UIManager.cs" id="8_4ybq1"]
-[ext_resource type="Script" path="res://NeutralUnit.cs" id="9_ge3sk"]
+[ext_resource type="Script" path="res://game/units/BattleStats.cs" id="8_1outy"]
+[ext_resource type="Script" path="res://game/main/UIManager.cs" id="8_4ybq1"]
+[ext_resource type="Script" path="res://game/units/NeutralUnit.cs" id="9_ge3sk"]
 [ext_resource type="Resource" uid="uid://cbo6rewdq70yj" path="res://unit_templates/neutral_unit_templates/wolf.tres" id="10_rafuh"]
+
+[sub_resource type="Resource" id="Resource_grcv5"]
+script = ExtResource("8_1outy")
+attack = 6
+defence = 2
+health = 10
+maxHealth = 10
+
+[sub_resource type="Resource" id="Resource_i543h"]
+script = ExtResource("8_1outy")
+attack = 5
+defence = 3
+health = 10
+maxHealth = 0
 
 [sub_resource type="Resource" id="Resource_jw1ln"]
 script = ExtResource("9_ge3sk")
@@ -34,6 +50,7 @@ script = ExtResource("9_ge3sk")
 Template = ExtResource("10_rafuh")
 
 [node name="Game" type="Node2D"]
+script = ExtResource("1_64kao")
 
 [node name="Background2" type="Sprite2D" parent="."]
 position = Vector2(1526, 452)
@@ -52,18 +69,21 @@ script = ExtResource("2_r28mm")
 [node name="Imp" parent="Map/UnitList" instance=ExtResource("4_63g25")]
 position = Vector2(446, 278)
 Template = ExtResource("5_buf6p")
+battleStats = SubResource("Resource_grcv5")
 
 [node name="Orc" parent="Map/UnitList" instance=ExtResource("4_63g25")]
 position = Vector2(406, 295)
 Template = ExtResource("6_5s4c6")
+battleStats = SubResource("Resource_i543h")
 
 [node name="UnitManager" type="Node" parent="Map"]
 script = ExtResource("4_lus3e")
 
+[node name="SelectionSound" type="AudioStreamPlayer" parent="Map/UnitManager"]
+
 [node name="Field" parent="Map" instance=ExtResource("3_fsomy")]
 position = Vector2(401, 324)
 TypeName = "AutumnForest"
-presentNeutralUnits = [null]
 
 [node name="Field2" parent="Map" instance=ExtResource("3_fsomy")]
 position = Vector2(529, 334)
@@ -161,7 +181,6 @@ position = Vector2(950, 106)
 TypeName = "GrassPlains"
 
 [node name="UI" parent="." instance=ExtResource("5_n8336")]
-visible = false
 
 [node name="UIManager" type="Node" parent="."]
 script = ExtResource("8_4ybq1")

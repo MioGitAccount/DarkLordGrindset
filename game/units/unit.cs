@@ -65,6 +65,24 @@ public partial class unit : Node2D
 		isSelected = false;
 		sprite.Scale = new Vector2(0.08f, 0.08f); 
 	}
+
+	private void leaveCurrentField()
+	{
+		if (currentField != null)
+		{
+			currentField.RemovePlayerUnit(this);
+			currentField = null;
+		}
+	}
+
+	private void enterField(field newField)
+	{
+		if (newField != null)
+		{
+			newField.AddPlayerUnit(this);
+			currentField = newField;
+		}
+	}
 	public void MoveAlongPath(List<field> newPath)
 	{
 		if (newPath == null || newPath.Count < 2) return;
@@ -75,6 +93,7 @@ public partial class unit : Node2D
 		targetPos = path[pathIndex].GlobalPosition;
 		moveTimer = 0f;
 		isMoving = true;
+		leaveCurrentField();
 	}
 
 	private void MoveToNextNode()
@@ -82,7 +101,8 @@ public partial class unit : Node2D
 		if (pathIndex >= path.Count)
 		{
 			isMoving = false; // Reached final destination
-			//update field units list
+			enterField(path[path.Count - 1]);
+			
 			return;
 		}
 

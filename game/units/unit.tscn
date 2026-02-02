@@ -1,7 +1,7 @@
 [gd_scene load_steps=3 format=3 uid="uid://slm0fvupu3uq"]
 
 [ext_resource type="Texture2D" uid="uid://c41npyuyjjqth" path="res://images/Units/Imp.png" id="1_17lws"]
-[ext_resource type="Script" path="res://unit.cs" id="1_gback"]
+[ext_resource type="Script" path="res://game/units/unit.cs" id="1_gback"]
 
 [node name="Unit" type="Node2D"]
 script = ExtResource("1_gback")

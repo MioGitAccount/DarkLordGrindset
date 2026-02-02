@@ -110,21 +110,31 @@ public partial class map : Node2D
 			uIManager.UpdateSelectionInfo(selectedField);
 		}
 		else if(clickedNode is unit){
-			// Deselect the previous unit
-			if(selectedUnit != null)
-			{
-				selectedUnit.Deselect();
-			}		
 			// Select the new node
-			GD.Print(clickedNode.Name + " is selected");
-			unitManager.SelectUnit((unit)clickedNode);	
-			uIManager.UpdateUnitSelectionInfo((unit)clickedNode);
+			UnitSelected((unit)clickedNode);
 		}
+	}
+	public void UnitSelected(unit clickedUnit)
+	{
+		// Select the new node
+		GD.Print(clickedUnit.Name + " is selected");
+		unitManager.SelectUnit(clickedUnit);	
+		uIManager.UpdateUnitSelectionInfo(clickedUnit);
 	}
 	private void OnNodeRightClicked(Node2D node){
 		if(node is field)
-		unitManager.MoveSelectedUnitTo((field)node);
-		GD.Print("right click on: " + node);
+		{
+			if(unitManager.MoveSelectedUnitTo((field)node))
+			{
+				GD.Print("Moving unit to: " + node);
+				uIManager.UpdateSelectionInfo((field) node);
+			}
+			else
+			{
+				GD.Print("Cannot move unit to: " + node);
+			}
+			
+		}
 	}
 	 
 	private void ConnectAllNodes()

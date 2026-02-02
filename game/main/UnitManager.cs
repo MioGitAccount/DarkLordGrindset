@@ -6,10 +6,12 @@ public partial class UnitManager : Node
 {
 	//[Export] public PackedScene UnitScene;  // Assign `Unit.tscn` in the inspector
 	private Node unitsContainer;
-	private unit selectedUnit;
+	public unit selectedUnit{ get; set; }
+	private AudioStreamPlayer _selectSound;
 
 	public override void _Ready()
 	{
+		 _selectSound = GetNode<AudioStreamPlayer>("SelectionSound");
 		//unitsContainer = GetNode<Node>("/Game/Map/UnitList");
 	}
 
@@ -26,6 +28,16 @@ public partial class UnitManager : Node
 
 	public void SelectUnit(unit unit)
 	{
+		if(selectedUnit != null)
+		{
+			selectedUnit.Deselect();
+			var sound = unit.Template?.SelectSound;
+			if (sound != null)
+			{
+				_selectSound.Stream = sound;
+				_selectSound.Play();
+			}
+		}		
 		selectedUnit = unit;
 		unit.Select();
 	}
@@ -57,12 +69,13 @@ public partial class UnitManager : Node
 		}
 
 	}
-	public void MoveSelectedUnitTo(field targetNode)
+	public bool MoveSelectedUnitTo(field targetNode)
 	{
-		if (selectedUnit == null || selectedUnit.currentField == null || selectedUnit.isMoving) return;
+		if (selectedUnit == null || selectedUnit.currentField == null || selectedUnit.isMoving) return false;
 
 		List<field> path = PathFindingUtil.FindPath(selectedUnit.currentField, targetNode);
 		GD.Print("Path size: " + path.Count);
 		selectedUnit.MoveAlongPath(path);
+		return true;
 	}
 }

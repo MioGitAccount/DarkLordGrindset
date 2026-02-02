@@ -44,4 +44,13 @@ public partial class field : Node2D
 		return Position.DistanceTo(point) <= radius; // Check if within range
 	}
 
+	public void AddPlayerUnit(unit newUnit)
+	{
+		presentPlayerUnits.Add(newUnit);
+	}
+	public void RemovePlayerUnit(unit unitToRemove)
+	{
+		presentPlayerUnits.Remove(unitToRemove);
+	}
+
 }

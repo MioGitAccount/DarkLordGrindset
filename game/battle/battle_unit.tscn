@@ -1,6 +1,6 @@
 [gd_scene load_steps=3 format=3 uid="uid://lrhnerqp23xf"]
 
-[ext_resource type="Script" path="res://BattleUnit.cs" id="1_mr3yw"]
+[ext_resource type="Script" path="res://game/battle/BattleUnit.cs" id="1_mr3yw"]
 [ext_resource type="Texture2D" uid="uid://c41npyuyjjqth" path="res://images/Units/Imp.png" id="1_pl8xk"]
 
 [node name="BattleUnit" type="Node2D"]
