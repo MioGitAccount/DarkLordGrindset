@@ -1,13 +1,20 @@
 using Godot;
 using System;
+using System.Collections;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 
 public partial class unit : Node2D
 {
 	[Export] public string UnitType = "Warrior";  // Type of unit
 	[Export] public UnitTemplate Template;
 	[Export] public BattleStats battleStats;
+
+	[Export] public float VisibilityRadius = 200f; // Radius for visibility
+
+	[Export] public Godot.Collections.Array<Ability> Abilities = new Godot.Collections.Array<Ability>();
 	private Godot.Sprite2D sprite { get; set; }
+	public AbilityRunner abilityRunner { get; set; }
 	private bool isSelected;
 	private float radius = 20f; // Set a radius for detection
 	public field currentField{ get; set; }
@@ -21,12 +28,17 @@ public partial class unit : Node2D
 	private Vector2 targetPos;
 	private float moveTimer;
 
+	private FogOfWar _fogOfWar;
+
 	public override void _Ready()
 	{
+		_fogOfWar =  GetNode<FogOfWar>("/root/Game/Map/FogOfWar");
+		
 		sprite = GetNode<Godot.Sprite2D>("Sprite2D");
 		sprite.Scale = new Vector2(0.08f, 0.08f);
 		sprite.Texture = GetIcon();
-		
+		abilityRunner = GetNode<AbilityRunner>("AbilityRunner");
+		RevealArea();
 		
 	}
 	public Texture2D GetIcon()
@@ -102,13 +114,14 @@ public partial class unit : Node2D
 		{
 			isMoving = false; // Reached final destination
 			enterField(path[path.Count - 1]);
-			
+			RevealArea(); // Reveal area at final position
 			return;
 		}
 
 		startPos = GlobalPosition;
 		targetPos = path[pathIndex].GlobalPosition;
 		moveTimer = 0f;
+		RevealArea(); // Reveal area at new position
 	}
 	public void MoveTo(field newField)
 	{
@@ -119,5 +132,14 @@ public partial class unit : Node2D
 		GD.Print("Moving to: " + position);
 		Position = position;
 	}
+	
+	public void RevealArea()
+	{
+		if (_fogOfWar != null)
+		{
+			_fogOfWar.RevealAnimated(Position, VisibilityRadius);
+		}
+	}
+
 
 }

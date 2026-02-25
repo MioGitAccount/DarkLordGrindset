@@ -1,6 +1,6 @@
 [gd_scene load_steps=2 format=3 uid="uid://db6m60oqtm1ui"]
 
-[ext_resource type="Script" path="res://game/UI/ResourcesHolder.cs" id="1_ka5bm"]
+[ext_resource type="Script" path="res://game/map/resources/ResourcesHolder.cs" id="1_5njjg"]
 
 [node name="ResourcesHolder" type="Node2D"]
-script = ExtResource("1_ka5bm")
+script = ExtResource("1_5njjg")

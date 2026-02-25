@@ -1,7 +1,8 @@
-[gd_scene load_steps=3 format=3 uid="uid://slm0fvupu3uq"]
+[gd_scene load_steps=4 format=3 uid="uid://slm0fvupu3uq"]
 
 [ext_resource type="Texture2D" uid="uid://c41npyuyjjqth" path="res://images/Units/Imp.png" id="1_17lws"]
 [ext_resource type="Script" path="res://game/units/unit.cs" id="1_gback"]
+[ext_resource type="Script" path="res://game/units/AbilityRunner.cs" id="3_ksiks"]
 
 [node name="Unit" type="Node2D"]
 script = ExtResource("1_gback")
@@ -12,3 +13,6 @@ script = ExtResource("1_gback")
 position = Vector2(9.53674e-07, 0)
 scale = Vector2(0.08, 0.08)
 texture = ExtResource("1_17lws")
+
+[node name="AbilityRunner" type="Node" parent="."]
+script = ExtResource("3_ksiks")

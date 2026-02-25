@@ -1,0 +1,10 @@
+[gd_resource type="Resource" script_class="ResourceDrainAbility" load_steps=3 format=3 uid="uid://eef4tg2vrqhq"]
+
+[ext_resource type="Script" path="res://game/abilities/mapAbilities/ResourceDrainAbility.cs" id="1_2mtxx"]
+[ext_resource type="Texture2D" uid="uid://b0gygbitc8vij" path="res://images/resources/wood.png" id="1_8gxsi"]
+
+[resource]
+script = ExtResource("1_2mtxx")
+DrainAmount = 1
+Name = "Cut"
+Icon = ExtResource("1_8gxsi")

@@ -15,6 +15,10 @@ run/main_scene="res://game/map/map.tscn"
 config/features=PackedStringArray("4.2", "C#", "Forward Plus")
 config/icon="res://icon.svg"
 
+[autoload]
+
+GlobalTickManager="*res://game/main/GlobalTickManager.cs"
+
 [dotnet]
 
 project/assembly_name="DeathLand"

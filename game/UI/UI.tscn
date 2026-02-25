@@ -1,8 +1,10 @@
-[gd_scene load_steps=12 format=3 uid="uid://d2oqmhsdb8fn3"]
+[gd_scene load_steps=16 format=3 uid="uid://d2oqmhsdb8fn3"]
 
 [ext_resource type="PackedScene" uid="uid://ykx71v7jaffu" path="res://game/UI/gold_panel.tscn" id="1_6tog4"]
+[ext_resource type="Script" path="res://game/UI/PanelContainerForResources.cs" id="1_d6vvm"]
 [ext_resource type="Texture2D" uid="uid://bqep5x4vfa77c" path="res://images/Cave.png" id="1_psass"]
 [ext_resource type="PackedScene" uid="uid://xpqe4k100als" path="res://game/UI/wood_panel.tscn" id="2_hqfiw"]
+[ext_resource type="PackedScene" uid="uid://dvwm1u0yxbaqq" path="res://game/UI/resource_panel.tscn" id="2_kbymv"]
 [ext_resource type="PackedScene" uid="uid://dgd7ebhu4fh0b" path="res://game/battle/battle_ground.tscn" id="4_2tdiq"]
 [ext_resource type="Script" path="res://game/UI/unitsUI/PanelContainerForNeutrals.cs" id="4_t24s8"]
 [ext_resource type="Script" path="res://game/UI/unitsUI/PanelContainerForPlayerUnits.cs" id="4_u7sea"]
@@ -10,6 +12,8 @@
 [ext_resource type="PackedScene" uid="uid://d07r7c7njqtd6" path="res://game/UI/unitsUI/unit_entry.tscn" id="5_d45l4"]
 [ext_resource type="PackedScene" uid="uid://c0bsf3syvvpk4" path="res://game/UI/unitsUI/neutral_unit_entry.tscn" id="5_vs10q"]
 [ext_resource type="Script" path="res://game/UI/unitsUI/UnitStatsPanel.cs" id="8_jh1dx"]
+[ext_resource type="Script" path="res://game/UI/UnitAbilityContainer.cs" id="10_0dnka"]
+[ext_resource type="PackedScene" uid="uid://snx6jbpyvlae" path="res://game/UI/ability_entry.tscn" id="11_u17c4"]
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_jv2aq"]
 bg_color = Color(0.0980392, 0.0980392, 0.0980392, 1)
@@ -28,19 +32,13 @@ custom_minimum_size = Vector2(300, 0)
 layout_mode = 2
 size_flags_horizontal = 10
 
-[node name="Resources" type="HBoxContainer" parent="BigHContainer/RightVContainer"]
-custom_minimum_size = Vector2(100, 40)
+[node name="PanelContainerForResources" type="PanelContainer" parent="BigHContainer/RightVContainer"]
+custom_minimum_size = Vector2(0, 40)
 layout_mode = 2
-size_flags_horizontal = 8
-size_flags_vertical = 8
+script = ExtResource("1_d6vvm")
+ResourcePanelScene = ExtResource("2_kbymv")
 
-[node name="GoldPanel" parent="BigHContainer/RightVContainer/Resources" instance=ExtResource("1_6tog4")]
-custom_minimum_size = Vector2(120, 40)
-layout_mode = 2
-size_flags_horizontal = 4
-
-[node name="WoodPanel" parent="BigHContainer/RightVContainer/Resources" instance=ExtResource("2_hqfiw")]
-custom_minimum_size = Vector2(120, 40)
+[node name="HBoxContainer" type="HBoxContainer" parent="BigHContainer/RightVContainer/PanelContainerForResources"]
 layout_mode = 2
 
 [node name="Panel" type="Panel" parent="BigHContainer/RightVContainer"]
@@ -104,10 +102,12 @@ alignment = 1
 [node name="GoldPanel" parent="HBoxContainer" instance=ExtResource("1_6tog4")]
 custom_minimum_size = Vector2(120, 0)
 layout_mode = 2
+script = null
 
 [node name="WoodPanel" parent="HBoxContainer" instance=ExtResource("2_hqfiw")]
 custom_minimum_size = Vector2(120, 0)
 layout_mode = 2
+script = null
 
 [node name="Panel" type="Panel" parent="."]
 anchors_preset = 7
@@ -130,11 +130,12 @@ scale = Vector2(0.5, 0.5)
 anchors_preset = 2
 anchor_top = 1.0
 anchor_bottom = 1.0
-offset_top = -233.0
+offset_top = -284.0
 offset_right = 227.0
 grow_vertical = 0
 size_flags_horizontal = 0
 size_flags_vertical = 8
+theme_override_constants/separation = 0
 alignment = 1
 
 [node name="Panel" type="Panel" parent="UnitVContainer"]
@@ -150,6 +151,15 @@ offset_right = 213.0
 offset_bottom = 222.0
 texture = ExtResource("5_ancib")
 expand_mode = 1
+
+[node name="UnitAbilityContainer" type="PanelContainer" parent="UnitVContainer"]
+custom_minimum_size = Vector2(0, 45)
+layout_mode = 2
+script = ExtResource("10_0dnka")
+AbilityEntryScene = ExtResource("11_u17c4")
+
+[node name="HBoxContainer" type="HBoxContainer" parent="UnitVContainer/UnitAbilityContainer"]
+layout_mode = 2
 
 [node name="UnitStatsPanel" type="Panel" parent="." node_paths=PackedStringArray("NameLabel", "HpLabel", "AttackLabel", "DefenseLabel")]
 custom_minimum_size = Vector2(100, 160)
