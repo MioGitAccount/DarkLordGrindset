@@ -1,5 +1,7 @@
 using Godot;
 using System;
+using System.Collections.Generic;
+
 
 public partial class PanelContainerForResources : PanelContainer
 {
@@ -11,7 +13,7 @@ public partial class PanelContainerForResources : PanelContainer
 		_resourceListContainer = GetNode<Control>("HBoxContainer");
 	}
 
-	public void ShowResources(Godot.Collections.Array<ResourceInstance> resources)
+	public void ShowResources(List<ResourceInstance> resources)
 	{
 		//_resourceListContainer.QueueFreeChildren();
 		foreach (var child in _resourceListContainer.GetChildren())

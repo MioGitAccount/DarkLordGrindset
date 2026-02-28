@@ -3,15 +3,15 @@
 importer="texture"
 type="CompressedTexture2D"
 uid="uid://bdqtjy1kdk63h"
-path="res://.godot/imported/GrassCrossRoads.png-958ace9f64ea23349f407688a73b1097.ctex"
+path="res://.godot/imported/GrassCrossRoads.png-8dd5c2ece9fdae927490fe59fa020ad0.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://images/GrassCrossRoads.png"
-dest_files=["res://.godot/imported/GrassCrossRoads.png-958ace9f64ea23349f407688a73b1097.ctex"]
+source_file="res://images/Bioms/GrassCrossRoads.png"
+dest_files=["res://.godot/imported/GrassCrossRoads.png-8dd5c2ece9fdae927490fe59fa020ad0.ctex"]
 
 [params]
 

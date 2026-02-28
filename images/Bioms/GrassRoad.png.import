@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://2nwmteg3t8ed"
-path="res://.godot/imported/OreMine.png-06333b5d969e57bb66ad23d75df0d1cc.ctex"
+uid="uid://dpweveo52d6xr"
+path="res://.godot/imported/GrassRoad.png-975af3918710d8dad4a03903b3f5d504.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://images/OreMine.png"
-dest_files=["res://.godot/imported/OreMine.png-06333b5d969e57bb66ad23d75df0d1cc.ctex"]
+source_file="res://images/Bioms/GrassRoad.png"
+dest_files=["res://.godot/imported/GrassRoad.png-975af3918710d8dad4a03903b3f5d504.ctex"]
 
 [params]
 

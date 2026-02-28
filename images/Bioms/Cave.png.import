@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://7sveurkj45uy"
-path="res://.godot/imported/SpringForest.png-f6443db3e793a2e426b273d8f9efacf0.ctex"
+uid="uid://bqep5x4vfa77c"
+path="res://.godot/imported/Cave.png-47d3417c835d3e6242eb1a409c50c7f4.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://images/SpringForest.png"
-dest_files=["res://.godot/imported/SpringForest.png-f6443db3e793a2e426b273d8f9efacf0.ctex"]
+source_file="res://images/Bioms/Cave.png"
+dest_files=["res://.godot/imported/Cave.png-47d3417c835d3e6242eb1a409c50c7f4.ctex"]
 
 [params]
 

@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://cil0hcdda2cvy"
-path="res://.godot/imported/Bridge.jpg-0be190f062fb02d058955f966690e100.ctex"
+uid="uid://7sveurkj45uy"
+path="res://.godot/imported/SpringForest.png-45ffec59d785cc80a0f45c14c063294d.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://images/Bridge.jpg"
-dest_files=["res://.godot/imported/Bridge.jpg-0be190f062fb02d058955f966690e100.ctex"]
+source_file="res://images/Bioms/SpringForest.png"
+dest_files=["res://.godot/imported/SpringForest.png-45ffec59d785cc80a0f45c14c063294d.ctex"]
 
 [params]
 

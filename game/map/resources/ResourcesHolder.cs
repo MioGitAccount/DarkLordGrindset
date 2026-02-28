@@ -1,12 +1,10 @@
 using Godot;
 using System;
+using System.Collections.Generic;
 
 public partial class ResourcesHolder : Node2D
 {
-	[Export]
 	public ResourceInstance wood;
-
-	[Export]
 	public ResourceInstance gold;
 	
 	
@@ -36,11 +34,11 @@ public partial class ResourcesHolder : Node2D
 		}
 	}
 
-	public Godot.Collections.Array<ResourceInstance> Resources
+	public List<ResourceInstance> Resources
 	{
 		get
 		{
-			var list = new Godot.Collections.Array<ResourceInstance>();
+			var list = new List<ResourceInstance>();
 			if (wood != null) list.Add(wood);
 			if (gold != null) list.Add(gold);
 			return list;
@@ -73,23 +71,21 @@ public partial class ResourcesHolder : Node2D
 	private void setWood(float amount, float regenRate)
 	{
 		if (wood == null)
-			wood = new ResourceInstance();
-		wood.CurrentAmount = amount/2;
-		wood.MaxAmount = amount;
-		wood.RegenRate = regenRate;
-		wood.type = ResourceType.Wood;
-		AddChild(wood);
+			wood = new ResourceInstance(ResourceType.Wood, amount/2, amount, regenRate);
 	}
 
 	private void setGold(float amount, float regenRate)
 	{
 		if (gold == null)
-			gold = new ResourceInstance();
-		gold.CurrentAmount = amount/2;
-		gold.MaxAmount = amount;
-		gold.RegenRate = regenRate;
-		gold.type = ResourceType.Gold;
-		AddChild(gold);
+			gold = new ResourceInstance(ResourceType.Gold, amount/2, amount, regenRate);
+	}
+	public void stopDrainingResource(ResourceType type, unit source)
+	{
+		ResourceInstance resource = GetResourceByType(type);
+		if (resource != null)
+		{
+			resource.StopDraining(source);
+		}
 	}
 
 	

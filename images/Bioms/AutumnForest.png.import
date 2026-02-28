@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://bb60n5g8gybqf"
-path="res://.godot/imported/GrassPlains.png-5252bc0bf04e8149946f7656c9d10d30.ctex"
+uid="uid://cic74myocttei"
+path="res://.godot/imported/AutumnForest.png-690f90b89dbab2fefb33a5afc3c59c8f.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://images/GrassPlains.png"
-dest_files=["res://.godot/imported/GrassPlains.png-5252bc0bf04e8149946f7656c9d10d30.ctex"]
+source_file="res://images/Bioms/AutumnForest.png"
+dest_files=["res://.godot/imported/AutumnForest.png-690f90b89dbab2fefb33a5afc3c59c8f.ctex"]
 
 [params]
 

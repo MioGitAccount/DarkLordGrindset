@@ -5,13 +5,9 @@ using System.Threading.Tasks.Dataflow;
 
 public partial class ResourceInstance
 {
-	[Export]
 	public float CurrentAmount{ get; set; }
-	[Export]
 	public float MaxAmount { get; set; }
-	[Export]
 	public float RegenRate { get; set; }
-	[Export]
 	public ResourceType type{ get; set; }
 
 	public event Action<float> OnAmountChanged;
@@ -19,8 +15,12 @@ public partial class ResourceInstance
 	private readonly List<ResourceDrainRequest> _activeDrains = new();
 
 
-	public  override void _Ready()
+	public ResourceInstance(ResourceType type, float initialAmount, float maxAmount, float regenRate)
 	{
+		this.type = type;
+		CurrentAmount = initialAmount;
+		MaxAmount = maxAmount;
+		RegenRate = regenRate;
 		GlobalTickManager.Instance.OnTick += HandleTick;
 	}
 	private void HandleTick()

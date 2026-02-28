@@ -105,7 +105,7 @@ TypeName = "GrassCrossRoads"
 [node name="Field5" parent="Map" instance=ExtResource("3_fsomy")]
 position = Vector2(791, 325)
 scale = Vector2(1.07, 1)
-TypeName = "GrassPlains"
+TypeName = "GrassRoad"
 
 [node name="Field6" parent="Map" instance=ExtResource("3_fsomy")]
 position = Vector2(747, 253)
@@ -116,7 +116,7 @@ presentNeutralUnits = [SubResource("Resource_jw1ln")]
 [node name="Field7" parent="Map" instance=ExtResource("3_fsomy")]
 position = Vector2(858, 258)
 scale = Vector2(0.913249, 0.854191)
-TypeName = "GrassCrossRoads"
+TypeName = "GrassRoad"
 
 [node name="Field8" parent="Map" instance=ExtResource("3_fsomy")]
 position = Vector2(939, 272)
@@ -131,7 +131,7 @@ TypeName = "Bridge"
 [node name="Field10" parent="Map" instance=ExtResource("3_fsomy")]
 position = Vector2(750, 454)
 scale = Vector2(0.913249, 0.854191)
-TypeName = "GrassPlains"
+TypeName = "GrassRoad"
 
 [node name="Field11" parent="Map" instance=ExtResource("3_fsomy")]
 position = Vector2(835, 465)
@@ -184,10 +184,43 @@ TypeName = "Village"
 position = Vector2(950, 106)
 TypeName = "GrassPlains"
 
+[node name="Field23" parent="Map" instance=ExtResource("3_fsomy")]
+position = Vector2(1015, 144)
+TypeName = "GrassPlains"
+
+[node name="Field24" parent="Map" instance=ExtResource("3_fsomy")]
+position = Vector2(694, 0)
+TypeName = "GrassPlains"
+
+[node name="Field25" parent="Map" instance=ExtResource("3_fsomy")]
+position = Vector2(590, -4)
+TypeName = "GrassPlains"
+
+[node name="Field29" parent="Map" instance=ExtResource("3_fsomy")]
+position = Vector2(511, 34)
+TypeName = "GrassPlains"
+
+[node name="Field30" parent="Map" instance=ExtResource("3_fsomy")]
+position = Vector2(424, 39)
+TypeName = "GrassPlains"
+
+[node name="Field26" parent="Map" instance=ExtResource("3_fsomy")]
+position = Vector2(513, -26)
+TypeName = "SpringForest"
+
+[node name="Field27" parent="Map" instance=ExtResource("3_fsomy")]
+position = Vector2(534, -88)
+TypeName = "SpringForest"
+
+[node name="Field28" parent="Map" instance=ExtResource("3_fsomy")]
+position = Vector2(604, -116)
+TypeName = "GrassPlains"
+
 [node name="FogOfWar" type="Node2D" parent="Map"]
 script = ExtResource("14_ho7uh")
 
 [node name="UI" parent="." instance=ExtResource("5_n8336")]
+visible = false
 
 [node name="UIManager" type="Node" parent="."]
 script = ExtResource("8_4ybq1")

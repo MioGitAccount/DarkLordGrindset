@@ -63,7 +63,7 @@ public partial class UIManager : Node
 	}
 	public void UpdatePlayerResourcesInfo(field selectedField)
 	{
-		Godot.Collections.Array<ResourceInstance> resources = selectedField.resourcesHolder.Resources;
+		List<ResourceInstance> resources = selectedField.resourcesHolder.Resources;
 		var panel = GetNode<PanelContainerForResources>("../UI/BigHContainer/RightVContainer/PanelContainerForResources");
 		panel.ShowResources(resources);	
 	}

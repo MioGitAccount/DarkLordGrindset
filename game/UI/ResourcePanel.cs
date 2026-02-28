@@ -36,6 +36,12 @@ public partial class ResourcePanel : Panel
 				return null;
 		}
 	}
+	public override void _ExitTree()
+	{
+		if (BoundResource != null)
+			BoundResource.OnAmountChanged -= UpdateAmount;
+	}
+	
 	
 
 

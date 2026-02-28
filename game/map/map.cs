@@ -16,7 +16,10 @@ public partial class map : Node2D
 		("Field13","Field14"),("Field7","Field15"),("Field15","Field16"),
 		("Field16","Field17"),("Field17","Field18"),("Field18","Field19"),
 		("Field19","Field20"),("Field20","Field21"),("Field20","Field22"),
-		("Field22","Field15")
+		("Field22","Field15"),("Field22","Field23"),("Field18","Field24"),
+		("Field24","Field25"),("Field25","Field26"),("Field26","Field27"),
+		("Field27","Field28"),("Field25","Field29"),("Field29","Field30")
+
 	};
 	private List<unit> units = new List<unit>();
 	UnitManager unitManager;

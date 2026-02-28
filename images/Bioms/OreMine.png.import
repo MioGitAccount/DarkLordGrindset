@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://cic74myocttei"
-path="res://.godot/imported/AutumnForest.png-50effeddfcd368af5cc68e1f7d396cb3.ctex"
+uid="uid://2nwmteg3t8ed"
+path="res://.godot/imported/OreMine.png-63d0d6a6d8de816483e8a6ac580ab567.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://images/AutumnForest.png"
-dest_files=["res://.godot/imported/AutumnForest.png-50effeddfcd368af5cc68e1f7d396cb3.ctex"]
+source_file="res://images/Bioms/OreMine.png"
+dest_files=["res://.godot/imported/OreMine.png-63d0d6a6d8de816483e8a6ac580ab567.ctex"]
 
 [params]
 

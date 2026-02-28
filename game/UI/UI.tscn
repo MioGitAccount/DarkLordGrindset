@@ -2,9 +2,9 @@
 
 [ext_resource type="PackedScene" uid="uid://ykx71v7jaffu" path="res://game/UI/gold_panel.tscn" id="1_6tog4"]
 [ext_resource type="Script" path="res://game/UI/PanelContainerForResources.cs" id="1_d6vvm"]
-[ext_resource type="Texture2D" uid="uid://bqep5x4vfa77c" path="res://images/Cave.png" id="1_psass"]
 [ext_resource type="PackedScene" uid="uid://xpqe4k100als" path="res://game/UI/wood_panel.tscn" id="2_hqfiw"]
 [ext_resource type="PackedScene" uid="uid://dvwm1u0yxbaqq" path="res://game/UI/resource_panel.tscn" id="2_kbymv"]
+[ext_resource type="Texture2D" uid="uid://bqep5x4vfa77c" path="res://images/Bioms/Cave.png" id="3_mqhgo"]
 [ext_resource type="PackedScene" uid="uid://dgd7ebhu4fh0b" path="res://game/battle/battle_ground.tscn" id="4_2tdiq"]
 [ext_resource type="Script" path="res://game/UI/unitsUI/PanelContainerForNeutrals.cs" id="4_t24s8"]
 [ext_resource type="Script" path="res://game/UI/unitsUI/PanelContainerForPlayerUnits.cs" id="4_u7sea"]
@@ -61,7 +61,7 @@ offset_bottom = 230.0
 grow_horizontal = 2
 grow_vertical = 2
 size_flags_horizontal = 4
-texture = ExtResource("1_psass")
+texture = ExtResource("3_mqhgo")
 expand_mode = 1
 
 [node name="PanelContainerForNeutrals" type="PanelContainer" parent="BigHContainer/RightVContainer/Panel" node_paths=PackedStringArray("StatsPanel")]
