@@ -1,198 +1,238 @@
-[gd_scene load_steps=16 format=3 uid="uid://d2oqmhsdb8fn3"]
+[gd_scene load_steps=8 format=3 uid="uid://d2oqmhsdb8fn3"]
 
-[ext_resource type="PackedScene" uid="uid://ykx71v7jaffu" path="res://game/UI/gold_panel.tscn" id="1_6tog4"]
-[ext_resource type="Script" path="res://game/UI/PanelContainerForResources.cs" id="1_d6vvm"]
-[ext_resource type="PackedScene" uid="uid://xpqe4k100als" path="res://game/UI/wood_panel.tscn" id="2_hqfiw"]
-[ext_resource type="PackedScene" uid="uid://dvwm1u0yxbaqq" path="res://game/UI/resource_panel.tscn" id="2_kbymv"]
-[ext_resource type="Texture2D" uid="uid://bqep5x4vfa77c" path="res://images/Bioms/Cave.png" id="3_mqhgo"]
-[ext_resource type="PackedScene" uid="uid://dgd7ebhu4fh0b" path="res://game/battle/battle_ground.tscn" id="4_2tdiq"]
-[ext_resource type="Script" path="res://game/UI/unitsUI/PanelContainerForNeutrals.cs" id="4_t24s8"]
-[ext_resource type="Script" path="res://game/UI/unitsUI/PanelContainerForPlayerUnits.cs" id="4_u7sea"]
-[ext_resource type="Texture2D" uid="uid://c41npyuyjjqth" path="res://images/Units/Imp.png" id="5_ancib"]
-[ext_resource type="PackedScene" uid="uid://d07r7c7njqtd6" path="res://game/UI/unitsUI/unit_entry.tscn" id="5_d45l4"]
-[ext_resource type="PackedScene" uid="uid://c0bsf3syvvpk4" path="res://game/UI/unitsUI/neutral_unit_entry.tscn" id="5_vs10q"]
-[ext_resource type="Script" path="res://game/UI/unitsUI/UnitStatsPanel.cs" id="8_jh1dx"]
-[ext_resource type="Script" path="res://game/UI/UnitAbilityContainer.cs" id="10_0dnka"]
-[ext_resource type="PackedScene" uid="uid://snx6jbpyvlae" path="res://game/UI/ability_entry.tscn" id="11_u17c4"]
+[ext_resource type="Script" path="res://game/UI/UIManager.cs" id="1_mgr"]
+[ext_resource type="Theme" uid="uid://8ig4gbhiqwx5" path="res://game/UI/theme/hud_theme.tres" id="2_theme"]
+[ext_resource type="PackedScene" path="res://game/UI/widgets/resource_counter.tscn" id="3_counter"]
+[ext_resource type="PackedScene" path="res://game/UI/widgets/icon_slot.tscn" id="4_slot"]
+[ext_resource type="Script" path="res://game/UI/FieldInfoPanel.cs" id="5_field"]
+[ext_resource type="Script" path="res://game/UI/SelectedUnitPanel.cs" id="6_unit"]
+[ext_resource type="PackedScene" uid="uid://dgd7ebhu4fh0b" path="res://game/battle/battle_ground.tscn" id="7_battle"]
 
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_jv2aq"]
-bg_color = Color(0.0980392, 0.0980392, 0.0980392, 1)
+[node name="UI" type="CanvasLayer" node_paths=PackedStringArray("FieldInfo", "SelectedUnit", "PlayerGold", "PlayerWood", "BattleOverlay", "BattleButton", "CloseBattleButton")]
+script = ExtResource("1_mgr")
+FieldInfo = NodePath("HUD/FieldInfo")
+SelectedUnit = NodePath("HUD/SelectedUnit")
+PlayerGold = NodePath("HUD/TopBar/HBox/PlayerGold")
+PlayerWood = NodePath("HUD/TopBar/HBox/PlayerWood")
+BattleOverlay = NodePath("HUD/BattleOverlay")
+BattleButton = NodePath("HUD/TopBar/HBox/BattleButton")
+CloseBattleButton = NodePath("HUD/BattleOverlay/VBox/Header/CloseBattleButton")
 
-[node name="Ui" type="CanvasLayer"]
-
-[node name="BigHContainer" type="HBoxContainer" parent="."]
+[node name="HUD" type="Control" parent="."]
+layout_mode = 3
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
+mouse_filter = 2
+theme = ExtResource("2_theme")
 
-[node name="RightVContainer" type="VBoxContainer" parent="BigHContainer"]
+[node name="TopBar" type="PanelContainer" parent="HUD"]
+layout_mode = 0
+offset_left = 8.0
+offset_top = 8.0
+offset_right = 48.0
+offset_bottom = 48.0
+
+[node name="HBox" type="HBoxContainer" parent="HUD/TopBar"]
+layout_mode = 2
+theme_override_constants/separation = 16
+
+[node name="PlayerGold" parent="HUD/TopBar/HBox" instance=ExtResource("3_counter")]
+layout_mode = 2
+
+[node name="PlayerWood" parent="HUD/TopBar/HBox" instance=ExtResource("3_counter")]
+layout_mode = 2
+Type = 1
+
+[node name="VSeparator" type="VSeparator" parent="HUD/TopBar/HBox"]
+layout_mode = 2
+
+[node name="BattleButton" type="Button" parent="HUD/TopBar/HBox"]
+layout_mode = 2
+tooltip_text = "Open the battle screen (work in progress)"
+focus_mode = 0
+text = "Battle"
+
+[node name="FieldInfo" type="PanelContainer" parent="HUD" node_paths=PackedStringArray("TitleLabel", "FieldImage", "ResourcesRow", "NeutralSection", "NeutralUnitsRow", "PlayerUnitsEmptyLabel", "PlayerUnitsRow")]
+layout_mode = 1
+anchors_preset = 1
+anchor_left = 1.0
+anchor_right = 1.0
+offset_left = -298.0
+offset_top = 8.0
+offset_right = -8.0
+offset_bottom = 48.0
+grow_horizontal = 0
+script = ExtResource("5_field")
+IconSlotScene = ExtResource("4_slot")
+ResourceCounterScene = ExtResource("3_counter")
+TitleLabel = NodePath("VBox/TitleLabel")
+FieldImage = NodePath("VBox/FieldImage")
+ResourcesRow = NodePath("VBox/ResourcesRow")
+NeutralSection = NodePath("VBox/NeutralSection")
+NeutralUnitsRow = NodePath("VBox/NeutralSection/NeutralUnitsRow")
+PlayerUnitsEmptyLabel = NodePath("VBox/PlayerSection/PlayerUnitsEmptyLabel")
+PlayerUnitsRow = NodePath("VBox/PlayerSection/PlayerUnitsRow")
+
+[node name="VBox" type="VBoxContainer" parent="HUD/FieldInfo"]
+layout_mode = 2
+theme_override_constants/separation = 8
+
+[node name="TitleLabel" type="Label" parent="HUD/FieldInfo/VBox"]
+layout_mode = 2
+theme_type_variation = &"HeaderLabel"
+text = "Field"
+horizontal_alignment = 1
+
+[node name="FieldImage" type="TextureRect" parent="HUD/FieldInfo/VBox"]
+custom_minimum_size = Vector2(0, 200)
+layout_mode = 2
+mouse_filter = 2
+expand_mode = 1
+stretch_mode = 6
+
+[node name="ResourcesRow" type="HBoxContainer" parent="HUD/FieldInfo/VBox"]
+layout_mode = 2
+theme_override_constants/separation = 20
+alignment = 1
+
+[node name="NeutralSection" type="VBoxContainer" parent="HUD/FieldInfo/VBox"]
+layout_mode = 2
+
+[node name="HSeparator" type="HSeparator" parent="HUD/FieldInfo/VBox/NeutralSection"]
+layout_mode = 2
+
+[node name="NeutralHeader" type="Label" parent="HUD/FieldInfo/VBox/NeutralSection"]
+layout_mode = 2
+theme_type_variation = &"MutedLabel"
+text = "Hostiles"
+
+[node name="NeutralUnitsRow" type="HFlowContainer" parent="HUD/FieldInfo/VBox/NeutralSection"]
+layout_mode = 2
+
+[node name="PlayerSection" type="VBoxContainer" parent="HUD/FieldInfo/VBox"]
+layout_mode = 2
+
+[node name="HSeparator" type="HSeparator" parent="HUD/FieldInfo/VBox/PlayerSection"]
+layout_mode = 2
+
+[node name="PlayerHeader" type="Label" parent="HUD/FieldInfo/VBox/PlayerSection"]
+layout_mode = 2
+theme_type_variation = &"MutedLabel"
+text = "Your units"
+
+[node name="PlayerUnitsEmptyLabel" type="Label" parent="HUD/FieldInfo/VBox/PlayerSection"]
+layout_mode = 2
+text = "None here"
+
+[node name="PlayerUnitsRow" type="HFlowContainer" parent="HUD/FieldInfo/VBox/PlayerSection"]
+layout_mode = 2
+
+[node name="SelectedUnit" type="PanelContainer" parent="HUD" node_paths=PackedStringArray("Portrait", "NameLabel", "StatsLabel", "LocationLabel", "AbilitiesSection", "AbilitiesRow")]
 custom_minimum_size = Vector2(300, 0)
-layout_mode = 2
-size_flags_horizontal = 10
+layout_mode = 1
+anchors_preset = 2
+anchor_top = 1.0
+anchor_bottom = 1.0
+offset_left = 8.0
+offset_top = -48.0
+offset_right = 308.0
+offset_bottom = -8.0
+grow_vertical = 0
+script = ExtResource("6_unit")
+IconSlotScene = ExtResource("4_slot")
+Portrait = NodePath("VBox/Summary/Portrait")
+NameLabel = NodePath("VBox/Summary/Details/NameLabel")
+StatsLabel = NodePath("VBox/Summary/Details/StatsLabel")
+LocationLabel = NodePath("VBox/Summary/Details/LocationLabel")
+AbilitiesSection = NodePath("VBox/AbilitiesSection")
+AbilitiesRow = NodePath("VBox/AbilitiesSection/AbilitiesRow")
 
-[node name="PanelContainerForResources" type="PanelContainer" parent="BigHContainer/RightVContainer"]
-custom_minimum_size = Vector2(0, 40)
+[node name="VBox" type="VBoxContainer" parent="HUD/SelectedUnit"]
 layout_mode = 2
-script = ExtResource("1_d6vvm")
-ResourcePanelScene = ExtResource("2_kbymv")
+theme_override_constants/separation = 8
 
-[node name="HBoxContainer" type="HBoxContainer" parent="BigHContainer/RightVContainer/PanelContainerForResources"]
+[node name="Summary" type="HBoxContainer" parent="HUD/SelectedUnit/VBox"]
+layout_mode = 2
+theme_override_constants/separation = 10
+
+[node name="Portrait" type="TextureRect" parent="HUD/SelectedUnit/VBox/Summary"]
+custom_minimum_size = Vector2(96, 96)
+layout_mode = 2
+mouse_filter = 2
+expand_mode = 1
+stretch_mode = 5
+
+[node name="Details" type="VBoxContainer" parent="HUD/SelectedUnit/VBox/Summary"]
+layout_mode = 2
+size_flags_horizontal = 3
+alignment = 1
+
+[node name="NameLabel" type="Label" parent="HUD/SelectedUnit/VBox/Summary/Details"]
+layout_mode = 2
+theme_type_variation = &"HeaderLabel"
+text = "Unit"
+
+[node name="StatsLabel" type="Label" parent="HUD/SelectedUnit/VBox/Summary/Details"]
+layout_mode = 2
+autowrap_mode = 3
+
+[node name="LocationLabel" type="Label" parent="HUD/SelectedUnit/VBox/Summary/Details"]
+layout_mode = 2
+theme_type_variation = &"MutedLabel"
+
+[node name="AbilitiesSection" type="VBoxContainer" parent="HUD/SelectedUnit/VBox"]
 layout_mode = 2
 
-[node name="Panel" type="Panel" parent="BigHContainer/RightVContainer"]
-custom_minimum_size = Vector2(300, 500)
+[node name="HSeparator" type="HSeparator" parent="HUD/SelectedUnit/VBox/AbilitiesSection"]
 layout_mode = 2
-theme_override_styles/panel = SubResource("StyleBoxFlat_jv2aq")
 
-[node name="FieldImage" type="TextureRect" parent="BigHContainer/RightVContainer/Panel"]
-custom_minimum_size = Vector2(280, 460)
+[node name="AbilitiesHeader" type="Label" parent="HUD/SelectedUnit/VBox/AbilitiesSection"]
+layout_mode = 2
+theme_type_variation = &"MutedLabel"
+text = "Abilities"
+
+[node name="AbilitiesRow" type="HFlowContainer" parent="HUD/SelectedUnit/VBox/AbilitiesSection"]
+layout_mode = 2
+
+[node name="BattleOverlay" type="PanelContainer" parent="HUD"]
+visible = false
 layout_mode = 1
 anchors_preset = 8
 anchor_left = 0.5
 anchor_top = 0.5
 anchor_right = 0.5
 anchor_bottom = 0.5
-offset_left = -140.0
-offset_top = -230.0
-offset_right = 140.0
-offset_bottom = 230.0
+offset_left = -20.0
+offset_top = -20.0
+offset_right = 20.0
+offset_bottom = 20.0
 grow_horizontal = 2
 grow_vertical = 2
-size_flags_horizontal = 4
-texture = ExtResource("3_mqhgo")
-expand_mode = 1
 
-[node name="PanelContainerForNeutrals" type="PanelContainer" parent="BigHContainer/RightVContainer/Panel" node_paths=PackedStringArray("StatsPanel")]
-custom_minimum_size = Vector2(0, 60)
-layout_mode = 2
-offset_left = 17.0
-offset_top = 422.0
-offset_right = 302.0
-offset_bottom = 482.0
-script = ExtResource("4_t24s8")
-NeutralUnitEntryScene = ExtResource("5_vs10q")
-StatsPanel = NodePath("../../../../UnitStatsPanel")
-
-[node name="HBoxContainer" type="HBoxContainer" parent="BigHContainer/RightVContainer/Panel/PanelContainerForNeutrals"]
+[node name="VBox" type="VBoxContainer" parent="HUD/BattleOverlay"]
 layout_mode = 2
 
-[node name="FieldLabel" type="Label" parent="BigHContainer/RightVContainer"]
+[node name="Header" type="HBoxContainer" parent="HUD/BattleOverlay/VBox"]
 layout_mode = 2
 
-[node name="PanelContainerForPlayerUnits" type="PanelContainer" parent="BigHContainer/RightVContainer" node_paths=PackedStringArray("StatsPanel")]
-custom_minimum_size = Vector2(0, 60)
+[node name="Title" type="Label" parent="HUD/BattleOverlay/VBox/Header"]
 layout_mode = 2
-script = ExtResource("4_u7sea")
-UnitEntryScene = ExtResource("5_d45l4")
-StatsPanel = NodePath("../../../UnitStatsPanel")
+size_flags_horizontal = 3
+theme_type_variation = &"HeaderLabel"
+text = "Battle"
 
-[node name="HBoxContainer" type="HBoxContainer" parent="BigHContainer/RightVContainer/PanelContainerForPlayerUnits"]
+[node name="CloseBattleButton" type="Button" parent="HUD/BattleOverlay/VBox/Header"]
 layout_mode = 2
+focus_mode = 0
+text = "Close"
 
-[node name="HBoxContainer" type="HBoxContainer" parent="."]
-custom_minimum_size = Vector2(500, 40)
-offset_right = 500.0
-offset_bottom = 40.0
-size_flags_horizontal = 0
-size_flags_vertical = 0
-alignment = 1
-
-[node name="GoldPanel" parent="HBoxContainer" instance=ExtResource("1_6tog4")]
-custom_minimum_size = Vector2(120, 0)
+[node name="BattleHolder" type="Control" parent="HUD/BattleOverlay/VBox"]
+custom_minimum_size = Vector2(577, 325)
 layout_mode = 2
-script = null
+mouse_filter = 2
 
-[node name="WoodPanel" parent="HBoxContainer" instance=ExtResource("2_hqfiw")]
-custom_minimum_size = Vector2(120, 0)
-layout_mode = 2
-script = null
-
-[node name="Panel" type="Panel" parent="."]
-anchors_preset = 7
-anchor_left = 0.5
-anchor_top = 1.0
-anchor_right = 0.5
-anchor_bottom = 1.0
-offset_left = -295.0
-offset_top = -339.0
-offset_right = 295.0
-grow_horizontal = 2
-grow_vertical = 0
-size_flags_vertical = 8
-
-[node name="BattleGround" parent="Panel" instance=ExtResource("4_2tdiq")]
-position = Vector2(5, 8)
+[node name="BattleGround" parent="HUD/BattleOverlay/VBox/BattleHolder" instance=ExtResource("7_battle")]
 scale = Vector2(0.5, 0.5)
-
-[node name="UnitVContainer" type="VBoxContainer" parent="."]
-anchors_preset = 2
-anchor_top = 1.0
-anchor_bottom = 1.0
-offset_top = -284.0
-offset_right = 227.0
-grow_vertical = 0
-size_flags_horizontal = 0
-size_flags_vertical = 8
-theme_override_constants/separation = 0
-alignment = 1
-
-[node name="Panel" type="Panel" parent="UnitVContainer"]
-layout_mode = 2
-size_flags_vertical = 3
-
-[node name="TextureRect" type="TextureRect" parent="UnitVContainer/Panel"]
-custom_minimum_size = Vector2(200, 200)
-layout_mode = 0
-offset_left = 13.0
-offset_top = 22.0
-offset_right = 213.0
-offset_bottom = 222.0
-texture = ExtResource("5_ancib")
-expand_mode = 1
-
-[node name="UnitAbilityContainer" type="PanelContainer" parent="UnitVContainer"]
-custom_minimum_size = Vector2(0, 45)
-layout_mode = 2
-script = ExtResource("10_0dnka")
-AbilityEntryScene = ExtResource("11_u17c4")
-
-[node name="HBoxContainer" type="HBoxContainer" parent="UnitVContainer/UnitAbilityContainer"]
-layout_mode = 2
-
-[node name="UnitStatsPanel" type="Panel" parent="." node_paths=PackedStringArray("NameLabel", "HpLabel", "AttackLabel", "DefenseLabel")]
-custom_minimum_size = Vector2(100, 160)
-offset_left = 852.0
-offset_top = 564.0
-offset_right = 976.0
-offset_bottom = 724.0
-script = ExtResource("8_jh1dx")
-NameLabel = NodePath("MarginContainer/VBoxContainer/NameLabel")
-HpLabel = NodePath("MarginContainer/VBoxContainer/HPLabel")
-AttackLabel = NodePath("MarginContainer/VBoxContainer/AttackLabel")
-DefenseLabel = NodePath("MarginContainer/VBoxContainer/DefenceLabel")
-
-[node name="MarginContainer" type="MarginContainer" parent="UnitStatsPanel"]
-layout_mode = 0
-offset_right = 40.0
-offset_bottom = 40.0
-theme_override_constants/margin_left = 8
-theme_override_constants/margin_top = 12
-theme_override_constants/margin_right = 8
-theme_override_constants/margin_bottom = 12
-
-[node name="VBoxContainer" type="VBoxContainer" parent="UnitStatsPanel/MarginContainer"]
-layout_mode = 2
-
-[node name="NameLabel" type="Label" parent="UnitStatsPanel/MarginContainer/VBoxContainer"]
-layout_mode = 2
-
-[node name="HPLabel" type="Label" parent="UnitStatsPanel/MarginContainer/VBoxContainer"]
-layout_mode = 2
-
-[node name="AttackLabel" type="Label" parent="UnitStatsPanel/MarginContainer/VBoxContainer"]
-layout_mode = 2
-
-[node name="DefenceLabel" type="Label" parent="UnitStatsPanel/MarginContainer/VBoxContainer"]
-layout_mode = 2

@@ -11,7 +11,7 @@ config_version=5
 [application]
 
 config/name="DeathLand"
-run/main_scene="res://game/map/map.tscn"
+run/main_scene="res://game/main/game.tscn"
 config/features=PackedStringArray("4.2", "C#", "Forward Plus")
 config/icon="res://icon.svg"
 
@@ -22,6 +22,10 @@ GlobalTickManager="*res://game/main/GlobalTickManager.cs"
 [dotnet]
 
 project/assembly_name="DeathLand"
+
+[gui]
+
+timers/tooltip_delay_sec=0.25
 
 [input]
 

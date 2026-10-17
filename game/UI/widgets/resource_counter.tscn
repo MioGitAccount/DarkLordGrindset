@@ -1,0 +1,19 @@
+[gd_scene load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://game/UI/widgets/ResourceCounter.cs" id="1_counter"]
+
+[node name="ResourceCounter" type="HBoxContainer"]
+theme_override_constants/separation = 6
+script = ExtResource("1_counter")
+
+[node name="Icon" type="TextureRect" parent="."]
+custom_minimum_size = Vector2(26, 26)
+layout_mode = 2
+mouse_filter = 2
+expand_mode = 1
+stretch_mode = 5
+
+[node name="Amount" type="Label" parent="."]
+custom_minimum_size = Vector2(36, 0)
+layout_mode = 2
+text = "0"

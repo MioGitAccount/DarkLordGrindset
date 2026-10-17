@@ -1,0 +1,39 @@
+{
+	"source": "res://tools/sprites/source/imp_concept.webp",
+	"output_dir": "res://images/Units/sprites",
+	"size": 64,
+	"bg_tolerance": 0.11,
+	"palette_size": 24,
+	"outline": [20, 24, 28],
+	"ground_y": 54,
+	"min_island": 16,
+	"enhance": { "saturation": 1.25, "value_offset": 0.04, "value_gain": 1.45 },
+	"eyes": [[408, 243], [492, 243]],
+	"eye_colour": [255, 220, 70],
+	"eye_rim": [230, 60, 40],
+	"parts": {
+		"left_leg": [19, 47, 11, 15],
+		"right_leg": [30, 47, 13, 15],
+		"tail": [43, 42, 10, 14]
+	},
+	"animations": [
+		{
+			"name": "idle",
+			"speed": 2.5,
+			"frames": [
+				{},
+				{ "body": [0, 1], "tail": [1, 1] }
+			]
+		},
+		{
+			"name": "walk",
+			"speed": 7.0,
+			"frames": [
+				{ "left_leg": [0, -2] },
+				{ "body": [0, 1], "tail": [1, 1] },
+				{ "right_leg": [0, -2] },
+				{ "body": [0, 1], "tail": [1, 1] }
+			]
+		}
+	]
+}

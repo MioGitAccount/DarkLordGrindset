@@ -1,0 +1,10 @@
+[gd_scene load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://game/UI/widgets/IconSlot.cs" id="1_slot"]
+
+[node name="IconSlot" type="Button"]
+custom_minimum_size = Vector2(48, 48)
+focus_mode = 0
+icon_alignment = 1
+expand_icon = true
+script = ExtResource("1_slot")

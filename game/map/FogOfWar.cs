@@ -1,101 +1,132 @@
 using Godot;
 using System;
 
+public enum FogState
+{
+	Unexplored, // never seen: drawn black
+	Explored,   // seen before, no unit in range now: drawn grey ("last seen")
+	Visible,    // a player unit sees it right now
+}
+
+// Two-layer fog of war on a coarse grid (CellSize world pixels per cell).
+// Each cell stores "explored" (permanent) and "visible" (recomputed from the units
+// in ViewerGroup every UpdateInterval, easing in/out). fog.gdshader turns that into
+// black / grey / clear on top of the map.
 public partial class FogOfWar : Node2D
 {
+	public const string ViewerGroup = "fog_viewers"; // nodes with a VisibilityRadius
+
 	[Export] public int MapWidth = 3072;
 	[Export] public int MapHeight = 3072;
+	[Export] public int CellSize = 8;
+	[Export] public float UpdateInterval = 0.1f;
+	[Export] public float FadeSpeed = 2f; // visibility change per second (1 = one second fade)
 
-	private Image _fogImage;
-	private ImageTexture _fogTexture;
-	private Sprite2D _fogSprite;
+	// Raised after every fog update, so others can re-check fog states
+	public event Action Updated;
+
+	private int _w;
+	private int _h;
+	private float[] _visible;
+	private float[] _target;
+	private float[] _explored;
+	private byte[] _pixels;
+	private Image _image;
+	private ImageTexture _texture;
+	private double _timer;
 
 	public override void _EnterTree()
 	{
-		InitializeFog();
+		_w = Mathf.CeilToInt(MapWidth / (float)CellSize);
+		_h = Mathf.CeilToInt(MapHeight / (float)CellSize);
+		_visible = new float[_w * _h];
+		_target = new float[_w * _h];
+		_explored = new float[_w * _h];
+		_pixels = new byte[_w * _h * 2];
+		_image = Image.CreateFromData(_w, _h, false, Image.Format.Rg8, _pixels);
+		_texture = ImageTexture.CreateFromImage(_image);
+
+		var sprite = new Sprite2D
+		{
+			Texture = _texture,
+			Centered = true,
+			Scale = new Vector2(CellSize, CellSize),
+			TextureFilter = TextureFilterEnum.Linear,
+			Material = new ShaderMaterial { Shader = GD.Load<Shader>("res://game/map/fog.gdshader") },
+		};
+		AddChild(sprite);
 	}
 
-	private void InitializeFog()
+	public override void _Process(double delta)
 	{
-		// Create black fog image
-		_fogImage = Image.Create(MapWidth, MapHeight, false, Image.Format.Rgba8);
-		_fogImage.Fill(Colors.Black);
+		_timer += delta;
+		if (_timer < UpdateInterval)
+			return;
+		Recompute((float)_timer);
+		_timer = 0;
+	}
 
-		_fogTexture = ImageTexture.CreateFromImage(_fogImage);
-
-		_fogSprite = new Sprite2D();
-		_fogSprite.Texture = _fogTexture;
-
-		// Important: must match your Map sprite setup
-		_fogSprite.Centered = true;
-		_fogSprite.Position = Vector2.Zero;
-
-		AddChild(_fogSprite);
+	public FogState GetState(Vector2 worldPosition)
+	{
+		Vector2 cell = (ToLocal(worldPosition) + new Vector2(MapWidth, MapHeight) / 2f) / CellSize;
+		int x = (int)cell.X;
+		int y = (int)cell.Y;
+		if (x < 0 || y < 0 || x >= _w || y >= _h)
+			return FogState.Visible; // outside the fogged area
+		int i = y * _w + x;
+		if (_visible[i] >= 0.5f)
+			return FogState.Visible;
+		return _explored[i] >= 0.5f ? FogState.Explored : FogState.Unexplored;
 	}
 
 	public void ResetFog()
 	{
-		if (_fogImage == null)
-			return;
-
-		_fogImage.Fill(Colors.Black);
-		_fogTexture.Update(_fogImage);
+		Array.Clear(_visible);
+		Array.Clear(_explored);
+		Recompute(0);
 	}
 
-	public void RevealArea(Vector2 worldPosition, float radius)
+	private void Recompute(float elapsed)
 	{
-		if (_fogImage == null)
-			return;
-
-		// Convert world → map local coordinates
-		Vector2 localPos = ToLocal(worldPosition);
-
-		// Convert center-based coords → texture (top-left origin)
-		Vector2 texturePos = localPos + (Vector2)_fogImage.GetSize() / 2f;
-
-		int r = (int)radius;
-
-		for (int x = -r; x <= r; x++)
+		Array.Clear(_target);
+		foreach (Node node in GetTree().GetNodesInGroup(ViewerGroup))
 		{
-			for (int y = -r; y <= r; y++)
-			{
-				if (x * x + y * y <= r * r)
-				{
-					int px = (int)texturePos.X + x;
-					int py = (int)texturePos.Y + y;
-
-					if (px >= 0 && py >= 0 && px < MapWidth && py < MapHeight)
-					{
-						_fogImage.SetPixel(px, py, new Color(0, 0, 0, 0));
-					}
-				}
-			}
+			if (node is unit viewer)
+				Stamp(viewer.GlobalPosition, viewer.VisibilityRadius);
 		}
 
-		_fogTexture.Update(_fogImage);
+		float step = FadeSpeed * elapsed;
+		for (int i = 0; i < _visible.Length; i++)
+		{
+			_visible[i] = Mathf.MoveToward(_visible[i], _target[i], step);
+			_explored[i] = Mathf.Max(_explored[i], _visible[i]);
+			_pixels[i * 2] = (byte)(_explored[i] * 255);
+			_pixels[i * 2 + 1] = (byte)(_visible[i] * 255);
+		}
+		_image.SetData(_w, _h, false, Image.Format.Rg8, _pixels);
+		_texture.Update(_image);
+		Updated?.Invoke();
 	}
 
-public async void RevealAnimated(Vector2 worldPosition, float finalRadius, float duration = 1f)
-{
-	float elapsed = 0f;
-
-	while (elapsed < duration)
+	// Marks a circle as visible, with a soft edge two cells wide
+	private void Stamp(Vector2 worldPosition, float radius)
 	{
-		float t = elapsed / duration;
-
-		// Optional: ease-out for nicer feel
-		float eased = Mathf.SmoothStep(0f, 1f, t);
-
-		float currentRadius = Mathf.Lerp(0f, finalRadius, eased);
-
-		RevealArea(worldPosition, currentRadius);
-
-		await ToSignal(GetTree(), SceneTree.SignalName.ProcessFrame);
-
-		elapsed += (float)GetProcessDeltaTime();
+		Vector2 center = (ToLocal(worldPosition) + new Vector2(MapWidth, MapHeight) / 2f) / CellSize;
+		float r = radius / CellSize;
+		int x0 = Math.Max(0, (int)(center.X - r));
+		int x1 = Math.Min(_w - 1, (int)(center.X + r));
+		int y0 = Math.Max(0, (int)(center.Y - r));
+		int y1 = Math.Min(_h - 1, (int)(center.Y + r));
+		for (int y = y0; y <= y1; y++)
+		{
+			for (int x = x0; x <= x1; x++)
+			{
+				float d = new Vector2(x + 0.5f, y + 0.5f).DistanceTo(center);
+				float v = Mathf.Clamp((r - d) / 2f, 0f, 1f);
+				int i = y * _w + x;
+				if (v > _target[i])
+					_target[i] = v;
+			}
+		}
 	}
-
-	// Ensure full radius at end
-	RevealArea(worldPosition, finalRadius);
-}
 }

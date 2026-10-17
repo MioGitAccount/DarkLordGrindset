@@ -1,9 +1,10 @@
-[gd_resource type="Resource" script_class="UnitTemplate" load_steps=6 format=3 uid="uid://cwtq0y8xsda4m"]
+[gd_resource type="Resource" script_class="UnitTemplate" load_steps=7 format=3 uid="uid://cwtq0y8xsda4m"]
 
 [ext_resource type="Script" path="res://game/units/BattleStats.cs" id="1_e1v2y"]
 [ext_resource type="Script" path="res://game/units/UnitTemplate.cs" id="1_y4khv"]
 [ext_resource type="Texture2D" uid="uid://c41npyuyjjqth" path="res://images/Units/Imp.png" id="2_vajrq"]
 [ext_resource type="AudioStream" uid="uid://djn8mnlxgewb" path="res://sound/unitSound/click2.ogg" id="3_h5yr5"]
+[ext_resource type="SpriteFrames" uid="uid://baklxkda1i7ka" path="res://images/Units/sprites/imp_frames.tres" id="4_frames"]
 
 [sub_resource type="Resource" id="Resource_geemo"]
 script = ExtResource("1_e1v2y")
@@ -11,10 +12,13 @@ attack = 5
 defence = 2
 health = 15
 maxHealth = 15
+initiative = 0
+rangeUnit = false
 
 [resource]
 script = ExtResource("1_y4khv")
 Name = "Imp"
 Icon = ExtResource("2_vajrq")
+MapSprite = ExtResource("4_frames")
 SelectSound = ExtResource("3_h5yr5")
 DefaultStats = SubResource("Resource_geemo")

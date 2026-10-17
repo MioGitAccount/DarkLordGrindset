@@ -1,4 +1,4 @@
-[gd_scene load_steps=25 format=3 uid="uid://bmw3037w1kmrt"]
+[gd_scene load_steps=24 format=3 uid="uid://bmw3037w1kmrt"]
 
 [ext_resource type="Script" path="res://game/main/game.cs" id="1_64kao"]
 [ext_resource type="PackedScene" uid="uid://var6frhqr00x" path="res://game/map/map.tscn" id="1_h6xol"]
@@ -12,7 +12,6 @@
 [ext_resource type="Resource" uid="uid://bewribr222x3c" path="res://unit_templates/orc.tres" id="6_5s4c6"]
 [ext_resource type="Script" path="res://game/units/BattleStats.cs" id="8_1outy"]
 [ext_resource type="Resource" uid="uid://eef4tg2vrqhq" path="res://resources/abilities/CuttingTrees.tres" id="8_4oqi1"]
-[ext_resource type="Script" path="res://game/main/UIManager.cs" id="8_4ybq1"]
 [ext_resource type="Script" path="res://game/units/NeutralUnit.cs" id="9_ge3sk"]
 [ext_resource type="Resource" uid="uid://cbo6rewdq70yj" path="res://unit_templates/neutral_unit_templates/wolf.tres" id="10_rafuh"]
 [ext_resource type="Script" path="res://game/map/FogOfWar.cs" id="14_ho7uh"]
@@ -24,6 +23,8 @@ attack = 6
 defence = 2
 health = 10
 maxHealth = 10
+initiative = 0
+rangeUnit = false
 
 [sub_resource type="Resource" id="Resource_i543h"]
 script = ExtResource("8_1outy")
@@ -31,6 +32,8 @@ attack = 5
 defence = 3
 health = 10
 maxHealth = 0
+initiative = 0
+rangeUnit = false
 
 [sub_resource type="Resource" id="Resource_jw1ln"]
 script = ExtResource("9_ge3sk")
@@ -70,13 +73,13 @@ script = ExtResource("2_r28mm")
 [node name="UnitList" type="Node" parent="Map"]
 
 [node name="Imp" parent="Map/UnitList" instance=ExtResource("4_63g25")]
-position = Vector2(446, 278)
+position = Vector2(383, 327)
 Template = ExtResource("5_buf6p")
 battleStats = SubResource("Resource_grcv5")
 Abilities = [ExtResource("8_4oqi1")]
 
 [node name="Orc" parent="Map/UnitList" instance=ExtResource("4_63g25")]
-position = Vector2(406, 295)
+position = Vector2(406, 303)
 Template = ExtResource("6_5s4c6")
 battleStats = SubResource("Resource_i543h")
 
@@ -220,10 +223,6 @@ TypeName = "GrassPlains"
 script = ExtResource("14_ho7uh")
 
 [node name="UI" parent="." instance=ExtResource("5_n8336")]
-visible = false
-
-[node name="UIManager" type="Node" parent="."]
-script = ExtResource("8_4ybq1")
 
 [node name="GlobalTickManager" type="Node" parent="."]
 script = ExtResource("16_nryd8")

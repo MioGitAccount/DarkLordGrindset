@@ -11,6 +11,8 @@ attack = 4
 defence = 2
 health = 15
 maxHealth = 15
+initiative = 0
+rangeUnit = false
 
 [sub_resource type="Resource" id="Resource_i3nxr"]
 script = ExtResource("4_5oj21")
@@ -18,6 +20,8 @@ attack = 2
 defence = 2
 health = 15
 maxHealth = 15
+initiative = 0
+rangeUnit = false
 
 [sub_resource type="Resource" id="Resource_g0th6"]
 script = ExtResource("4_5oj21")
@@ -25,6 +29,8 @@ attack = 6
 defence = 0
 health = 15
 maxHealth = 20
+initiative = 0
+rangeUnit = false
 
 [sub_resource type="Resource" id="Resource_shmxu"]
 script = ExtResource("4_5oj21")
@@ -32,6 +38,8 @@ attack = 6
 defence = 3
 health = 14
 maxHealth = 14
+initiative = 0
+rangeUnit = false
 
 [sub_resource type="Resource" id="Resource_6ey3f"]
 script = ExtResource("4_5oj21")
@@ -39,6 +47,8 @@ attack = 7
 defence = 1
 health = 19
 maxHealth = 20
+initiative = 0
+rangeUnit = false
 
 [node name="BattleGround" type="Node2D"]
 script = ExtResource("1_447mj")
@@ -105,14 +115,14 @@ offset_bottom = 457.0
 size_flags_horizontal = 0
 size_flags_vertical = 0
 
-[node name="PanelContainerLeft2" type="Panel" parent="Panel"]
+[node name="PanelContainerRight" type="Panel" parent="Panel"]
 layout_mode = 0
 offset_left = 582.0
 offset_top = 158.0
 offset_right = 1157.0
 offset_bottom = 650.0
 
-[node name="Panel" type="Panel" parent="Panel/PanelContainerLeft2"]
+[node name="Panel" type="Panel" parent="Panel/PanelContainerRight"]
 custom_minimum_size = Vector2(100, 100)
 layout_mode = 2
 offset_left = 335.0
@@ -122,7 +132,7 @@ offset_bottom = 250.0
 size_flags_horizontal = 0
 size_flags_vertical = 0
 
-[node name="Panel2" type="Panel" parent="Panel/PanelContainerLeft2"]
+[node name="Panel2" type="Panel" parent="Panel/PanelContainerRight"]
 custom_minimum_size = Vector2(100, 100)
 layout_mode = 0
 offset_left = 334.0
@@ -132,7 +142,7 @@ offset_bottom = 380.0
 size_flags_horizontal = 0
 size_flags_vertical = 0
 
-[node name="Panel3" type="Panel" parent="Panel/PanelContainerLeft2"]
+[node name="Panel3" type="Panel" parent="Panel/PanelContainerRight"]
 custom_minimum_size = Vector2(100, 100)
 layout_mode = 0
 offset_left = 178.0
@@ -142,7 +152,7 @@ offset_bottom = 174.0
 size_flags_horizontal = 0
 size_flags_vertical = 0
 
-[node name="Panel4" type="Panel" parent="Panel/PanelContainerLeft2"]
+[node name="Panel4" type="Panel" parent="Panel/PanelContainerRight"]
 custom_minimum_size = Vector2(100, 100)
 layout_mode = 0
 offset_left = 178.0
@@ -152,7 +162,7 @@ offset_bottom = 318.0
 size_flags_horizontal = 0
 size_flags_vertical = 0
 
-[node name="Panel5" type="Panel" parent="Panel/PanelContainerLeft2"]
+[node name="Panel5" type="Panel" parent="Panel/PanelContainerRight"]
 custom_minimum_size = Vector2(100, 100)
 layout_mode = 0
 offset_left = 177.0
@@ -174,6 +184,11 @@ layout_mode = 2
 size_flags_horizontal = 4
 size_flags_vertical = 4
 text = "Attack"
+
+[node name="PanelContainerAbove" type="Panel" parent="Panel"]
+layout_mode = 0
+offset_right = 899.0
+offset_bottom = 151.0
 
 [node name="BattleUnitListLeft" type="Node2D" parent="."]
 
@@ -223,7 +238,6 @@ scale = Vector2(0.28, 0.28)
 battleStats = SubResource("Resource_shmxu")
 battlePosition = 1
 alive = true
-rangeUnit = true
 
 [node name="BattleUnit5" parent="BattleUnitListRight" instance=ExtResource("2_x6jbc")]
 position = Vector2(911, 405)

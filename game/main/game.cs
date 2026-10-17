@@ -6,10 +6,13 @@ public partial class game : Node2D
 	public override void _Ready()
 	{
 		var map = GetNode<map>("Map");
-		var panel = GetNode<PanelContainerForPlayerUnits>("UI/BigHContainer/RightVContainer/PanelContainerForPlayerUnits");
+		var ui = GetNode<UIManager>("UI");
 
-		panel.UnitSelected += map.UnitSelected;
-
+		map.FieldSelected += ui.ShowField;
+		map.UnitSelected += ui.ShowUnit;
+		ui.UnitSelected += map.SelectUnit;
+		map.FieldHovered += ui.ShowFieldHover;
+		map.IsPointerOverUI = ui.IsMouseOverPanel;
 	}
 
 }
