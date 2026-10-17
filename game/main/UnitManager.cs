@@ -31,13 +31,13 @@ public partial class UnitManager : Node
 		if(selectedUnit != null)
 		{
 			selectedUnit.Deselect();
-			var sound = unit.Template?.SelectSound;
-			if (sound != null)
-			{
-				_selectSound.Stream = sound;
-				_selectSound.Play();
-			}
-		}		
+		}
+		var sound = unit.Template?.SelectSound;
+		if (sound != null)
+		{
+			_selectSound.Stream = sound;
+			_selectSound.Play();
+		}
 		selectedUnit = unit;
 		unit.Select();
 	}
@@ -65,7 +65,7 @@ public partial class UnitManager : Node
 	public void setUnitLocation(List<unit> listOfUnits, field place){
 		foreach(unit aUnit in listOfUnits)
 		{
-			aUnit.currentField = place;
+			aUnit.EnterField(place, fade: false);
 		}
 
 	}

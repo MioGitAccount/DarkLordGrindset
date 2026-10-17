@@ -1,9 +1,10 @@
-[gd_resource type="Resource" script_class="UnitTemplate" load_steps=6 format=3 uid="uid://bewribr222x3c"]
+[gd_resource type="Resource" script_class="UnitTemplate" load_steps=7 format=3 uid="uid://bewribr222x3c"]
 
 [ext_resource type="Script" path="res://game/units/BattleStats.cs" id="1_4tidt"]
 [ext_resource type="Texture2D" uid="uid://2emeyiwasn81" path="res://images/Units/orcIcon.png" id="1_jx0do"]
 [ext_resource type="Script" path="res://game/units/UnitTemplate.cs" id="1_on788"]
 [ext_resource type="AudioStream" uid="uid://djn8mnlxgewb" path="res://sound/unitSound/click2.ogg" id="3_yi7qr"]
+[ext_resource type="SpriteFrames" path="res://images/Units/sprites/orc_frames.tres" id="4_frames"]
 
 [sub_resource type="Resource" id="Resource_mlt17"]
 script = ExtResource("1_4tidt")
@@ -11,10 +12,13 @@ attack = 4
 defence = 3
 health = 20
 maxHealth = 20
+initiative = 0
+rangeUnit = false
 
 [resource]
 script = ExtResource("1_on788")
 Name = "Orc"
 Icon = ExtResource("1_jx0do")
+MapSprite = ExtResource("4_frames")
 SelectSound = ExtResource("3_yi7qr")
 DefaultStats = SubResource("Resource_mlt17")

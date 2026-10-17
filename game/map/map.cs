@@ -26,9 +26,13 @@ public partial class map : Node2D
 
 	private field selectedField = null;
 	private unit selectedUnit = null;
-	//private Label fieldInfoLabel; // Reference to UI Label
-	//private TextureRect fieldImage;
-	private UIManager uIManager;
+	// The UI listens to these (wired up in game.cs)
+	public event Action<field> FieldSelected;
+	public event Action<unit> UnitSelected;
+	public event Action<field> FieldHovered;
+	// Set by game.cs; hover is ignored while the mouse is over a UI panel
+	public Func<bool> IsPointerOverUI = () => false;
+	private field hoveredField;
 	// Called when the node enters the scene tree for the first time.
 	public override void _Ready()
 	{
@@ -45,9 +49,39 @@ public partial class map : Node2D
 		unitManager.setUnitLocation(units, fields["Field"]);
 		GD.Print("There are " + fields.Count + " fields on map");
 		QueueRedraw();
-		uIManager = GetNode<UIManager>("../UIManager");
+		var fog = GetNode<FogOfWar>("FogOfWar");
+		fog.Updated += () =>
+		{
+			foreach (var f in fields.Values)
+				f.UpdateFog(fog.GetState(f.GlobalPosition));
+		};
 
 	}
+	public override void _Process(double delta)
+	{
+		field underMouse = null;
+		if (!IsPointerOverUI())
+		{
+			Vector2 mousePosition = GetGlobalMousePosition();
+			foreach (var node in fields.Values)
+			{
+				// Nothing to show for fields that were never explored
+				if (node.Fog != FogState.Unexplored && node.IsPointInside(mousePosition))
+				{
+					underMouse = node;
+					break;
+				}
+			}
+		}
+		if (underMouse == hoveredField)
+			return;
+
+		hoveredField?.SetHovered(false);
+		hoveredField = underMouse;
+		hoveredField?.SetHovered(true);
+		FieldHovered?.Invoke(hoveredField);
+	}
+
 	public override void _Draw()
 	{
 		foreach (var connection in connections)
@@ -60,7 +94,8 @@ public partial class map : Node2D
 			}
 		}
 	}
-	public override void _Input(InputEvent inputEvent)
+	// Unhandled input, so clicks on UI panels don't also select things on the map
+	public override void _UnhandledInput(InputEvent inputEvent)
 	{
 		if (inputEvent is InputEventMouseButton mouseEvent && mouseEvent.Pressed)
 		{
@@ -103,6 +138,9 @@ public partial class map : Node2D
 	{
 		// Select the new node
 		if(clickedNode is field){
+			// Fields never explored can't be inspected (right-click can still move there)
+			if (((field)clickedNode).Fog == FogState.Unexplored)
+				return;
 			// Deselect the previous field
 			if (selectedField != null)
 			{
@@ -110,19 +148,19 @@ public partial class map : Node2D
 			}
 			selectedField = (field)clickedNode;
 			selectedField.Select();
-			uIManager.UpdateSelectionInfo(selectedField);
+			FieldSelected?.Invoke(selectedField);
 		}
 		else if(clickedNode is unit){
 			// Select the new node
-			UnitSelected((unit)clickedNode);
+			SelectUnit((unit)clickedNode);
 		}
 	}
-	public void UnitSelected(unit clickedUnit)
+	public void SelectUnit(unit clickedUnit)
 	{
 		// Select the new node
 		GD.Print(clickedUnit.Name + " is selected");
 		unitManager.SelectUnit(clickedUnit);	
-		uIManager.UpdateUnitSelectionInfo(clickedUnit);
+		UnitSelected?.Invoke(clickedUnit);
 	}
 	private void OnNodeRightClicked(Node2D node){
 		if(node is field)
@@ -130,7 +168,6 @@ public partial class map : Node2D
 			if(unitManager.MoveSelectedUnitTo((field)node))
 			{
 				GD.Print("Moving unit to: " + node);
-				uIManager.UpdateSelectionInfo((field) node);
 			}
 			else
 			{
