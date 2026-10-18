@@ -14,7 +14,7 @@ public enum FogState
 // black / grey / clear on top of the map.
 public partial class FogOfWar : Node2D
 {
-	public const string ViewerGroup = "fog_viewers"; // nodes with a VisibilityRadius
+	public const string ViewerGroup = "fog_viewers"; // units (VisibilityRadius) and castle fields (Castle.VisionRadius)
 
 	[Export] public int MapWidth = 3072;
 	[Export] public int MapHeight = 3072;
@@ -93,6 +93,8 @@ public partial class FogOfWar : Node2D
 		{
 			if (node is unit viewer)
 				Stamp(viewer.GlobalPosition, viewer.VisibilityRadius);
+			else if (node is field castleField && castleField.Castle != null)
+				Stamp(castleField.GlobalPosition, castleField.Castle.VisionRadius);
 		}
 
 		float step = FadeSpeed * elapsed;

@@ -1,0 +1,255 @@
+[gd_resource type="Resource" script_class="SkillTree" load_steps=22 format=3 uid="uid://2nlr2pmxihgv"]
+
+[ext_resource type="Script" path="res://game/units/skills/SkillTree.cs" id="1_tree"]
+[ext_resource type="Script" path="res://game/units/skills/SkillDefinition.cs" id="2_skill"]
+[ext_resource type="Resource" uid="uid://eef4tg2vrqhq" path="res://resources/abilities/CuttingTrees.tres" id="3_cut"]
+[ext_resource type="Resource" path="res://resources/abilities/MineOre.tres" id="4_mine"]
+[ext_resource type="Resource" path="res://resources/abilities/Raid.tres" id="5_raid"]
+
+[sub_resource type="Resource" id="Skill_wood_cutter"]
+script = ExtResource("2_skill")
+Name = "Wood Cutter"
+Description = "Lets the orc cut trees for wood."
+Tier = 1
+Column = 0
+Cost = 1
+Requires = []
+BonusDeadliness = 0
+BonusStrength = 0
+BonusDurability = 0
+BonusCleverness = 0
+BonusQuickness = 0
+BonusVision = 0.0
+GrantedAbility = ExtResource("3_cut")
+
+[sub_resource type="Resource" id="Skill_brawler"]
+script = ExtResource("2_skill")
+Name = "Brawler"
+Description = "Grew up fighting for scraps."
+Tier = 1
+Column = 1
+Cost = 1
+Requires = []
+BonusDeadliness = 0
+BonusStrength = 1
+BonusDurability = 0
+BonusCleverness = 0
+BonusQuickness = 0
+BonusVision = 0.0
+
+[sub_resource type="Resource" id="Skill_thick_hide"]
+script = ExtResource("2_skill")
+Name = "Thick Hide"
+Description = "Tough green skin."
+Tier = 1
+Column = 2
+Cost = 1
+Requires = []
+BonusDeadliness = 0
+BonusStrength = 0
+BonusDurability = 1
+BonusCleverness = 0
+BonusQuickness = 0
+BonusVision = 0.0
+
+[sub_resource type="Resource" id="Skill_lumberjack"]
+script = ExtResource("2_skill")
+Name = "Lumberjack"
+Description = "Fells trees with one swing."
+Tier = 2
+Column = 0
+Cost = 1
+Requires = [SubResource("Skill_wood_cutter")]
+BonusDeadliness = 0
+BonusStrength = 1
+BonusDurability = 0
+BonusCleverness = 0
+BonusQuickness = 0
+BonusVision = 0.0
+
+[sub_resource type="Resource" id="Skill_berserker"]
+script = ExtResource("2_skill")
+Name = "Berserker"
+Description = "Fights harder the angrier it gets."
+Tier = 2
+Column = 1
+Cost = 1
+Requires = [SubResource("Skill_brawler")]
+BonusDeadliness = 1
+BonusStrength = 0
+BonusDurability = 0
+BonusCleverness = 0
+BonusQuickness = 0
+BonusVision = 0.0
+
+[sub_resource type="Resource" id="Skill_iron_skin"]
+script = ExtResource("2_skill")
+Name = "Iron Skin"
+Description = "Blades just bounce off."
+Tier = 2
+Column = 2
+Cost = 1
+Requires = [SubResource("Skill_thick_hide")]
+BonusDeadliness = 0
+BonusStrength = 0
+BonusDurability = 1
+BonusCleverness = 0
+BonusQuickness = 0
+BonusVision = 0.0
+
+[sub_resource type="Resource" id="Skill_forced_march"]
+script = ExtResource("2_skill")
+Name = "Forced March"
+Description = "Marches day and night without rest."
+Tier = 3
+Column = 0
+Cost = 1
+Requires = [SubResource("Skill_lumberjack")]
+BonusDeadliness = 0
+BonusStrength = 0
+BonusDurability = 0
+BonusCleverness = 0
+BonusQuickness = 1
+BonusVision = 0.0
+
+[sub_resource type="Resource" id="Skill_war_cry"]
+script = ExtResource("2_skill")
+Name = "War Cry"
+Description = "A roar that shakes the enemy's courage."
+Tier = 3
+Column = 1
+Cost = 1
+Requires = [SubResource("Skill_berserker")]
+BonusDeadliness = 2
+BonusStrength = 0
+BonusDurability = 0
+BonusCleverness = 0
+BonusQuickness = 0
+BonusVision = 0.0
+
+[sub_resource type="Resource" id="Skill_stone_wall"]
+script = ExtResource("2_skill")
+Name = "Stone Wall"
+Description = "Holds the line no matter what."
+Tier = 3
+Column = 2
+Cost = 1
+Requires = [SubResource("Skill_iron_skin")]
+BonusDeadliness = 0
+BonusStrength = 0
+BonusDurability = 2
+BonusCleverness = 0
+BonusQuickness = 0
+BonusVision = 0.0
+
+[sub_resource type="Resource" id="Skill_scouter"]
+script = ExtResource("2_skill")
+Name = "Scouter"
+Description = "Learned to look before charging. Longer range of vision."
+Tier = 4
+Column = 0
+Cost = 1
+Requires = [SubResource("Skill_forced_march")]
+BonusDeadliness = 0
+BonusStrength = 0
+BonusDurability = 0
+BonusCleverness = 0
+BonusQuickness = 0
+BonusVision = 60.0
+
+[sub_resource type="Resource" id="Skill_bone_crusher"]
+script = ExtResource("2_skill")
+Name = "Bone Crusher"
+Description = "Hits so hard that armour stops mattering."
+Tier = 4
+Column = 1
+Cost = 1
+Requires = [SubResource("Skill_war_cry")]
+BonusDeadliness = 1
+BonusStrength = 2
+BonusDurability = 0
+BonusCleverness = 0
+BonusQuickness = 0
+BonusVision = 0.0
+
+[sub_resource type="Resource" id="Skill_unbreakable"]
+script = ExtResource("2_skill")
+Name = "Unbreakable"
+Description = "Refuses to fall."
+Tier = 4
+Column = 2
+Cost = 1
+Requires = [SubResource("Skill_stone_wall")]
+BonusDeadliness = 0
+BonusStrength = 1
+BonusDurability = 2
+BonusCleverness = 0
+BonusQuickness = 0
+BonusVision = 0.0
+
+[sub_resource type="Resource" id="Skill_warchief"]
+script = ExtResource("2_skill")
+Name = "Warchief"
+Description = "Born to lead the horde."
+Tier = 5
+Column = 1
+Cost = 1
+Requires = [SubResource("Skill_bone_crusher"), SubResource("Skill_unbreakable")]
+BonusDeadliness = 2
+BonusStrength = 2
+BonusDurability = 0
+BonusCleverness = 0
+BonusQuickness = 0
+BonusVision = 0.0
+
+[sub_resource type="Resource" id="Skill_juggernaut"]
+script = ExtResource("2_skill")
+Name = "Juggernaut"
+Description = "A walking fortress."
+Tier = 5
+Column = 2
+Cost = 1
+Requires = [SubResource("Skill_unbreakable")]
+BonusDeadliness = 0
+BonusStrength = 0
+BonusDurability = 3
+BonusCleverness = 0
+BonusQuickness = 0
+BonusVision = 0.0
+
+[sub_resource type="Resource" id="Skill_miner"]
+script = ExtResource("2_skill")
+Name = "Miner"
+Description = "Swings a pick as well as an axe. Unlocks Mine: dig ore from a field."
+Tier = 1
+Column = 3
+Cost = 1
+Requires = []
+BonusDeadliness = 0
+BonusStrength = 0
+BonusDurability = 0
+BonusCleverness = 0
+BonusQuickness = 0
+BonusVision = 0.0
+GrantedAbility = ExtResource("4_mine")
+
+[sub_resource type="Resource" id="Skill_raider"]
+script = ExtResource("2_skill")
+Name = "Raider"
+Description = "Burn, loot, repeat. Unlocks Raid: plunder gold fast, but the field stops producing for a while."
+Tier = 2
+Column = 3
+Cost = 1
+Requires = [SubResource("Skill_brawler")]
+BonusDeadliness = 0
+BonusStrength = 0
+BonusDurability = 0
+BonusCleverness = 0
+BonusQuickness = 0
+BonusVision = 0.0
+GrantedAbility = ExtResource("5_raid")
+
+[resource]
+script = ExtResource("1_tree")
+Name = "Orc"
+Skills = [SubResource("Skill_wood_cutter"), SubResource("Skill_brawler"), SubResource("Skill_thick_hide"), SubResource("Skill_lumberjack"), SubResource("Skill_berserker"), SubResource("Skill_iron_skin"), SubResource("Skill_forced_march"), SubResource("Skill_war_cry"), SubResource("Skill_stone_wall"), SubResource("Skill_scouter"), SubResource("Skill_bone_crusher"), SubResource("Skill_unbreakable"), SubResource("Skill_warchief"), SubResource("Skill_juggernaut"), SubResource("Skill_miner"), SubResource("Skill_raider")]

@@ -5,6 +5,8 @@
 
 [resource]
 script = ExtResource("1_2mtxx")
-DrainAmount = 1
+ResourceType = 1
+DrainAmount = 1.0
 Name = "Cut"
+Description = "Cut trees on the field: 1 wood per second."
 Icon = ExtResource("1_8gxsi")

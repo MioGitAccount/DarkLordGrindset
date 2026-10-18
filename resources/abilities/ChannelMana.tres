@@ -1,0 +1,12 @@
+[gd_resource type="Resource" script_class="ResourceDrainAbility" load_steps=3 format=3]
+
+[ext_resource type="Script" path="res://game/abilities/mapAbilities/ResourceDrainAbility.cs" id="1_script"]
+[ext_resource type="Texture2D" uid="uid://d2db6m5sdcpj2" path="res://images/resources/mana.png" id="2_icon"]
+
+[resource]
+script = ExtResource("1_script")
+ResourceType = 4
+DrainAmount = 1.0
+Name = "Channel Mana"
+Description = "Draw raw mana out of the field: 1 mana per second."
+Icon = ExtResource("2_icon")

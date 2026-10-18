@@ -1,4 +1,4 @@
-[gd_scene load_steps=8 format=3 uid="uid://d2oqmhsdb8fn3"]
+[gd_scene load_steps=9 format=3 uid="uid://d2oqmhsdb8fn3"]
 
 [ext_resource type="Script" path="res://game/UI/UIManager.cs" id="1_mgr"]
 [ext_resource type="Theme" uid="uid://8ig4gbhiqwx5" path="res://game/UI/theme/hud_theme.tres" id="2_theme"]
@@ -7,6 +7,7 @@
 [ext_resource type="Script" path="res://game/UI/FieldInfoPanel.cs" id="5_field"]
 [ext_resource type="Script" path="res://game/UI/SelectedUnitPanel.cs" id="6_unit"]
 [ext_resource type="PackedScene" uid="uid://dgd7ebhu4fh0b" path="res://game/battle/battle_ground.tscn" id="7_battle"]
+[ext_resource type="Script" path="res://game/UI/widgets/AttributePentagon.cs" id="8_pentagon"]
 
 [node name="UI" type="CanvasLayer" node_paths=PackedStringArray("FieldInfo", "SelectedUnit", "PlayerGold", "PlayerWood", "BattleOverlay", "BattleButton", "CloseBattleButton")]
 script = ExtResource("1_mgr")
@@ -130,7 +131,7 @@ text = "None here"
 [node name="PlayerUnitsRow" type="HFlowContainer" parent="HUD/FieldInfo/VBox/PlayerSection"]
 layout_mode = 2
 
-[node name="SelectedUnit" type="PanelContainer" parent="HUD" node_paths=PackedStringArray("Portrait", "NameLabel", "StatsLabel", "LocationLabel", "AbilitiesSection", "AbilitiesRow")]
+[node name="SelectedUnit" type="PanelContainer" parent="HUD" node_paths=PackedStringArray("Portrait", "NameLabel", "StatsLabel", "LocationLabel", "AttributesChart", "AbilitiesSection", "AbilitiesRow")]
 custom_minimum_size = Vector2(300, 0)
 layout_mode = 1
 anchors_preset = 2
@@ -147,6 +148,7 @@ Portrait = NodePath("VBox/Summary/Portrait")
 NameLabel = NodePath("VBox/Summary/Details/NameLabel")
 StatsLabel = NodePath("VBox/Summary/Details/StatsLabel")
 LocationLabel = NodePath("VBox/Summary/Details/LocationLabel")
+AttributesChart = NodePath("VBox/AttributesChart")
 AbilitiesSection = NodePath("VBox/AbilitiesSection")
 AbilitiesRow = NodePath("VBox/AbilitiesSection/AbilitiesRow")
 
@@ -182,6 +184,11 @@ autowrap_mode = 3
 [node name="LocationLabel" type="Label" parent="HUD/SelectedUnit/VBox/Summary/Details"]
 layout_mode = 2
 theme_type_variation = &"MutedLabel"
+
+[node name="AttributesChart" type="Control" parent="HUD/SelectedUnit/VBox"]
+custom_minimum_size = Vector2(0, 140)
+layout_mode = 2
+script = ExtResource("8_pentagon")
 
 [node name="AbilitiesSection" type="VBoxContainer" parent="HUD/SelectedUnit/VBox"]
 layout_mode = 2

@@ -7,6 +7,8 @@ using System;
 public partial class FieldInfoPanel : PanelContainer
 {
 	public event Action<unit> UnitClicked;
+	// The "Enter castle" button of a castle field
+	public event Action<Castle> CastleRequested;
 
 	[Export] public PackedScene IconSlotScene;
 	[Export] public PackedScene ResourceCounterScene;
@@ -21,10 +23,27 @@ public partial class FieldInfoPanel : PanelContainer
 
 	private field _field;
 	private Label _neutralHeader;
+	private Label _perksLabel;
+	private Button _castleButton;
 
 	public override void _Ready()
 	{
 		_neutralHeader = NeutralSection.GetNode<Label>("NeutralHeader");
+		// Created in code so saving UI.tscn in the editor can't drop it; sits right under the resources
+		_perksLabel = new Label
+		{
+			Name = "PerksLabel",
+			ThemeTypeVariation = "MutedLabel",
+			AutowrapMode = TextServer.AutowrapMode.WordSmart,
+			MouseFilter = MouseFilterEnum.Pass, // so the tooltip shows
+		};
+		ResourcesRow.GetParent().AddChild(_perksLabel);
+		ResourcesRow.GetParent().MoveChild(_perksLabel, ResourcesRow.GetIndex() + 1);
+		// Shown on fields with the Castle perk; opens the build window
+		_castleButton = new Button { Name = "CastleButton", Text = "Enter castle", FocusMode = FocusModeEnum.None };
+		_castleButton.Pressed += () => CastleRequested?.Invoke(_field?.Castle);
+		ResourcesRow.GetParent().AddChild(_castleButton);
+		ResourcesRow.GetParent().MoveChild(_castleButton, _perksLabel.GetIndex() + 1);
 		ShowField(null);
 	}
 
@@ -33,6 +52,17 @@ public partial class FieldInfoPanel : PanelContainer
 		if (_field != null)
 			_field.ContentsChanged -= Refresh;
 	}
+
+	public override void _Process(double delta)
+	{
+		// Timed perks (e.g. "Raided") count down; refresh their seconds left a few times a second
+		_perksRefreshTimer -= delta;
+		if (_field == null || _perksRefreshTimer > 0)
+			return;
+		_perksRefreshTimer = 0.5;
+		RefreshPerks();
+	}
+	private double _perksRefreshTimer;
 
 	public void ShowField(field selectedField)
 	{
@@ -53,8 +83,12 @@ public partial class FieldInfoPanel : PanelContainer
 
 	private void Refresh()
 	{
-		TitleLabel.Text = (_field.type?.Name ?? _field.Name) + (InSight ? "" : " (last seen)");
+		TitleLabel.Text = (_field.type?.Name ?? _field.Name) + (_field.IsPlayerOwned ? " (yours)" : InSight ? "" : " (last seen)");
+		_castleButton.Visible = _field.Castle != null;
+		if (_field.Castle != null)
+			_castleButton.Text = $"Enter castle (Tower {_field.Castle.TowerLevel})";
 		RefreshResources();
+		RefreshPerks();
 		RefreshNeutralUnits();
 		RefreshPlayerUnits();
 	}
@@ -75,6 +109,25 @@ public partial class FieldInfoPanel : PanelContainer
 		}
 	}
 
+	// Perks are part of the land, so they stay known in fog
+	private void RefreshPerks()
+	{
+		var perks = new System.Collections.Generic.List<FieldPerk>(_field.Perks);
+		_perksLabel.Visible = perks.Count > 0;
+		if (perks.Count == 0)
+			return;
+		var names = new System.Collections.Generic.List<string>();
+		var details = new System.Collections.Generic.List<string>();
+		foreach (var perk in perks)
+		{
+			int ticksLeft = _field.GetTimedPerkTicksLeft(perk);
+			names.Add(ticksLeft > 0 ? $"{perk.Name} ({ticksLeft}s)" : perk.Name);
+			details.Add($"{perk.Name}: {perk.Description}\n  {perk.EffectText()}");
+		}
+		_perksLabel.Text = "Perks: " + string.Join(", ", names);
+		_perksLabel.TooltipText = string.Join("\n", details);
+	}
+
 	private void RefreshNeutralUnits()
 	{
 		UIText.ClearChildren(NeutralUnitsRow);
@@ -88,7 +141,7 @@ public partial class FieldInfoPanel : PanelContainer
 		{
 			var slot = IconSlotScene.Instantiate<IconSlot>();
 			string name = neutral.Template?.Name ?? "Unknown";
-			slot.Setup(neutral.GetIcon(), () => UIText.UnitTooltip(name, neutral.GetEffectiveStats()));
+			slot.Setup(neutral.GetIcon(), () => UIText.UnitTooltip(name, neutral.GetEffectiveStats(), neutral.GetAttributes()));
 			NeutralUnitsRow.AddChild(slot);
 		}
 	}
@@ -107,7 +160,7 @@ public partial class FieldInfoPanel : PanelContainer
 		{
 			var slot = IconSlotScene.Instantiate<IconSlot>();
 			string name = playerUnit.Template?.Name ?? playerUnit.Name;
-			slot.Setup(playerUnit.GetIcon(), () => UIText.UnitTooltip(name, playerUnit.battleStats) + "\nClick to select");
+			slot.Setup(playerUnit.GetIcon(), () => UIText.UnitTooltip(name, playerUnit.battleStats, playerUnit.Attributes) + "\nClick to select");
 			slot.Pressed += () => UnitClicked?.Invoke(playerUnit);
 			PlayerUnitsRow.AddChild(slot);
 		}

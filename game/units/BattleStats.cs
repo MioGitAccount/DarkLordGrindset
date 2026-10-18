@@ -9,6 +9,8 @@ public partial class BattleStats : Resource
 	[Export] public int defence { get; set; }
 	[Export] public int health { get; set; }
 	[Export] public int maxHealth { get; set; }
+	[Export] public int mana { get; set; }
+	[Export] public int maxMana { get; set; }
 	[Export] public int initiative { get; set; }
 	[Export] public bool rangeUnit { get; set; }
 

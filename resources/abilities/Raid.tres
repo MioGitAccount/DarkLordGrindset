@@ -1,0 +1,16 @@
+[gd_resource type="Resource" script_class="RaidAbility" load_steps=4 format=3]
+
+[ext_resource type="Script" path="res://game/abilities/mapAbilities/RaidAbility.cs" id="1_script"]
+[ext_resource type="Texture2D" uid="uid://dukydt8s8rika" path="res://images/resources/gold.png" id="2_icon"]
+[ext_resource type="Resource" path="res://resources/field_perks/raided.tres" id="3_raided"]
+
+[resource]
+script = ExtResource("1_script")
+ResourceType = 0
+DrainAmount = 10.0
+Name = "Raid"
+Description = "Plunder the field: 10 gold per second. The field becomes Raided and stops generating resources; the longer you raid, the longer it lasts (3s per second of raiding, up to 5 min)."
+Icon = ExtResource("2_icon")
+RaidedPerk = ExtResource("3_raided")
+RaidedTicksPerTick = 3
+MaxRaidedTicks = 300

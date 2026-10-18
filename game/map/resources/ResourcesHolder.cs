@@ -1,92 +1,68 @@
 using Godot;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 
+// The resources lying on one field. Which resources exist, how fast they regenerate and how
+// much the field can hold all come from the field's perks (see ApplyPerks).
 public partial class ResourcesHolder : Node2D
 {
-	public ResourceInstance wood;
-	public ResourceInstance gold;
-	
-	
-	// Every node or unit will have deferent resources on start
-	public override void _Ready()
-	{
+	// A field starts with this share of its capacity
+	public const float StartingFill = 0.5f;
 
-	}
+	private readonly SortedDictionary<ResourceType, ResourceInstance> _resources = new();
 
-	// Called every frame. 'delta' is the elapsed time since the previous frame.
-	public override void _Process(double delta)
-	{
-	}
+	// Only resources the field actually has, in ResourceType order
+	public List<ResourceInstance> Resources => _resources.Values.ToList();
 
-	public void setResourcesBasedOnType(FieldTypeEnum typeEnum)
+	public void ApplyPerks(IEnumerable<FieldPerk> perks)
 	{
-		switch (typeEnum)
+		var capacity = new Dictionary<ResourceType, float>();
+		var perTick = new Dictionary<ResourceType, float>();
+		foreach (var perk in perks)
 		{
-			case FieldTypeEnum.AutumnForest:
-				setWood(300, 1);
-				break;
-			case FieldTypeEnum.Village:
-				setGold(1000, 2);
-				break;
-			default:
-				break;
+			foreach (var yield in perk.Yields)
+			{
+				if (yield == null)
+					continue;
+				capacity[yield.Type] = capacity.GetValueOrDefault(yield.Type) + yield.Capacity;
+				perTick[yield.Type] = perTick.GetValueOrDefault(yield.Type) + yield.PerTick;
+			}
+		}
+
+		foreach (var (type, max) in capacity)
+		{
+			if (max <= 0)
+				continue; // generation without anywhere to store it: the field doesn't have this resource
+			float regen = perTick.GetValueOrDefault(type);
+			if (_resources.TryGetValue(type, out var existing))
+			{
+				existing.MaxAmount = max;
+				existing.RegenRate = regen;
+				existing.CurrentAmount = Mathf.Min(existing.CurrentAmount, max);
+			}
+			else
+			{
+				_resources[type] = new ResourceInstance(type, max * StartingFill, max, regen);
+			}
 		}
 	}
 
-	public List<ResourceInstance> Resources
+	// Set by the field while one of its perks stops generation
+	public bool GenerationStopped
 	{
-		get
+		get => _generationStopped;
+		set
 		{
-			var list = new List<ResourceInstance>();
-			if (wood != null) list.Add(wood);
-			if (gold != null) list.Add(gold);
-			return list;
+			_generationStopped = value;
+			foreach (var resource in _resources.Values)
+				resource.Paused = value;
 		}
 	}
+	private bool _generationStopped;
 
-	public float tryDrainResource(ResourceType type, unit source, float drainPerTick)
+	public ResourceInstance GetResource(ResourceType type)
 	{
-		ResourceInstance resource = GetResourceByType(type);
-		if (resource != null)
-		{
-			resource.StartDraining(source, drainPerTick);
-			return resource.CurrentAmount;
-		}
-		return 0;
+		return _resources.GetValueOrDefault(type);
 	}
-
-	private ResourceInstance GetResourceByType(ResourceType type)
-	{
-		switch (type)
-		{
-			case ResourceType.Wood:
-				return wood;
-			case ResourceType.Gold:
-				return gold;
-			default:
-				return null;
-		}
-	}
-	private void setWood(float amount, float regenRate)
-	{
-		if (wood == null)
-			wood = new ResourceInstance(ResourceType.Wood, amount/2, amount, regenRate);
-	}
-
-	private void setGold(float amount, float regenRate)
-	{
-		if (gold == null)
-			gold = new ResourceInstance(ResourceType.Gold, amount/2, amount, regenRate);
-	}
-	public void stopDrainingResource(ResourceType type, unit source)
-	{
-		ResourceInstance resource = GetResourceByType(type);
-		if (resource != null)
-		{
-			resource.StopDraining(source);
-		}
-	}
-
-	
 }

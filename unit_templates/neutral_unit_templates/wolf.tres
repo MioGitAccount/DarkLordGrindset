@@ -1,8 +1,17 @@
-[gd_resource type="Resource" script_class="UnitTemplate" load_steps=5 format=3 uid="uid://cbo6rewdq70yj"]
+[gd_resource type="Resource" script_class="UnitTemplate" load_steps=7 format=3 uid="uid://cbo6rewdq70yj"]
 
 [ext_resource type="Script" path="res://game/units/UnitTemplate.cs" id="1_fw6kh"]
 [ext_resource type="Script" path="res://game/units/BattleStats.cs" id="1_si4nl"]
 [ext_resource type="Texture2D" uid="uid://dt828kslfubnx" path="res://images/Units/wolfIcon.png" id="2_p5xed"]
+[ext_resource type="Script" path="res://game/units/SpecialAttributes.cs" id="9_attrs"]
+
+[sub_resource type="Resource" id="Resource_attrs"]
+script = ExtResource("9_attrs")
+Deadliness = 4
+Strength = 3
+Durability = 2
+Cleverness = 2
+Quickness = 7
 
 [sub_resource type="Resource" id="Resource_pjfic"]
 script = ExtResource("1_si4nl")
@@ -10,6 +19,8 @@ attack = 4
 defence = 2
 health = 10
 maxHealth = 10
+mana = 0
+maxMana = 0
 initiative = 0
 rangeUnit = false
 
@@ -18,3 +29,4 @@ script = ExtResource("1_fw6kh")
 Name = "Imp"
 Icon = ExtResource("2_p5xed")
 DefaultStats = SubResource("Resource_pjfic")
+Attributes = SubResource("Resource_attrs")

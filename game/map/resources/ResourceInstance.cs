@@ -1,19 +1,17 @@
 using Godot;
 using System;
-using System.Collections.Generic;
-using System.Threading.Tasks.Dataflow;
 
+// One resource lying on a field: how much there is, the most it can hold and how much grows back per tick
 public partial class ResourceInstance
 {
 	public float CurrentAmount{ get; set; }
 	public float MaxAmount { get; set; }
 	public float RegenRate { get; set; }
 	public ResourceType type{ get; set; }
+	// True while a perk like "Raided" stops the field from generating
+	public bool Paused { get; set; }
 
 	public event Action<float> OnAmountChanged;
-
-	private readonly List<ResourceDrainRequest> _activeDrains = new();
-
 
 	public ResourceInstance(ResourceType type, float initialAmount, float maxAmount, float regenRate)
 	{
@@ -23,50 +21,23 @@ public partial class ResourceInstance
 		RegenRate = regenRate;
 		GlobalTickManager.Instance.OnTick += HandleTick;
 	}
+
 	private void HandleTick()
 	{
-		// 1️⃣ Regenerate first
-		if (CurrentAmount < MaxAmount)
-		{
-			CurrentAmount += RegenRate;
-			CurrentAmount = Mathf.Min(CurrentAmount, MaxAmount);
-		}
-
-		// 2️⃣ Process drains
-		foreach (var drain in _activeDrains)
-		{
-			if (CurrentAmount <= 0)
-				break;
-
-			float actualDrain = Mathf.Min(drain.DrainPerTick, CurrentAmount);
-
-			CurrentAmount -= actualDrain;
-
-			// Give resources to player
-			//drain.Source.Owner.ResourceHolder.AddWood(actualDrain);
-		}
+		if (Paused || CurrentAmount >= MaxAmount)
+			return;
+		CurrentAmount = Mathf.Min(CurrentAmount + RegenRate, MaxAmount);
 		OnAmountChanged?.Invoke(CurrentAmount);
 	}
 
-	public void StartDraining(unit source, float drainPerTick)
+	// Removes up to `amount` and returns how much was actually there to take
+	public float Take(float amount)
 	{
-		_activeDrains.Add(new ResourceDrainRequest(source, drainPerTick));
-	}
-	public void StopDraining(unit source)
-	{
-		_activeDrains.RemoveAll(d => d.Source == source);
-	}
-
-}
-
-public class ResourceDrainRequest
-{
-	public unit Source { get; }
-	public float DrainPerTick { get; }
-
-	public ResourceDrainRequest(unit source, float drainPerTick)
-	{
-		Source = source;
-		DrainPerTick = drainPerTick;
+		float taken = Mathf.Clamp(amount, 0, CurrentAmount);
+		if (taken <= 0)
+			return 0;
+		CurrentAmount -= taken;
+		OnAmountChanged?.Invoke(CurrentAmount);
+		return taken;
 	}
 }

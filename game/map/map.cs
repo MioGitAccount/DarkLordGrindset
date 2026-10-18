@@ -18,10 +18,12 @@ public partial class map : Node2D
 		("Field19","Field20"),("Field20","Field21"),("Field20","Field22"),
 		("Field22","Field15"),("Field22","Field23"),("Field18","Field24"),
 		("Field24","Field25"),("Field25","Field26"),("Field26","Field27"),
-		("Field27","Field28"),("Field25","Field29"),("Field29","Field30")
+		("Field27","Field28"),("Field25","Field29"),("Field29","Field30"),
+		("Field","Field31")
 
 	};
 	private List<unit> units = new List<unit>();
+	private static readonly PackedScene UnitScene = GD.Load<PackedScene>("res://game/units/unit.tscn");
 	UnitManager unitManager;
 
 	private field selectedField = null;
@@ -47,6 +49,12 @@ public partial class map : Node2D
 		unitManager = GetNode<UnitManager>("UnitManager");
 		units = unitManager.findAllUnits();
 		unitManager.setUnitLocation(units, fields["Field"]);
+		foreach (var f in fields.Values)
+		{
+			var castleField = f;
+			if (castleField.Castle != null)
+				castleField.Castle.UnitRecruited += (template, level) => SpawnUnit(template, castleField, level);
+		}
 		GD.Print("There are " + fields.Count + " fields on map");
 		QueueRedraw();
 		var fog = GetNode<FogOfWar>("FogOfWar");
@@ -132,6 +140,21 @@ public partial class map : Node2D
 
 			}
 		}
+	}
+
+	// A new player unit standing on `place` (e.g. recruited in a castle), already at `level`
+	public unit SpawnUnit(UnitTemplate template, field place, int level = 1)
+	{
+		var newUnit = UnitScene.Instantiate<unit>();
+		newUnit.Template = template;
+		newUnit.Name = template?.Name ?? "Unit";
+		newUnit.Position = place.Position;
+		GetNode("UnitList").AddChild(newUnit, forceReadableName: true);
+		newUnit.Progression.LevelUpTo(level);
+		units.Add(newUnit);
+		newUnit.EnterField(place, fade: false);
+		GD.Print($"Recruited {newUnit.Name} (level {level}) at {place.Name}");
+		return newUnit;
 	}
 
 	public void OnNodeClicked(Node2D clickedNode)

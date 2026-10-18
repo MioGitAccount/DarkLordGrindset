@@ -1,0 +1,11 @@
+[gd_resource type="Resource" script_class="FieldPerk" load_steps=3 format=3]
+
+[ext_resource type="Script" path="res://game/map/resources/FieldPerk.cs" id="1_perk"]
+[ext_resource type="Resource" path="res://resources/buildings/castle_buildings.tres" id="2_buildings"]
+
+[resource]
+script = ExtResource("1_perk")
+Name = "Castle"
+Description = "Seat of the dark lord. Raise buildings here to recruit units and see further."
+Yields = []
+Buildings = ExtResource("2_buildings")

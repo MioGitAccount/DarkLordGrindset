@@ -1,0 +1,16 @@
+[gd_resource type="Resource" script_class="FieldPerk" load_steps=4 format=3]
+
+[ext_resource type="Script" path="res://game/map/resources/FieldPerk.cs" id="1_perk"]
+[ext_resource type="Script" path="res://game/map/resources/ResourceYield.cs" id="2_yield"]
+
+[sub_resource type="Resource" id="Yield_0"]
+script = ExtResource("2_yield")
+Type = 2
+PerTick = 1.0
+Capacity = 200.0
+
+[resource]
+script = ExtResource("1_perk")
+Name = "Ore Vein"
+Description = "A rich vein of ore close to the surface. Generates ore."
+Yields = [SubResource("Yield_0")]

@@ -67,7 +67,9 @@ public partial class BattleUIControler : Control
 		for (int i = 0; i < container.GetChildCount() && i < units.Count; i++)
 		{
 			
-			var panel = container.GetChild(i) as BattlePositionPanel;
+			// Slots without the BattlePositionPanel script can't hold units (battle UI is still WIP)
+			if (container.GetChild(i) is not BattlePositionPanel panel)
+				continue;
 			var unit = units[i];
 			panel.SetUnit(unit);
 
@@ -86,7 +88,8 @@ public partial class BattleUIControler : Control
 	{
 		for (int i = 0; i < container.GetChildCount(); i++)
 		{
-			var panel = container.GetChild(i) as BattlePositionPanel;
+			if (container.GetChild(i) is not BattlePositionPanel panel)
+				continue;
 
 			panel.OnPanelClicked = (targetPanel) =>
 			{

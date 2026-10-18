@@ -5,11 +5,7 @@ using System.Collections.Generic;
 // or is bound to a field's ResourceInstance and follows its changes.
 public partial class ResourceCounter : HBoxContainer
 {
-	private static readonly Dictionary<ResourceType, string> IconPaths = new()
-	{
-		{ ResourceType.Wood, "res://images/resources/wood.png" },
-		{ ResourceType.Gold, "res://images/resources/gold.png" },
-	};
+	private static readonly Dictionary<ResourceType, Texture2D> Icons = new();
 
 	[Export] public ResourceType Type = ResourceType.Gold;
 	[Export] public float Amount;
@@ -18,9 +14,16 @@ public partial class ResourceCounter : HBoxContainer
 	private TextureRect _icon;
 	private Label _label;
 
+	// Icons live at res://images/resources/<type in lower case>.png
 	public static Texture2D GetIcon(ResourceType type)
 	{
-		return IconPaths.TryGetValue(type, out var path) ? GD.Load<Texture2D>(path) : null;
+		if (!Icons.TryGetValue(type, out var icon))
+		{
+			string path = $"res://images/resources/{type.ToString().ToLowerInvariant()}.png";
+			icon = ResourceLoader.Exists(path) ? GD.Load<Texture2D>(path) : null;
+			Icons[type] = icon;
+		}
+		return icon;
 	}
 
 	public override void _Ready()
@@ -69,11 +72,12 @@ public partial class ResourceCounter : HBoxContainer
 		if (_bound != null)
 		{
 			_label.Text = $"{_bound.CurrentAmount:0} / {_bound.MaxAmount:0}";
-			TooltipText = $"{Type}: +{_bound.RegenRate:0.#} per tick";
+			TooltipText = $"{Type}: +{_bound.RegenRate:0.##} per tick, holds up to {_bound.MaxAmount:0}";
 		}
 		else
 		{
-			_label.Text = $"{Amount:0}";
+			// Floor, so 0.5 mana collected doesn't already read as 1
+			_label.Text = $"{Mathf.Floor(Amount):0}";
 			TooltipText = Type.ToString();
 		}
 	}

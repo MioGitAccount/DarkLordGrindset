@@ -1,0 +1,10 @@
+[gd_resource type="Resource" script_class="FieldPerk" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://game/map/resources/FieldPerk.cs" id="1_perk"]
+
+[resource]
+script = ExtResource("1_perk")
+Name = "Raided"
+Description = "Recently plundered. The locals hide and nothing grows back until they recover."
+Yields = []
+StopsGeneration = true

@@ -8,11 +8,27 @@ public partial class unit : Node2D
 {
 	[Export] public string UnitType = "Warrior";  // Type of unit
 	[Export] public UnitTemplate Template;
+	// Base stats for this unit; falls back to Template.DefaultStats.
+	// From _Ready on it holds the effective stats (base + attribute bonuses), see RecalculateStats.
 	[Export] public BattleStats battleStats;
+	// Per-unit attributes; falls back to Template.Attributes. From _Ready on: base + skill bonuses.
+	[Export] public SpecialAttributes Attributes;
 
-	[Export] public float VisibilityRadius = 200f; // Radius for visibility
+	[Export] public float VisibilityRadius = 200f; // Radius for visibility; skills can add to it
 
+	// Abilities the unit starts with; skills add more
 	[Export] public Godot.Collections.Array<Ability> Abilities = new Godot.Collections.Array<Ability>();
+
+	// Level, experience, skill points and unlocked skills
+	public UnitProgression Progression { get; private set; }
+	public SkillTree SkillTree => Template?.SkillTree;
+	// Bumped whenever stats, attributes, abilities or progression change, so UI knows when to refresh
+	public int Revision { get; private set; }
+
+	private BattleStats _baseStats;
+	private SpecialAttributes _baseAttributes;
+	private float _baseVisibilityRadius;
+	private Godot.Collections.Array<Ability> _baseAbilities;
 	private Godot.Sprite2D sprite { get; set; }
 	private AnimatedSprite2D animatedSprite;
 	public AbilityRunner abilityRunner { get; set; }
@@ -24,6 +40,9 @@ public partial class unit : Node2D
 	private List<field> path;
 	private int pathIndex = 0;
 	[Export] public float MoveSpeed = 100f;
+	// Seconds to cross one field at Quickness 0; each Quickness point makes the unit 10% faster
+	[Export] public float BaseFieldTravelTime = 30f;
+	public float FieldTravelTime => BaseFieldTravelTime / Attributes.MoveSpeedMultiplier;
 	public bool isMoving;
 	private Vector2 startPos;
 	private Vector2 targetPos;
@@ -38,6 +57,23 @@ public partial class unit : Node2D
 	{
 		AddToGroup(FogOfWar.ViewerGroup); // the fog reveals VisibilityRadius around this unit
 
+		// Own copies, so changing this unit's attributes or stats never touches the shared template
+		_baseAttributes = (Attributes ?? Template?.Attributes)?.Duplicate() as SpecialAttributes ?? new SpecialAttributes();
+		_baseStats = (battleStats ?? Template?.DefaultStats)?.Duplicate() as BattleStats ?? new BattleStats();
+		_baseVisibilityRadius = VisibilityRadius;
+		_baseAbilities = new Godot.Collections.Array<Ability>(Abilities);
+		battleStats = null;
+
+		Progression = new UnitProgression();
+		Progression.Changed += skillsChanged =>
+		{
+			if (skillsChanged)
+				RecalculateStats();
+			else
+				Revision++;
+		};
+		RecalculateStats();
+
 		sprite = GetNode<Godot.Sprite2D>("Sprite2D");
 		sprite.Scale = new Vector2(0.08f, 0.08f);
 		sprite.Texture = GetIcon();
@@ -51,6 +87,53 @@ public partial class unit : Node2D
 		}
 		abilityRunner = GetNode<AbilityRunner>("AbilityRunner");
 	}
+	// Rebuilds attributes, stats, vision and abilities from the base values plus unlocked skills.
+	// Damage taken and mana spent carry over.
+	private void RecalculateStats()
+	{
+		var skills = new List<SkillDefinition>();
+		if (SkillTree != null)
+			foreach (var skill in SkillTree.Skills)
+				if (Progression.IsUnlocked(skill))
+					skills.Add(skill);
+
+		var attributes = (SpecialAttributes)_baseAttributes.Duplicate();
+		float vision = _baseVisibilityRadius;
+		var abilities = new Godot.Collections.Array<Ability>(_baseAbilities);
+		foreach (var skill in skills)
+		{
+			for (int i = 0; i < SpecialAttributes.Count; i++)
+				attributes.Set(i, attributes.Get(i) + skill.BonusAttribute(i));
+			vision += skill.BonusVision;
+			if (skill.GrantedAbility != null && !abilities.Contains(skill.GrantedAbility))
+				abilities.Add(skill.GrantedAbility);
+		}
+
+		var stats = attributes.ApplyTo(_baseStats);
+		if (battleStats != null)
+		{
+			if (battleStats.maxHealth > 0)
+				stats.health = Math.Max(0, stats.maxHealth - (battleStats.maxHealth - battleStats.health));
+			stats.mana = Math.Max(0, stats.maxMana - (battleStats.maxMana - battleStats.mana));
+		}
+
+		Attributes = attributes;
+		battleStats = stats;
+		VisibilityRadius = vision;
+		Abilities = abilities;
+		Revision++;
+	}
+
+	public void AddExperience(int amount)
+	{
+		Progression.AddExperience(amount);
+	}
+
+	public bool UnlockSkill(SkillDefinition skill)
+	{
+		return Progression.TryUnlock(skill);
+	}
+
 	public Texture2D GetIcon()
 	{
 		return Template?.Icon;
@@ -91,7 +174,7 @@ public partial class unit : Node2D
 		if (!isMoving) return;
 
 		moveTimer += (float)delta;
-		float t = Mathf.Clamp(moveTimer / 30f, 0f, 1f);
+		float t = Mathf.Clamp(moveTimer / FieldTravelTime, 0f, 1f);
 
 		// Interpolate between start and target
 		Position = startPos.Lerp(targetPos, t);
@@ -173,6 +256,7 @@ public partial class unit : Node2D
 		targetPos = path[pathIndex].GlobalPosition;
 		moveTimer = 0f;
 		isMoving = true;
+		abilityRunner.StopAbility(); // a new order ends whatever the unit was doing
 		leaveCurrentField();
 	}
 
@@ -189,8 +273,16 @@ public partial class unit : Node2D
 		targetPos = path[pathIndex].GlobalPosition;
 		moveTimer = 0f;
 	}
+	public bool IsUsingAbility(Ability ability) => ability != null && abilityRunner?.ActiveAbility == ability;
+
+	// Starts the ability, or stops it when it is already running
 	public void UseAbility(Ability ability)
 	{
+		if (IsUsingAbility(ability))
+		{
+			abilityRunner.StopAbility();
+			return;
+		}
 		if (ability is TickingAbility tickingAbility)
 		{
 			abilityRunner.StartAbility(tickingAbility, new AbilityExecutionContext

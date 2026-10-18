@@ -11,5 +11,6 @@ public enum FieldTypeEnum
 	GrassPlains,
 	Village,
 	GrassCrossRoads,
-	GrassRoad
+	GrassRoad,
+	Castle
 }

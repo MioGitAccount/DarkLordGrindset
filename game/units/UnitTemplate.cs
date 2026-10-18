@@ -11,4 +11,8 @@ public partial class UnitTemplate : Resource
 
 	[Export] public AudioStream SelectSound;
 	[Export] public BattleStats DefaultStats;
+	// Deadliness/Strength/Durability/Cleverness/Quickness; added on top of DefaultStats
+	[Export] public SpecialAttributes Attributes;
+	// Shared by every unit of this type; each unit chooses which skills to unlock
+	[Export] public SkillTree SkillTree;
 }

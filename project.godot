@@ -19,6 +19,12 @@ config/icon="res://icon.svg"
 
 GlobalTickManager="*res://game/main/GlobalTickManager.cs"
 
+[display]
+
+window/size/mode=3
+window/stretch/mode="canvas_items"
+window/stretch/aspect="expand"
+
 [dotnet]
 
 project/assembly_name="DeathLand"

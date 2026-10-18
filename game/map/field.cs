@@ -15,6 +15,10 @@ public partial class field : Node2D
 	public fieldType type { get; private set; }
 	private Godot.Sprite2D sprite{ get;  set; }
 	[Export] public ResourcesHolder resourcesHolder{ get; set; }
+	// Perks of this one field on top of its type's perks (e.g. a forest with an extra ore vein)
+	[Export] public Godot.Collections.Array<FieldPerk> ExtraPerks = new();
+	// Perks that wear off: perk -> ticks left (e.g. "Raided")
+	private readonly Dictionary<FieldPerk, int> _timedPerks = new();
 	public Godot.Collections.Array<unit> presentPlayerUnits = new();
 	[Export] public Godot.Collections.Array<NeutralUnit> presentNeutralUnits = new();
 	// Raised when units enter or leave this field, or its fog state changes
@@ -22,6 +26,9 @@ public partial class field : Node2D
 	public FogState Fog { get; private set; } = FogState.Unexplored;
 	// Neutral units as they were the last time a player unit could see this field
 	public Godot.Collections.Array<NeutralUnit> LastSeenNeutrals { get; private set; } = new();
+	// The player's castle when one of the field's perks has Buildings; null on other fields
+	public Castle Castle { get; private set; }
+	public bool IsPlayerOwned => Castle != null;
 	public override void _Ready()
 	{
 		type = FieldTypeManager.GetFieldType(TypeName);
@@ -34,7 +41,88 @@ public partial class field : Node2D
 		}
 		UpdateMarker();
 		resourcesHolder = GetNode<ResourcesHolder>("ResourcesHolder");
-		resourcesHolder.setResourcesBasedOnType(this.type.FieldTypeEnum);
+		resourcesHolder.ApplyPerks(Perks);
+		foreach (var perk in Perks)
+		{
+			if (perk.Buildings == null)
+				continue;
+			Castle = new Castle(this, perk.Buildings);
+			Castle.Changed += () => ContentsChanged?.Invoke();
+			AddToGroup(FogOfWar.ViewerGroup); // the castle sees around itself, see Castle.VisionRadius
+			break;
+		}
+		GlobalTickManager.Instance.OnTick += TickTimedPerks;
+	}
+
+	public override void _ExitTree()
+	{
+		if (GlobalTickManager.Instance != null)
+			GlobalTickManager.Instance.OnTick -= TickTimedPerks;
+	}
+
+	// The field type's perks followed by this field's ExtraPerks
+	public IEnumerable<FieldPerk> Perks
+	{
+		get
+		{
+			if (type != null)
+				foreach (var perk in type.Perks)
+					yield return perk;
+			foreach (var perk in ExtraPerks)
+				if (perk != null)
+					yield return perk;
+			foreach (var perk in _timedPerks.Keys)
+				yield return perk;
+		}
+	}
+
+	// Ticks until a timed perk wears off; 0 for permanent perks and perks the field doesn't have
+	public int GetTimedPerkTicksLeft(FieldPerk perk)
+	{
+		return _timedPerks.GetValueOrDefault(perk);
+	}
+
+	// Gives the field a perk for `ticks` more ticks (stacking on time it already has, up to maxTicks)
+	public void AddTimedPerk(FieldPerk perk, int ticks, int maxTicks = int.MaxValue)
+	{
+		bool isNew = !_timedPerks.ContainsKey(perk);
+		_timedPerks[perk] = Math.Min(_timedPerks.GetValueOrDefault(perk) + ticks, maxTicks);
+		if (isNew)
+		{
+			UpdateGeneration();
+			ContentsChanged?.Invoke();
+		}
+	}
+
+	private void TickTimedPerks()
+	{
+		if (_timedPerks.Count == 0)
+			return;
+		bool removed = false;
+		foreach (var perk in new List<FieldPerk>(_timedPerks.Keys))
+		{
+			int left = _timedPerks[perk] - 1;
+			if (left > 0)
+				_timedPerks[perk] = left;
+			else
+			{
+				_timedPerks.Remove(perk);
+				removed = true;
+			}
+		}
+		if (removed)
+		{
+			UpdateGeneration();
+			ContentsChanged?.Invoke();
+		}
+	}
+
+	private void UpdateGeneration()
+	{
+		bool stopped = false;
+		foreach (var perk in Perks)
+			stopped |= perk.StopsGeneration;
+		resourcesHolder.GenerationStopped = stopped;
 	}
 	public void AddNeighbor(field node)
 	{

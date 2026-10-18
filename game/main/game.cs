@@ -13,6 +13,14 @@ public partial class game : Node2D
 		ui.UnitSelected += map.SelectUnit;
 		map.FieldHovered += ui.ShowFieldHover;
 		map.IsPointerOverUI = ui.IsMouseOverPanel;
+
+		PlayerResources.Changed += ui.SetPlayerResource;
+		PlayerResources.Reset();
+	}
+
+	public override void _ExitTree()
+	{
+		PlayerResources.Changed -= GetNode<UIManager>("UI").SetPlayerResource;
 	}
 
 }

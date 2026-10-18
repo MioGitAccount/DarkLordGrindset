@@ -1,0 +1,255 @@
+[gd_resource type="Resource" script_class="SkillTree" load_steps=22 format=3 uid="uid://dqn2enw377rth"]
+
+[ext_resource type="Script" path="res://game/units/skills/SkillTree.cs" id="1_tree"]
+[ext_resource type="Script" path="res://game/units/skills/SkillDefinition.cs" id="2_skill"]
+[ext_resource type="Resource" uid="uid://eef4tg2vrqhq" path="res://resources/abilities/CuttingTrees.tres" id="3_cut"]
+[ext_resource type="Resource" path="res://resources/abilities/Steal.tres" id="4_steal"]
+[ext_resource type="Resource" path="res://resources/abilities/ChannelMana.tres" id="5_mana"]
+
+[sub_resource type="Resource" id="Skill_wood_cutter"]
+script = ExtResource("2_skill")
+Name = "Wood Cutter"
+Description = "Small claws, sharp axe. Lets the imp cut trees for wood."
+Tier = 1
+Column = 0
+Cost = 1
+Requires = []
+BonusDeadliness = 0
+BonusStrength = 0
+BonusDurability = 0
+BonusCleverness = 0
+BonusQuickness = 0
+BonusVision = 0.0
+GrantedAbility = ExtResource("3_cut")
+
+[sub_resource type="Resource" id="Skill_sneaky"]
+script = ExtResource("2_skill")
+Name = "Sneaky"
+Description = "Imps are hard to catch."
+Tier = 1
+Column = 1
+Cost = 1
+Requires = []
+BonusDeadliness = 0
+BonusStrength = 0
+BonusDurability = 0
+BonusCleverness = 0
+BonusQuickness = 1
+BonusVision = 0.0
+
+[sub_resource type="Resource" id="Skill_sharp_claws"]
+script = ExtResource("2_skill")
+Name = "Sharp Claws"
+Description = "Filed claws that bite deeper."
+Tier = 1
+Column = 2
+Cost = 1
+Requires = []
+BonusDeadliness = 1
+BonusStrength = 0
+BonusDurability = 0
+BonusCleverness = 0
+BonusQuickness = 0
+BonusVision = 0.0
+
+[sub_resource type="Resource" id="Skill_lumberjack"]
+script = ExtResource("2_skill")
+Name = "Lumberjack"
+Description = "Hauling logs all day builds muscle."
+Tier = 2
+Column = 0
+Cost = 1
+Requires = [SubResource("Skill_wood_cutter")]
+BonusDeadliness = 0
+BonusStrength = 1
+BonusDurability = 0
+BonusCleverness = 0
+BonusQuickness = 0
+BonusVision = 0.0
+
+[sub_resource type="Resource" id="Skill_scouter"]
+script = ExtResource("2_skill")
+Name = "Scouter"
+Description = "Climbs high and watches far. Longer range of vision."
+Tier = 2
+Column = 1
+Cost = 1
+Requires = [SubResource("Skill_sneaky")]
+BonusDeadliness = 0
+BonusStrength = 0
+BonusDurability = 0
+BonusCleverness = 0
+BonusQuickness = 0
+BonusVision = 60.0
+
+[sub_resource type="Resource" id="Skill_silent_killer"]
+script = ExtResource("2_skill")
+Name = "Silent Killer"
+Description = "Strikes before the victim hears a thing."
+Tier = 2
+Column = 2
+Cost = 1
+Requires = [SubResource("Skill_sharp_claws")]
+BonusDeadliness = 1
+BonusStrength = 0
+BonusDurability = 0
+BonusCleverness = 0
+BonusQuickness = 0
+BonusVision = 0.0
+
+[sub_resource type="Resource" id="Skill_devils_cunning"]
+script = ExtResource("2_skill")
+Name = "Devil's Cunning"
+Description = "Learns the dark lord's tricks."
+Tier = 3
+Column = 0
+Cost = 1
+Requires = [SubResource("Skill_lumberjack")]
+BonusDeadliness = 0
+BonusStrength = 0
+BonusDurability = 0
+BonusCleverness = 2
+BonusQuickness = 0
+BonusVision = 0.0
+
+[sub_resource type="Resource" id="Skill_eagle_eye"]
+script = ExtResource("2_skill")
+Name = "Eagle Eye"
+Description = "Spots a rabbit three valleys away."
+Tier = 3
+Column = 1
+Cost = 1
+Requires = [SubResource("Skill_scouter")]
+BonusDeadliness = 0
+BonusStrength = 0
+BonusDurability = 0
+BonusCleverness = 0
+BonusQuickness = 0
+BonusVision = 80.0
+
+[sub_resource type="Resource" id="Skill_backstab"]
+script = ExtResource("2_skill")
+Name = "Backstab"
+Description = "Always aims for the soft spots."
+Tier = 3
+Column = 2
+Cost = 1
+Requires = [SubResource("Skill_silent_killer")]
+BonusDeadliness = 2
+BonusStrength = 0
+BonusDurability = 0
+BonusCleverness = 0
+BonusQuickness = 0
+BonusVision = 0.0
+
+[sub_resource type="Resource" id="Skill_thick_skin"]
+script = ExtResource("2_skill")
+Name = "Thick Skin"
+Description = "Brimstone-hardened hide."
+Tier = 4
+Column = 0
+Cost = 1
+Requires = [SubResource("Skill_devils_cunning")]
+BonusDeadliness = 0
+BonusStrength = 0
+BonusDurability = 2
+BonusCleverness = 0
+BonusQuickness = 0
+BonusVision = 0.0
+
+[sub_resource type="Resource" id="Skill_shadow_step"]
+script = ExtResource("2_skill")
+Name = "Shadow Step"
+Description = "Moves from shadow to shadow."
+Tier = 4
+Column = 1
+Cost = 1
+Requires = [SubResource("Skill_eagle_eye")]
+BonusDeadliness = 0
+BonusStrength = 0
+BonusDurability = 0
+BonusCleverness = 0
+BonusQuickness = 2
+BonusVision = 0.0
+
+[sub_resource type="Resource" id="Skill_bloodlust"]
+script = ExtResource("2_skill")
+Name = "Bloodlust"
+Description = "Every kill makes it hungrier."
+Tier = 4
+Column = 2
+Cost = 1
+Requires = [SubResource("Skill_backstab")]
+BonusDeadliness = 1
+BonusStrength = 1
+BonusDurability = 0
+BonusCleverness = 0
+BonusQuickness = 0
+BonusVision = 0.0
+
+[sub_resource type="Resource" id="Skill_lord_of_whispers"]
+script = ExtResource("2_skill")
+Name = "Lord of Whispers"
+Description = "Nothing happens in the land without the imp knowing."
+Tier = 5
+Column = 1
+Cost = 1
+Requires = [SubResource("Skill_shadow_step"), SubResource("Skill_devils_cunning")]
+BonusDeadliness = 0
+BonusStrength = 0
+BonusDurability = 0
+BonusCleverness = 2
+BonusQuickness = 0
+BonusVision = 100.0
+
+[sub_resource type="Resource" id="Skill_assassin"]
+script = ExtResource("2_skill")
+Name = "Assassin"
+Description = "The dark lord's own knife in the dark."
+Tier = 5
+Column = 2
+Cost = 1
+Requires = [SubResource("Skill_bloodlust"), SubResource("Skill_shadow_step")]
+BonusDeadliness = 3
+BonusStrength = 0
+BonusDurability = 0
+BonusCleverness = 0
+BonusQuickness = 0
+BonusVision = 0.0
+
+[sub_resource type="Resource" id="Skill_pickpocket"]
+script = ExtResource("2_skill")
+Name = "Pickpocket"
+Description = "Light fingers. Unlocks Steal: take a little gold from a field."
+Tier = 1
+Column = 3
+Cost = 1
+Requires = []
+BonusDeadliness = 0
+BonusStrength = 0
+BonusDurability = 0
+BonusCleverness = 0
+BonusQuickness = 0
+BonusVision = 0.0
+GrantedAbility = ExtResource("4_steal")
+
+[sub_resource type="Resource" id="Skill_mana_siphon"]
+script = ExtResource("2_skill")
+Name = "Mana Siphon"
+Description = "If it isn't nailed down, an imp takes it - even magic. Unlocks Channel Mana."
+Tier = 2
+Column = 3
+Cost = 1
+Requires = [SubResource("Skill_pickpocket")]
+BonusDeadliness = 0
+BonusStrength = 0
+BonusDurability = 0
+BonusCleverness = 0
+BonusQuickness = 0
+BonusVision = 0.0
+GrantedAbility = ExtResource("5_mana")
+
+[resource]
+script = ExtResource("1_tree")
+Name = "Imp"
+Skills = [SubResource("Skill_wood_cutter"), SubResource("Skill_sneaky"), SubResource("Skill_sharp_claws"), SubResource("Skill_lumberjack"), SubResource("Skill_scouter"), SubResource("Skill_silent_killer"), SubResource("Skill_devils_cunning"), SubResource("Skill_eagle_eye"), SubResource("Skill_backstab"), SubResource("Skill_thick_skin"), SubResource("Skill_shadow_step"), SubResource("Skill_bloodlust"), SubResource("Skill_lord_of_whispers"), SubResource("Skill_assassin"), SubResource("Skill_pickpocket"), SubResource("Skill_mana_siphon")]
