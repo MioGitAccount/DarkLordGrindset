@@ -62,6 +62,7 @@ public static class MapCatalog
 		new ObjectType { Id = "dead_tree", Name = "Dead tree", Category = "Nature", Size = 18, ScatterSpacing = 14 },
 		new ObjectType { Id = "bush", Name = "Bush", Category = "Nature", Size = 8, ScatterSpacing = 10, Ground = GroundKind.Forest, GroundRadius = 2.5f, GroundStrength = 0.2f },
 		new ObjectType { Id = "mountain", Name = "Mountain", Category = "Nature", Size = 70, ScatterSpacing = 45, Ground = GroundKind.Rock, GroundRadius = 1.45f, GroundStrength = 0.9f },
+		new ObjectType { Id = "snow_mountain", Name = "Snowy mountain", Category = "Nature", Size = 70, ScatterSpacing = 45, Ground = GroundKind.Rock, GroundRadius = 1.45f, GroundStrength = 0.9f },
 		new ObjectType { Id = "hill", Name = "Hill", Category = "Nature", Size = 22, ScatterSpacing = 40, Ground = GroundKind.Rock, GroundRadius = 1.3f, GroundStrength = 0.5f },
 		new ObjectType { Id = "rocks", Name = "Rocks", Category = "Nature", Size = 12, ScatterSpacing = 20, Ground = GroundKind.Rock, GroundRadius = 1.6f, GroundStrength = 0.5f },
 		new ObjectType { Id = "castle", Name = "Castle", Category = "Buildings", Size = 70, SuggestsField = "Castle", Ground = GroundKind.Settlement, GroundRadius = 1.15f, GroundStrength = 1.0f },

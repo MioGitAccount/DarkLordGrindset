@@ -188,9 +188,31 @@ public partial class MapEditor
 
 	// ---------------------------------------------------------------- left panel: tools
 
+	private bool _leftPending, _rightPending;
+
+	// Panels are rebuilt at the end of the frame, never right away: a rebuild often comes from
+	// a click on a control inside the panel, and Godot keeps using that control after our handler
+	// returns (e.g. ItemList reads the mouse position for item_clicked), so it must still be there.
 	private void RebuildLeftPanel()
 	{
-		if (_leftBox == null)
+		if (_leftPending)
+			return;
+		_leftPending = true;
+		Callable.From(RebuildLeftPanelNow).CallDeferred();
+	}
+
+	private void RebuildRightPanel()
+	{
+		if (_rightPending)
+			return;
+		_rightPending = true;
+		Callable.From(RebuildRightPanelNow).CallDeferred();
+	}
+
+	private void RebuildLeftPanelNow()
+	{
+		_leftPending = false;
+		if (_leftBox == null || !IsInsideTree())
 			return;
 		Clear(_leftBox);
 		switch (_layer)
@@ -342,9 +364,10 @@ public partial class MapEditor
 
 	// ---------------------------------------------------------------- right panel: selection
 
-	private void RebuildRightPanel()
+	private void RebuildRightPanelNow()
 	{
-		if (_rightBox == null)
+		_rightPending = false;
+		if (_rightBox == null || !IsInsideTree())
 			return;
 		Clear(_rightBox);
 		if (_layer == Layer.Fields && _selectedField != null)

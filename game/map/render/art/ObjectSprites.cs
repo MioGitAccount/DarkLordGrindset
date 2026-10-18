@@ -24,7 +24,7 @@ public static class ObjectSprites
 	// Area each type's sprite covers, in units: u across (0 = middle), v up (-1 = top, 0 = ground)
 	public static Rect2 UnitsOf(string type) => type switch
 	{
-		"mountain" => R(-0.8f, 0.8f, -1.06f, 0.1f),
+		"mountain" or "snow_mountain" => R(-0.8f, 0.8f, -1.06f, 0.1f),
 		"hill" => R(-0.85f, 0.85f, -1.06f, 0.12f),
 		"pine" => R(-0.4f, 0.4f, -1.06f, 0.1f),
 		"oak" => R(-0.55f, 0.55f, -1.06f, 0.1f),
@@ -78,7 +78,8 @@ public static class ObjectSprites
 		var painter = new Painter(raster, variant, type.GetHashCode(), 1f / pxPerUnit);
 		switch (type)
 		{
-			case "mountain": painter.Mountain(); break;
+			case "mountain":
+			case "snow_mountain": painter.Mountain(); break;
 			case "hill": painter.Hill(); break;
 			case "pine": painter.Pine(); break;
 			case "oak": painter.Oak(); break;

@@ -72,6 +72,7 @@ only) are optional. Objects are drawn sorted by `y`, so lower objects cover high
 | `dead_tree`  | 18  | blighted land                                                       |
 | `bush`       | 8   |                                                                     |
 | `mountain`   | 70  | ranges: overlapping rows ~40 px apart; even `variant` = snow cap    |
+| `snow_mountain` | 70 | grey, snowy: for cold regions                               |
 | `hill`       | 22  |                                                                     |
 | `rocks`      | 12  |                                                                     |
 | `castle`     | 70  | even variant = red roofs, odd = blue                                |
