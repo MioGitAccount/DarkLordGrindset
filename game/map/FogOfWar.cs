@@ -35,7 +35,31 @@ public partial class FogOfWar : Node2D
 	private ImageTexture _texture;
 	private double _timer;
 
+	private Sprite2D _sprite;
+
 	public override void _EnterTree()
+	{
+		_sprite = new Sprite2D
+		{
+			Centered = true,
+			Scale = new Vector2(CellSize, CellSize),
+			TextureFilter = TextureFilterEnum.Linear,
+			Material = new ShaderMaterial { Shader = GD.Load<Shader>("res://game/map/fog.gdshader") },
+		};
+		AddChild(_sprite);
+		Allocate();
+	}
+
+	// Covers a map of this size whose top-left corner is at the parent's origin; clears the fog
+	public void Setup(Vector2 mapSize)
+	{
+		MapWidth = Mathf.CeilToInt(mapSize.X);
+		MapHeight = Mathf.CeilToInt(mapSize.Y);
+		Position = mapSize / 2f;
+		Allocate();
+	}
+
+	private void Allocate()
 	{
 		_w = Mathf.CeilToInt(MapWidth / (float)CellSize);
 		_h = Mathf.CeilToInt(MapHeight / (float)CellSize);
@@ -45,16 +69,7 @@ public partial class FogOfWar : Node2D
 		_pixels = new byte[_w * _h * 2];
 		_image = Image.CreateFromData(_w, _h, false, Image.Format.Rg8, _pixels);
 		_texture = ImageTexture.CreateFromImage(_image);
-
-		var sprite = new Sprite2D
-		{
-			Texture = _texture,
-			Centered = true,
-			Scale = new Vector2(CellSize, CellSize),
-			TextureFilter = TextureFilterEnum.Linear,
-			Material = new ShaderMaterial { Shader = GD.Load<Shader>("res://game/map/fog.gdshader") },
-		};
-		AddChild(sprite);
+		_sprite.Texture = _texture;
 	}
 
 	public override void _Process(double delta)
