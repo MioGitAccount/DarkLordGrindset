@@ -18,7 +18,8 @@ public partial class CameraController : Camera2D
 		{
 			velocity = velocity.Normalized() * Speed * (float)delta;
 			Position += velocity;
-			
+			// Don't wander off the map (limits are set from the map size by game.cs)
+			Position = Position.Clamp(new Vector2(LimitLeft, LimitTop), new Vector2(LimitRight, LimitBottom));
 		}
 		
 	}

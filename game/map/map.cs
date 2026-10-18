@@ -2,26 +2,19 @@ using Godot;
 using System.Collections.Generic;
 using System;
 using System.Collections.ObjectModel;
+using System.Linq;
 using System.Runtime.InteropServices;
 
 public partial class map : Node2D
 {
 	private Dictionary<String, field> fields= new Dictionary<String, field>();
-	private List<(string, string)> connections = new List<(string, string)>
-	{
-		("Field","Field2"),("Field2","Field3"),("Field3","Field4"),
-		("Field4","Field5"),("Field4","Field10"),("Field5","Field6"),
-		("Field5","Field7"),("Field7","Field8"),("Field8","Field9"),
-		("Field10","Field11"),("Field11","Field12"),("Field2","Field13"),
-		("Field13","Field14"),("Field7","Field15"),("Field15","Field16"),
-		("Field16","Field17"),("Field17","Field18"),("Field18","Field19"),
-		("Field19","Field20"),("Field20","Field21"),("Field20","Field22"),
-		("Field22","Field15"),("Field22","Field23"),("Field18","Field24"),
-		("Field24","Field25"),("Field25","Field26"),("Field26","Field27"),
-		("Field27","Field28"),("Field25","Field29"),("Field29","Field30"),
-		("Field","Field31")
-
-	};
+	// Built from the map file (layer 3 of the Map Editor)
+	private List<(string, string)> connections = new List<(string, string)>();
+	private static readonly PackedScene FieldScene = GD.Load<PackedScene>("res://game/map/field.tscn");
+	// The map being played (see MapSelection)
+	public MapData Data { get; private set; }
+	// Where the player's starting units begin: the first Castle field
+	public field StartField { get; private set; }
 	private List<unit> units = new List<unit>();
 	private static readonly PackedScene UnitScene = GD.Load<PackedScene>("res://game/units/unit.tscn");
 	UnitManager unitManager;
@@ -38,17 +31,26 @@ public partial class map : Node2D
 	// Called when the node enters the scene tree for the first time.
 	public override void _Ready()
 	{
-		//Find fields
-		List<Node> listOfNodes = new List<Node>(GetChildren());
-		foreach (Node node in listOfNodes)
+		Data = MapSelection.LoadSelected() ?? new MapData();
+		var view = new MapView { Name = "MapView", ShowBehindParent = true };
+		AddChild(view);
+		MoveChild(view, 0);
+		view.SetMap(Data);
+		CreateFields();
+		// Fields placed by hand in the scene still work too
+		foreach (Node node in GetChildren())
 		{
-			if (node is field)
-				fields.Add(node.Name, (field)node);
+			if (node is field placed)
+				fields.TryAdd(node.Name, placed);
 		}
+		foreach (var c in Data.Connections)
+			connections.Add((c[0], c[1]));
 		ConnectAllNodes();
 		unitManager = GetNode<UnitManager>("UnitManager");
 		units = unitManager.findAllUnits();
-		unitManager.setUnitLocation(units, fields["Field"]);
+		StartField = fields.Values.FirstOrDefault(f => f.TypeName == "Castle") ?? fields.Values.FirstOrDefault();
+		if (StartField != null)
+			unitManager.setUnitLocation(units, StartField);
 		foreach (var f in fields.Values)
 		{
 			var castleField = f;
@@ -58,6 +60,8 @@ public partial class map : Node2D
 		GD.Print("There are " + fields.Count + " fields on map");
 		QueueRedraw();
 		var fog = GetNode<FogOfWar>("FogOfWar");
+		fog.Setup(Data.Size);
+		MoveChild(fog, GetChildCount() - 1); // fog covers the fields created above
 		fog.Updated += () =>
 		{
 			foreach (var f in fields.Values)
@@ -200,6 +204,36 @@ public partial class map : Node2D
 		}
 	}
 	 
+	// One field node per field in the map file
+	private void CreateFields()
+	{
+		foreach (var data in Data.Fields)
+		{
+			if (string.IsNullOrEmpty(data.Id) || fields.ContainsKey(data.Id))
+				continue;
+			var newField = FieldScene.Instantiate<field>();
+			newField.Name = data.Id;
+			newField.TypeName = data.Type;
+			newField.Position = MapData.V(data.Pos);
+			foreach (var perkName in data.Perks ?? new List<string>())
+			{
+				var perk = MapCatalog.LoadPerk(perkName);
+				if (perk != null)
+					newField.ExtraPerks.Add(perk);
+			}
+			foreach (var neutral in data.Neutrals ?? new List<NeutralData>())
+			{
+				var template = MapCatalog.LoadUnitTemplate(neutral.Template);
+				if (template == null)
+					continue;
+				for (int i = 0; i < neutral.Count; i++)
+					newField.presentNeutralUnits.Add(new NeutralUnit { Template = template });
+			}
+			AddChild(newField);
+			fields[data.Id] = newField;
+		}
+	}
+
 	private void ConnectAllNodes()
 	{
 		foreach(String key in fields.Keys)
@@ -209,7 +243,8 @@ public partial class map : Node2D
 			List<field> neighbors = new List<field>();
 			foreach(String s in neighborsNames)
 			{
-				neighbors.Add(fields[s]);
+				if (fields.ContainsKey(s))
+					neighbors.Add(fields[s]);
 			}
 			fields[key].Neighbors = neighbors;
 		}

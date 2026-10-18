@@ -1,18 +1,14 @@
-[gd_scene load_steps=23 format=3 uid="uid://bmw3037w1kmrt"]
+[gd_scene load_steps=14 format=3 uid="uid://bmw3037w1kmrt"]
 
 [ext_resource type="Script" path="res://game/main/game.cs" id="1_64kao"]
 [ext_resource type="PackedScene" uid="uid://var6frhqr00x" path="res://game/map/map.tscn" id="1_h6xol"]
-[ext_resource type="Texture2D" uid="uid://b2e6tho8b0ct4" path="res://images/resources/DeathLandMap.jpg" id="1_xcb63"]
 [ext_resource type="Script" path="res://game/map/CameraController.cs" id="2_r28mm"]
-[ext_resource type="PackedScene" uid="uid://cud0aqm12mait" path="res://game/map/field.tscn" id="3_fsomy"]
 [ext_resource type="PackedScene" uid="uid://slm0fvupu3uq" path="res://game/units/unit.tscn" id="4_63g25"]
 [ext_resource type="Script" path="res://game/main/UnitManager.cs" id="4_lus3e"]
 [ext_resource type="Resource" uid="uid://cwtq0y8xsda4m" path="res://unit_templates/imp.tres" id="5_buf6p"]
 [ext_resource type="PackedScene" uid="uid://d2oqmhsdb8fn3" path="res://game/UI/UI.tscn" id="5_n8336"]
 [ext_resource type="Resource" uid="uid://bewribr222x3c" path="res://unit_templates/orc.tres" id="6_5s4c6"]
 [ext_resource type="Script" path="res://game/units/BattleStats.cs" id="8_1outy"]
-[ext_resource type="Script" path="res://game/units/NeutralUnit.cs" id="9_ge3sk"]
-[ext_resource type="Resource" uid="uid://cbo6rewdq70yj" path="res://unit_templates/neutral_unit_templates/wolf.tres" id="10_rafuh"]
 [ext_resource type="Script" path="res://game/map/FogOfWar.cs" id="14_ho7uh"]
 [ext_resource type="Script" path="res://game/main/GlobalTickManager.cs" id="16_nryd8"]
 
@@ -38,37 +34,10 @@ maxMana = 0
 initiative = 0
 rangeUnit = false
 
-[sub_resource type="Resource" id="Resource_jw1ln"]
-script = ExtResource("9_ge3sk")
-Template = ExtResource("5_buf6p")
-
-[sub_resource type="Resource" id="Resource_qleos"]
-script = ExtResource("9_ge3sk")
-Template = ExtResource("10_rafuh")
-
-[sub_resource type="Resource" id="Resource_o4fsw"]
-script = ExtResource("9_ge3sk")
-Template = ExtResource("10_rafuh")
-
-[sub_resource type="Resource" id="Resource_qlny6"]
-script = ExtResource("9_ge3sk")
-Template = ExtResource("10_rafuh")
-
-[sub_resource type="Resource" id="Resource_30i42"]
-script = ExtResource("9_ge3sk")
-Template = ExtResource("10_rafuh")
-
 [node name="Game" type="Node2D"]
 script = ExtResource("1_64kao")
 
-[node name="Background2" type="Sprite2D" parent="."]
-position = Vector2(1526, 452)
-scale = Vector2(1.73858, 1.54497)
-texture = ExtResource("1_xcb63")
-metadata/_edit_lock_ = true
-
 [node name="CameraController" type="Camera2D" parent="."]
-offset = Vector2(415, 343)
 zoom = Vector2(1.4, 1.4)
 script = ExtResource("2_r28mm")
 
@@ -90,141 +59,6 @@ battleStats = SubResource("Resource_i543h")
 script = ExtResource("4_lus3e")
 
 [node name="SelectionSound" type="AudioStreamPlayer" parent="Map/UnitManager"]
-
-[node name="Field31" parent="Map" instance=ExtResource("3_fsomy")]
-position = Vector2(298, 347)
-TypeName = "Castle"
-
-[node name="Field" parent="Map" instance=ExtResource("3_fsomy")]
-position = Vector2(415, 343)
-TypeName = "AutumnForest"
-
-[node name="Field2" parent="Map" instance=ExtResource("3_fsomy")]
-position = Vector2(529, 334)
-TypeName = "AutumnForest"
-
-[node name="Field3" parent="Map" instance=ExtResource("3_fsomy")]
-position = Vector2(634, 385)
-scale = Vector2(1, 0.987588)
-TypeName = "SpringForest"
-
-[node name="Field4" parent="Map" instance=ExtResource("3_fsomy")]
-position = Vector2(739, 384)
-TypeName = "GrassCrossRoads"
-
-[node name="Field5" parent="Map" instance=ExtResource("3_fsomy")]
-position = Vector2(791, 325)
-scale = Vector2(1.07, 1)
-TypeName = "GrassRoad"
-
-[node name="Field6" parent="Map" instance=ExtResource("3_fsomy")]
-position = Vector2(747, 253)
-scale = Vector2(0.913249, 0.854191)
-TypeName = "Village"
-presentNeutralUnits = [SubResource("Resource_jw1ln")]
-
-[node name="Field7" parent="Map" instance=ExtResource("3_fsomy")]
-position = Vector2(858, 258)
-scale = Vector2(0.913249, 0.854191)
-TypeName = "GrassRoad"
-
-[node name="Field8" parent="Map" instance=ExtResource("3_fsomy")]
-position = Vector2(939, 272)
-scale = Vector2(1.14, 1)
-TypeName = "SpringForest"
-
-[node name="Field9" parent="Map" instance=ExtResource("3_fsomy")]
-position = Vector2(1021, 277)
-scale = Vector2(0.913249, 0.854191)
-TypeName = "Bridge"
-
-[node name="Field10" parent="Map" instance=ExtResource("3_fsomy")]
-position = Vector2(750, 454)
-scale = Vector2(0.913249, 0.854191)
-TypeName = "GrassRoad"
-
-[node name="Field11" parent="Map" instance=ExtResource("3_fsomy")]
-position = Vector2(835, 465)
-scale = Vector2(0.913249, 0.854191)
-TypeName = "SpringForest"
-presentNeutralUnits = [SubResource("Resource_qleos"), SubResource("Resource_o4fsw"), SubResource("Resource_qlny6"), SubResource("Resource_30i42")]
-
-[node name="Field12" parent="Map" instance=ExtResource("3_fsomy")]
-position = Vector2(919, 468)
-scale = Vector2(0.834024, 0.729642)
-TypeName = "GrassPlains"
-
-[node name="Field13" parent="Map" instance=ExtResource("3_fsomy")]
-position = Vector2(562, 251)
-TypeName = "GrassPlains"
-
-[node name="Field14" parent="Map" instance=ExtResource("3_fsomy")]
-position = Vector2(555, 176)
-TypeName = "GrassPlains"
-
-[node name="Field15" parent="Map" instance=ExtResource("3_fsomy")]
-position = Vector2(897, 174)
-TypeName = "GrassCrossRoads"
-
-[node name="Field16" parent="Map" instance=ExtResource("3_fsomy")]
-position = Vector2(811, 136)
-TypeName = "SpringForest"
-
-[node name="Field17" parent="Map" instance=ExtResource("3_fsomy")]
-position = Vector2(738, 106)
-TypeName = "GrassPlains"
-
-[node name="Field18" parent="Map" instance=ExtResource("3_fsomy")]
-position = Vector2(768, 34)
-TypeName = "GrassPlains"
-
-[node name="Field19" parent="Map" instance=ExtResource("3_fsomy")]
-position = Vector2(853, -6)
-TypeName = "SpringForest"
-
-[node name="Field20" parent="Map" instance=ExtResource("3_fsomy")]
-position = Vector2(940, 27)
-TypeName = "GrassPlains"
-
-[node name="Field21" parent="Map" instance=ExtResource("3_fsomy")]
-position = Vector2(930, -49)
-TypeName = "Village"
-
-[node name="Field22" parent="Map" instance=ExtResource("3_fsomy")]
-position = Vector2(950, 106)
-TypeName = "GrassPlains"
-
-[node name="Field23" parent="Map" instance=ExtResource("3_fsomy")]
-position = Vector2(1015, 144)
-TypeName = "GrassPlains"
-
-[node name="Field24" parent="Map" instance=ExtResource("3_fsomy")]
-position = Vector2(694, 0)
-TypeName = "GrassPlains"
-
-[node name="Field25" parent="Map" instance=ExtResource("3_fsomy")]
-position = Vector2(590, -4)
-TypeName = "GrassPlains"
-
-[node name="Field29" parent="Map" instance=ExtResource("3_fsomy")]
-position = Vector2(511, 34)
-TypeName = "GrassPlains"
-
-[node name="Field30" parent="Map" instance=ExtResource("3_fsomy")]
-position = Vector2(424, 39)
-TypeName = "GrassPlains"
-
-[node name="Field26" parent="Map" instance=ExtResource("3_fsomy")]
-position = Vector2(513, -26)
-TypeName = "SpringForest"
-
-[node name="Field27" parent="Map" instance=ExtResource("3_fsomy")]
-position = Vector2(534, -88)
-TypeName = "SpringForest"
-
-[node name="Field28" parent="Map" instance=ExtResource("3_fsomy")]
-position = Vector2(604, -116)
-TypeName = "GrassPlains"
 
 [node name="FogOfWar" type="Node2D" parent="Map"]
 script = ExtResource("14_ho7uh")
