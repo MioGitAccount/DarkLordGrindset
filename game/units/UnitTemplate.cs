@@ -15,4 +15,7 @@ public partial class UnitTemplate : Resource
 	[Export] public SpecialAttributes Attributes;
 	// Shared by every unit of this type; each unit chooses which skills to unlock
 	[Export] public SkillTree SkillTree;
+	// Battle traits and actions every unit of this type has; skills can add more
+	[Export] public Godot.Collections.Array<CombatPassive> CombatPassives = new();
+	[Export] public Godot.Collections.Array<CombatAbility> CombatAbilities = new();
 }

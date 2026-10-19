@@ -190,6 +190,22 @@ public partial class field : Node2D
 		presentPlayerUnits.Add(newUnit);
 		ContentsChanged?.Invoke();
 	}
+	// Neutral units killed in battle
+	public void RemoveNeutralUnits(IEnumerable<NeutralUnit> killed)
+	{
+		bool removed = false;
+		foreach (var neutral in killed)
+			removed |= presentNeutralUnits.Remove(neutral);
+		if (!removed)
+			return;
+		if (Fog == FogState.Visible)
+			LastSeenNeutrals = presentNeutralUnits.Duplicate();
+		ContentsChanged?.Invoke();
+	}
+
+	// Lets the UI know something about the field's units changed (e.g. damage taken in battle)
+	public void NotifyContentsChanged() => ContentsChanged?.Invoke();
+
 	public void RemovePlayerUnit(unit unitToRemove)
 	{
 		if (presentPlayerUnits.Remove(unitToRemove))

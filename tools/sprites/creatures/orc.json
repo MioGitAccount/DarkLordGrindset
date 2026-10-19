@@ -34,6 +34,7 @@
 		]
 	],
 	"parts": {
+		"weapon": [38, 0, 26, 32],
 		"left_leg": [8, 50, 13, 14],
 		"right_leg": [31, 50, 16, 14]
 	},
@@ -54,6 +55,16 @@
 				{ "body": [0, 1] },
 				{ "right_leg": [0, -2] },
 				{ "body": [0, 1] }
+			]
+		},
+		{
+			"name": "attack",
+			"speed": 8.0,
+			"loop": false,
+			"frames": [
+				{ "weapon": [-2, -2], "body": [-1, 0] },
+				{ "weapon": [2, 2], "body": [2, 1] },
+				{ "weapon": [1, 1], "body": [1, 0] }
 			]
 		}
 	]

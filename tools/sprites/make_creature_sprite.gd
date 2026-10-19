@@ -7,7 +7,7 @@
 # repaint the eyes, then animate by shifting body parts and add an outline.
 #
 # Writes <output_dir>/<name>_sheet.png (all frames in one row, in animation order)
-# and, only if it doesn't exist yet, <output_dir>/<name>_frames.tres (SpriteFrames).
+# and <output_dir>/<name>_frames.tres (SpriteFrames; an existing file keeps its uid).
 # With preview_dir it also writes <name>_preview.png (sheet at 5x) and
 # <name>_grid.png (first frame at 10x with a grid every 4px, red every 8px).
 extends SceneTree
@@ -137,12 +137,15 @@ func _copy(from: Image, to: Image, area: Rect2i, offset: Vector2i, exclude: Arra
 				to.set_pixelv(q, c)
 
 
-# Writes a SpriteFrames resource with one AtlasTexture per frame. Skipped when
-# the file exists, so Godot's uid (and anything referencing it) is kept.
+# Writes a SpriteFrames resource with one AtlasTexture per frame. When the file
+# exists its uid is kept, so the templates referencing it keep working.
 func _write_sprite_frames(path: String, sheet_path: String) -> void:
+	var uid := ""
 	if FileAccess.file_exists(path):
-		print("Kept existing ", path, " (delete it to regenerate)")
-		return
+		var header := FileAccess.get_file_as_string(path).get_slice("\n", 0)
+		var at := header.find(' uid="')
+		if at >= 0:
+			uid = header.substr(at, header.find('"', at + 6) - at + 1)
 	var subs := ""
 	var anims: Array[String] = []
 	var index := 0
@@ -152,8 +155,9 @@ func _write_sprite_frames(path: String, sheet_path: String) -> void:
 			subs += '[sub_resource type="AtlasTexture" id="AtlasTexture_%d"]\natlas = ExtResource("1_sheet")\nregion = Rect2(%d, 0, %d, %d)\n\n' % [index, index * size, size, size]
 			entries.append('{\n"duration": 1.0,\n"texture": SubResource("AtlasTexture_%d")\n}' % index)
 			index += 1
-		anims.append('{\n"frames": [%s],\n"loop": true,\n"name": &"%s",\n"speed": %s\n}' % [", ".join(entries), anim.name, float(anim.speed)])
-	var text := '[gd_resource type="SpriteFrames" load_steps=%d format=3]\n\n' % (index + 2)
+		var loop: bool = anim.get("loop", true)
+		anims.append('{\n"frames": [%s],\n"loop": %s,\n"name": &"%s",\n"speed": %s\n}' % [", ".join(entries), str(loop).to_lower(), anim.name, float(anim.speed)])
+	var text := '[gd_resource type="SpriteFrames" load_steps=%d format=3%s]\n\n' % [index + 2, uid]
 	text += '[ext_resource type="Texture2D" path="%s" id="1_sheet"]\n\n' % sheet_path
 	text += subs + "[resource]\nanimations = [%s]\n" % ", ".join(anims)
 	var file := FileAccess.open(path, FileAccess.WRITE)

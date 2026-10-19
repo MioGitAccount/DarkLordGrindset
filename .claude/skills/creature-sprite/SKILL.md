@@ -13,8 +13,8 @@ Godot doesn't import it.
 - `source/<name>_concept.<ext>`: the concept art (png/jpg/webp).
 
 Output goes to `images/Units/sprites/<name>_sheet.png` (all frames in one row) and
-`<name>_frames.tres` (SpriteFrames with `idle` and `walk`). The `.tres` is written only
-if it doesn't exist yet, so Godot's uid and references to it survive regeneration.
+`<name>_frames.tres` (SpriteFrames with `idle`, `walk` and `attack`). Regenerating rewrites
+the `.tres` but keeps its existing uid, so the templates referencing it keep working.
 
 Godot 4.2 executable (use the console build to see output):
 `/c/Users/Miomir/Desktop/Godot_v4.2.1-stable_mono_win64/Godot_v4.2.1-stable_mono_win64_console.exe`
@@ -61,6 +61,11 @@ fine, because the `enhance` step brightens it.
    - Keep the imp's rhythm unless asked otherwise: idle = 2 frames (breathe down 1px);
      walk = left foot up, body down, right foot up, body down. Four-legged creatures
      (wolf): four leg boxes, and lift diagonal pairs together (front-left with back-right).
+   - `attack` (used by the battle screen; sprites face right, enemies are flipped):
+     3 frames, `"speed": 8.0, "loop": false` - wind-up, strike, follow-through. Give the
+     weapon or striking hand its own part box and move it at most 1-2px more than the
+     body; bigger offsets tear it off where the box edge crosses an arm or handle (see
+     `orc.json`, `imp.json`). Most of the attack feel comes from the battle lunge anyway.
 6. **Wire it into the game**: in `unit_templates/<name>.tres` (or
    `unit_templates/neutral_unit_templates/`), add an ext_resource for
    `res://images/Units/sprites/<name>_frames.tres` and set `MapSprite = ExtResource(...)`,
@@ -131,6 +136,6 @@ weapon) are removed by colour match, not flood fill.
   scale drops pixels; keep the linear filter.
 - Moving or renaming an asset that is referenced by uid can break loading until the
   editor rescans. Keep paths stable.
-- Don't delete and regenerate an existing `<name>_frames.tres` unless the frame count
-  or animation names changed. If you must, the template's ext_resource will need its
-  uid removed or updated.
+- Don't delete an existing `<name>_frames.tres`: rerunning the generator rewrites it in
+  place with the same uid. A deleted one comes back with a new uid, and the template's
+  ext_resource then needs its uid removed or updated.

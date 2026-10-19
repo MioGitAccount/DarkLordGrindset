@@ -1,4 +1,4 @@
-[gd_scene load_steps=9 format=3 uid="uid://d2oqmhsdb8fn3"]
+[gd_scene load_steps=8 format=3 uid="uid://d2oqmhsdb8fn3"]
 
 [ext_resource type="Script" path="res://game/UI/UIManager.cs" id="1_mgr"]
 [ext_resource type="Theme" uid="uid://8ig4gbhiqwx5" path="res://game/UI/theme/hud_theme.tres" id="2_theme"]
@@ -6,18 +6,15 @@
 [ext_resource type="PackedScene" path="res://game/UI/widgets/icon_slot.tscn" id="4_slot"]
 [ext_resource type="Script" path="res://game/UI/FieldInfoPanel.cs" id="5_field"]
 [ext_resource type="Script" path="res://game/UI/SelectedUnitPanel.cs" id="6_unit"]
-[ext_resource type="PackedScene" uid="uid://dgd7ebhu4fh0b" path="res://game/battle/battle_ground.tscn" id="7_battle"]
 [ext_resource type="Script" path="res://game/UI/widgets/AttributePentagon.cs" id="8_pentagon"]
 
-[node name="UI" type="CanvasLayer" node_paths=PackedStringArray("FieldInfo", "SelectedUnit", "PlayerGold", "PlayerWood", "BattleOverlay", "BattleButton", "CloseBattleButton")]
+[node name="UI" type="CanvasLayer" node_paths=PackedStringArray("FieldInfo", "SelectedUnit", "PlayerGold", "PlayerWood", "BattleButton")]
 script = ExtResource("1_mgr")
 FieldInfo = NodePath("HUD/FieldInfo")
 SelectedUnit = NodePath("HUD/SelectedUnit")
 PlayerGold = NodePath("HUD/TopBar/HBox/PlayerGold")
 PlayerWood = NodePath("HUD/TopBar/HBox/PlayerWood")
-BattleOverlay = NodePath("HUD/BattleOverlay")
 BattleButton = NodePath("HUD/TopBar/HBox/BattleButton")
-CloseBattleButton = NodePath("HUD/BattleOverlay/VBox/Header/CloseBattleButton")
 
 [node name="HUD" type="Control" parent="."]
 layout_mode = 3
@@ -52,7 +49,7 @@ layout_mode = 2
 
 [node name="BattleButton" type="Button" parent="HUD/TopBar/HBox"]
 layout_mode = 2
-tooltip_text = "Open the battle screen (work in progress)"
+tooltip_text = "Fight the enemies on the selected field with your units there"
 focus_mode = 0
 text = "Battle"
 
@@ -203,43 +200,3 @@ text = "Abilities"
 
 [node name="AbilitiesRow" type="HFlowContainer" parent="HUD/SelectedUnit/VBox/AbilitiesSection"]
 layout_mode = 2
-
-[node name="BattleOverlay" type="PanelContainer" parent="HUD"]
-visible = false
-layout_mode = 1
-anchors_preset = 8
-anchor_left = 0.5
-anchor_top = 0.5
-anchor_right = 0.5
-anchor_bottom = 0.5
-offset_left = -20.0
-offset_top = -20.0
-offset_right = 20.0
-offset_bottom = 20.0
-grow_horizontal = 2
-grow_vertical = 2
-
-[node name="VBox" type="VBoxContainer" parent="HUD/BattleOverlay"]
-layout_mode = 2
-
-[node name="Header" type="HBoxContainer" parent="HUD/BattleOverlay/VBox"]
-layout_mode = 2
-
-[node name="Title" type="Label" parent="HUD/BattleOverlay/VBox/Header"]
-layout_mode = 2
-size_flags_horizontal = 3
-theme_type_variation = &"HeaderLabel"
-text = "Battle"
-
-[node name="CloseBattleButton" type="Button" parent="HUD/BattleOverlay/VBox/Header"]
-layout_mode = 2
-focus_mode = 0
-text = "Close"
-
-[node name="BattleHolder" type="Control" parent="HUD/BattleOverlay/VBox"]
-custom_minimum_size = Vector2(577, 325)
-layout_mode = 2
-mouse_filter = 2
-
-[node name="BattleGround" parent="HUD/BattleOverlay/VBox/BattleHolder" instance=ExtResource("7_battle")]
-scale = Vector2(0.5, 0.5)
