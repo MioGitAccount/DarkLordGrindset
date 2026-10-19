@@ -7,6 +7,11 @@ uniform sampler2D blight_tex : filter_linear_mipmap, repeat_enable;
 uniform sampler2D variation_tex : filter_linear_mipmap, repeat_enable; // TerrainTextures.Variation
 uniform sampler2D ground_tex : filter_linear, repeat_disable;  // GroundInfluence: R forest, G rock, B settlement
 uniform vec2 world_size = vec2(1024.0);
+uniform float blight_tile = 256.0; // world px per blight texture tile
+uniform sampler2D rock_tex : filter_linear_mipmap, repeat_enable;  // dirt texture, greyed: rocky foothills
+uniform float rock_tile = 256.0;
+uniform sampler2D worn_tex : filter_linear_mipmap, repeat_enable;  // road texture: worn ground around settlements
+uniform float worn_tile = 256.0;
 uniform vec3 forest_floor : source_color = vec3(0.27, 0.33, 0.17);
 uniform vec3 rock_ground : source_color = vec3(0.5, 0.44, 0.36);
 uniform vec3 worn_dirt : source_color = vec3(0.72, 0.62, 0.44);
@@ -28,9 +33,12 @@ float ring(float d, float at, float width) {
 }
 
 void fragment() {
-	vec4 c = COLOR; // already the terrain texture times the vertex color
-	// Vertex alpha < 1: the soft band around land shapes. Turn it into a brushy, irregular edge
-	float band = c.a;
+	// Vertex alpha < 1: the soft band around land shapes, turned into a brushy, irregular edge below
+	float band = COLOR.a;
+	// Anti-tiling: a second look at the texture (other scale and offset), blended in by slow
+	// noise, so the same patch of the texture never repeats in a visible grid
+	float pick = smoothstep(0.38, 0.62, texture(variation_tex, world / 900.0 + 0.21).r);
+	vec4 c = mix(texture(TEXTURE, UV), texture(TEXTURE, UV * 0.81 + vec2(0.37, 0.59)), pick);
 	c.a = 1.0;
 	// Large, slow color variation so the repeating texture tiles don't show
 	float big = texture(variation_tex, world / 2300.0).r - 0.5;
@@ -60,9 +68,12 @@ void fragment() {
 	c.rgb = mix(c.rgb, mix(c.rgb, forest_floor * (0.8 + 0.4 * fine), 0.7), forest * 0.75);
 	// Grit: small dark and light stones in the rocky ground
 	float grit = texture(variation_tex, world / 17.0 + 0.4).r;
-	vec3 rocky = rock_ground * (0.75 + 0.5 * fine) * (1.0 - 0.22 * smoothstep(0.6, 0.75, grit) + 0.12 * smoothstep(0.38, 0.25, grit));
+	vec3 rock_paint = mix(texture(rock_tex, world / rock_tile).rgb, texture(rock_tex, world / rock_tile * 0.81 + vec2(0.37, 0.59)).rgb, pick);
+	// The dirt texture, greyed and darkened towards the rock color, keeps its pebbles and cracks
+	vec3 rocky = mix(rock_paint, rock_ground, 0.45) * (0.82 + 0.3 * rock_paint.r) * (1.0 - 0.15 * smoothstep(0.6, 0.75, grit));
 	c.rgb = mix(c.rgb, rocky, rock * 0.85);
-	c.rgb = mix(c.rgb, worn_dirt * (0.86 + 0.28 * fine), worn * 0.8);
+	vec3 worn_paint = mix(texture(worn_tex, world / worn_tile).rgb, texture(worn_tex, world / worn_tile * 0.81 + vec2(0.37, 0.59)).rgb, pick);
+	c.rgb = mix(c.rgb, mix(worn_paint, worn_dirt, 0.3), worn * 0.8);
 
 	if (d > 0.0) {
 		// Lighter, shallow water along every coast
@@ -79,7 +90,7 @@ void fragment() {
 
 	// Blight: dark stain with a brown rim, soft edges from the blurred mask
 	float b = info.b;
-	vec3 stain = texture(blight_tex, world / 256.0).rgb; // TerrainTextures.TileWorldSize
+	vec3 stain = mix(texture(blight_tex, world / blight_tile).rgb, texture(blight_tex, world / blight_tile * 0.81 + vec2(0.37, 0.59)).rgb, pick);
 	c.rgb = mix(c.rgb, blight_edge_color, 0.5 * smoothstep(0.05, 0.35, b) * (1.0 - smoothstep(0.35, 0.7, b)));
 	c.rgb = mix(c.rgb, stain, 0.9 * smoothstep(0.3, 0.75, b));
 

@@ -1944,6 +1944,125 @@
       "points": [[643.4,899],[631,900.8],[615.5,900.3],[610.5,894.9],[609.1,888],[611.4,885.7],[626.9,882.1],[664.8,881.6],[686.3,883.4],[693.2,888.5],[692.2,900.3],[687.7,905.4],[680.4,910.4],[661.2,914.1],[638.3,914.1],[608.7,909.5],[602.7,901.7],[602.7,894.9],[607.7,887.5],[625.6,882.5],[645.2,880.2],[676.3,880.2]],
       "width": 20,
       "rough": false
+    },
+    {
+      "type": "dirt",
+      "shape": "stroke",
+      "points": [[543.5,1040.3]],
+      "width": 50,
+      "rough": false
+    },
+    {
+      "type": "dirt",
+      "shape": "stroke",
+      "points": [[534.5,1016.7]],
+      "width": 50,
+      "rough": false
+    },
+    {
+      "type": "dirt",
+      "shape": "stroke",
+      "points": [[552.6,890.4]],
+      "width": 50,
+      "rough": false
+    },
+    {
+      "type": "dirt",
+      "shape": "stroke",
+      "points": [[538.1,857.7]],
+      "width": 16,
+      "rough": false
+    },
+    {
+      "type": "dirt",
+      "shape": "stroke",
+      "points": [[530.2,862]],
+      "width": 16,
+      "rough": false
+    },
+    {
+      "type": "blight",
+      "shape": "stroke",
+      "points": [[510.9,1013.1]],
+      "width": 16,
+      "rough": false
+    },
+    {
+      "type": "blight",
+      "shape": "stroke",
+      "points": [[512.7,1027]],
+      "width": 16,
+      "rough": false
+    },
+    {
+      "type": "blight",
+      "shape": "stroke",
+      "points": [[576.2,1035.5]],
+      "width": 16,
+      "rough": false
+    },
+    {
+      "type": "blight",
+      "shape": "stroke",
+      "points": [[567.7,1036.1]],
+      "width": 16,
+      "rough": false
+    },
+    {
+      "type": "blight",
+      "shape": "stroke",
+      "points": [[510.3,1043.3]],
+      "width": 16,
+      "rough": false
+    },
+    {
+      "type": "blight",
+      "shape": "stroke",
+      "points": [[471.6,1072.4]],
+      "width": 16,
+      "rough": false
+    },
+    {
+      "type": "blight",
+      "shape": "stroke",
+      "points": [[840.6,848.1],[817.1,852.9]],
+      "width": 16,
+      "rough": false
+    },
+    {
+      "type": "road",
+      "shape": "stroke",
+      "points": [[834.6,843.9],[843,846.3],[847.9,852.3],[870.8,856.6]],
+      "width": 10,
+      "rough": false
+    },
+    {
+      "type": "road",
+      "shape": "stroke",
+      "points": [[878.1,851.7],[849.1,851.1]],
+      "width": 10,
+      "rough": false
+    },
+    {
+      "type": "road",
+      "shape": "stroke",
+      "points": [[873.8,849.3],[896.8,849.3]],
+      "width": 10,
+      "rough": false
+    },
+    {
+      "type": "road",
+      "shape": "stroke",
+      "points": [[924,848.7],[926.4,848.1]],
+      "width": 10,
+      "rough": false
+    },
+    {
+      "type": "road",
+      "shape": "stroke",
+      "points": [[938.5,849.9],[904.6,849.9]],
+      "width": 10,
+      "rough": false
     }
   ],
   "objects": [

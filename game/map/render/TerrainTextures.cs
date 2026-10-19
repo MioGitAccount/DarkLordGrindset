@@ -4,14 +4,19 @@ using System.Collections.Generic;
 
 // Seamless tiling texture per terrain type in a painted style: broad color blotches, horizontal
 // brush strokes, warm/cool shifts and fine grain, in the type's two colors.
-// A hand-made texture at res://images/terrain/<id>.png (any size, must tile) replaces it.
+// A hand-made texture at res://images/terrain/<id>.png (must tile, see tools/sprites/make_tileable.gd)
+// replaces it; those are more detailed, so one tile covers CustomTileWorldSize.
 public static class TerrainTextures
 {
-	public const float TileWorldSize = 256f; // world pixels covered by one texture tile
+	public const float TileWorldSize = 256f;       // world pixels covered by one generated texture tile
+	public const float CustomTileWorldSize = 512f; // ... and by one hand-made texture tile
 	private const int Pixels = 512;          // texture pixels per tile: 2 per world pixel, sharp when zoomed in
 
 	private static readonly Dictionary<string, Texture2D> Cache = new();
 	private static Texture2D _variation;
+
+	public static float TileSizeOf(string terrainId) =>
+		ResourceLoader.Exists($"res://images/terrain/{terrainId}.png") ? CustomTileWorldSize : TileWorldSize;
 
 	public static Texture2D Get(string terrainId)
 	{
