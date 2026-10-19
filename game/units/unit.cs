@@ -24,6 +24,11 @@ public partial class unit : Node2D
 	public SkillTree SkillTree => Template?.SkillTree;
 	// Bumped whenever stats, attributes, abilities or progression change, so UI knows when to refresh
 	public int Revision { get; private set; }
+	// Battle traits and actions from the template plus unlocked skills, see RecalculateStats
+	public List<CombatPassive> CombatPassives { get; private set; } = new();
+	public List<CombatAbility> CombatAbilities { get; private set; } = new();
+	// Raised when the unit dies (in battle), right before it is removed from the game
+	public event Action<unit> Died;
 
 	private BattleStats _baseStats;
 	private SpecialAttributes _baseAttributes;
@@ -100,6 +105,17 @@ public partial class unit : Node2D
 		var attributes = (SpecialAttributes)_baseAttributes.Duplicate();
 		float vision = _baseVisibilityRadius;
 		var abilities = new Godot.Collections.Array<Ability>(_baseAbilities);
+		var combatPassives = new List<CombatPassive>();
+		var combatAbilities = new List<CombatAbility>();
+		if (Template != null)
+		{
+			foreach (var passive in Template.CombatPassives)
+				if (passive != null)
+					combatPassives.Add(passive);
+			foreach (var combatAbility in Template.CombatAbilities)
+				if (combatAbility != null)
+					combatAbilities.Add(combatAbility);
+		}
 		foreach (var skill in skills)
 		{
 			for (int i = 0; i < SpecialAttributes.Count; i++)
@@ -107,6 +123,10 @@ public partial class unit : Node2D
 			vision += skill.BonusVision;
 			if (skill.GrantedAbility != null && !abilities.Contains(skill.GrantedAbility))
 				abilities.Add(skill.GrantedAbility);
+			if (skill.GrantedCombatPassive != null && !combatPassives.Contains(skill.GrantedCombatPassive))
+				combatPassives.Add(skill.GrantedCombatPassive);
+			if (skill.GrantedCombatAbility != null && !combatAbilities.Contains(skill.GrantedCombatAbility))
+				combatAbilities.Add(skill.GrantedCombatAbility);
 		}
 
 		var stats = attributes.ApplyTo(_baseStats);
@@ -121,7 +141,27 @@ public partial class unit : Node2D
 		battleStats = stats;
 		VisibilityRadius = vision;
 		Abilities = abilities;
+		CombatPassives = combatPassives;
+		CombatAbilities = combatAbilities;
 		Revision++;
+	}
+
+	// Health and mana left after a battle the unit survived
+	public void ApplyBattleOutcome(int health, int mana)
+	{
+		battleStats.health = Math.Clamp(health, 0, battleStats.maxHealth);
+		battleStats.mana = Math.Clamp(mana, 0, battleStats.maxMana);
+		Revision++;
+	}
+
+	// Killed in battle: leaves its field and the game
+	public void Die()
+	{
+		abilityRunner?.StopAbility();
+		currentField?.RemovePlayerUnit(this);
+		currentField = null;
+		Died?.Invoke(this);
+		QueueFree();
 	}
 
 	public void AddExperience(int amount)

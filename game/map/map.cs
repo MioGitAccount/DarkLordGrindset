@@ -48,6 +48,8 @@ public partial class map : Node2D
 		ConnectAllNodes();
 		unitManager = GetNode<UnitManager>("UnitManager");
 		units = unitManager.findAllUnits();
+		foreach (var existing in units)
+			existing.Died += OnUnitDied;
 		StartField = fields.Values.FirstOrDefault(f => f.TypeName == "Castle") ?? fields.Values.FirstOrDefault();
 		if (StartField != null)
 			unitManager.setUnitLocation(units, StartField);
@@ -156,9 +158,17 @@ public partial class map : Node2D
 		GetNode("UnitList").AddChild(newUnit, forceReadableName: true);
 		newUnit.Progression.LevelUpTo(level);
 		units.Add(newUnit);
+		newUnit.Died += OnUnitDied;
 		newUnit.EnterField(place, fade: false);
 		GD.Print($"Recruited {newUnit.Name} (level {level}) at {place.Name}");
 		return newUnit;
+	}
+
+	private void OnUnitDied(unit deadUnit)
+	{
+		units.Remove(deadUnit);
+		if (unitManager.selectedUnit == deadUnit)
+			unitManager.selectedUnit = null;
 	}
 
 	public void OnNodeClicked(Node2D clickedNode)

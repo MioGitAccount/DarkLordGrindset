@@ -31,6 +31,9 @@ public partial class SkillDefinition : Resource
 	[Export] public float BonusVision;
 	// Ability the unit can use once this skill is unlocked
 	[Export] public Ability GrantedAbility;
+	// Battle trait or battle action the unit gets once this skill is unlocked
+	[Export] public CombatPassive GrantedCombatPassive;
+	[Export] public CombatAbility GrantedCombatAbility;
 
 	// Unit level needed before a skill of this tier can be learned: 1, 3, 5, 7, 9
 	public int RequiredUnitLevel => 1 + (Tier - 1) * 2;
@@ -56,6 +59,10 @@ public partial class SkillDefinition : Resource
 			lines.Add($"+{BonusVision:0} vision range");
 		if (GrantedAbility != null)
 			lines.Add($"Unlocks ability: {GrantedAbility.Name}");
+		if (GrantedCombatPassive != null)
+			lines.Add($"Battle passive: {GrantedCombatPassive.Name}");
+		if (GrantedCombatAbility != null)
+			lines.Add($"Battle ability: {GrantedCombatAbility.Name}");
 		return lines;
 	}
 }

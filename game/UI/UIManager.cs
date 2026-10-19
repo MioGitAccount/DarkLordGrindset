@@ -11,9 +11,8 @@ public partial class UIManager : CanvasLayer
 	[Export] private SelectedUnitPanel SelectedUnit;
 	[Export] private ResourceCounter PlayerGold;
 	[Export] private ResourceCounter PlayerWood;
-	[Export] private Control BattleOverlay;
+	// Starts a battle on the selected field (see BattleScreen)
 	[Export] private BaseButton BattleButton;
-	[Export] private BaseButton CloseBattleButton;
 	// Created in code (it builds its own contents), so it doesn't depend on UI.tscn
 	private FieldHoverCard FieldHoverCard;
 	// Top bar counter for every ResourceType; the player always sees all of them
@@ -21,6 +20,9 @@ public partial class UIManager : CanvasLayer
 	private UnitInspectWindow UnitInspect;
 	private SkillTreeWindow SkillTree;
 	private BuildWindow Build;
+	private BattleScreen Battle;
+	// The field shown in the field panel; the Battle button fights there
+	private field _shownField;
 
 	public override void _Ready()
 	{
@@ -38,9 +40,11 @@ public partial class UIManager : CanvasLayer
 		SelectedUnit.InspectRequested += selected => { CloseWindows(); UnitInspect.Open(selected); };
 		SelectedUnit.SkillsRequested += selected => { CloseWindows(); SkillTree.Open(selected); };
 		FieldInfo.CastleRequested += castle => { CloseWindows(); Build.Open(castle); };
-		BattleButton.Pressed += () => SetBattleVisible(!BattleOverlay.Visible);
-		CloseBattleButton.Pressed += () => SetBattleVisible(false);
-		SetBattleVisible(false);
+		// Last child, so the full-screen battle covers the rest of the HUD
+		Battle = new BattleScreen { Name = "Battle" };
+		FieldInfo.GetParent().AddChild(Battle);
+		BattleButton.Pressed += () => { CloseWindows(); Battle.Open(_shownField); };
+		UpdateBattleButton();
 	}
 
 	private void CloseWindows()
@@ -53,6 +57,25 @@ public partial class UIManager : CanvasLayer
 	public void ShowField(field selectedField)
 	{
 		FieldInfo.ShowField(selectedField);
+		if (_shownField != null)
+			_shownField.ContentsChanged -= UpdateBattleButton;
+		_shownField = selectedField;
+		if (_shownField != null)
+			_shownField.ContentsChanged += UpdateBattleButton;
+		UpdateBattleButton();
+	}
+
+	public override void _ExitTree()
+	{
+		if (_shownField != null)
+			_shownField.ContentsChanged -= UpdateBattleButton;
+	}
+
+	private void UpdateBattleButton()
+	{
+		bool canFight = BattleScreen.CanFightOn(_shownField, out string reason);
+		BattleButton.Disabled = !canFight;
+		BattleButton.TooltipText = canFight ? "Fight the enemies on the selected field with your units there" : reason;
 	}
 
 	public void ShowFieldHover(field hoveredField)
@@ -113,8 +136,4 @@ public partial class UIManager : CanvasLayer
 			counter.SetAmount(amount);
 	}
 
-	public void SetBattleVisible(bool visible)
-	{
-		BattleOverlay.Visible = visible;
-	}
 }
