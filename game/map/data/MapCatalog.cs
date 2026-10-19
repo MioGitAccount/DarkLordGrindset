@@ -51,6 +51,7 @@ public static class MapCatalog
 		new TerrainType { Id = "meadow", Name = "Meadow", Kind = TerrainKind.Land, Dark = new Color(0.55f, 0.63f, 0.26f), Light = new Color(0.67f, 0.72f, 0.34f), BrushWidth = 60, Feather = 22, Hint = "Bright lush grass." },
 		new TerrainType { Id = "dirt", Name = "Dirt", Kind = TerrainKind.Land, Dark = new Color(0.6f, 0.51f, 0.33f), Light = new Color(0.73f, 0.64f, 0.45f), BrushWidth = 50, Feather = 20 },
 		new TerrainType { Id = "desert", Name = "Desert", Kind = TerrainKind.Land, Dark = new Color(0.8f, 0.71f, 0.52f), Light = new Color(0.9f, 0.82f, 0.63f), BrushWidth = 80, Feather = 24 },
+		new TerrainType { Id = "snow", Name = "Snow", Kind = TerrainKind.Land, Dark = new Color(0.78f, 0.8f, 0.85f), Light = new Color(0.93f, 0.94f, 0.96f), BrushWidth = 80, Feather = 24, Hint = "Snowfields, e.g. around snowy mountains." },
 		new TerrainType { Id = "road", Name = "Road", Kind = TerrainKind.Land, Dark = new Color(0.66f, 0.57f, 0.4f), Light = new Color(0.76f, 0.68f, 0.5f), BrushWidth = 10, Feather = 3, Hint = "Paint as a thin stroke." },
 		new TerrainType { Id = "blight", Name = "Blight", Kind = TerrainKind.Overlay, Dark = new Color(0.17f, 0.15f, 0.14f), Light = new Color(0.27f, 0.23f, 0.18f), BrushWidth = 90, Hint = "Dark Lord corruption: a soft dark stain." },
 	}.ToDictionary(t => t.Id);

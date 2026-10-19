@@ -145,6 +145,11 @@ public partial class TerrainRenderer : Node2D
 		var displayMaterial = (ShaderMaterial)_colorPainter.Material;
 		displayMaterial.SetShaderParameter("distance_tex", _distanceViewport.GetTexture());
 		displayMaterial.SetShaderParameter("blight_tex", TerrainTextures.Get("blight"));
+		displayMaterial.SetShaderParameter("blight_tile", TerrainTextures.TileSizeOf("blight"));
+		displayMaterial.SetShaderParameter("rock_tex", TerrainTextures.Get("dirt"));
+		displayMaterial.SetShaderParameter("rock_tile", TerrainTextures.TileSizeOf("dirt"));
+		displayMaterial.SetShaderParameter("worn_tex", TerrainTextures.Get("road"));
+		displayMaterial.SetShaderParameter("worn_tile", TerrainTextures.TileSizeOf("road"));
 		displayMaterial.SetShaderParameter("variation_tex", TerrainTextures.Variation());
 		displayMaterial.SetShaderParameter("world_size", size);
 		_ground.SetMap(_data);
@@ -235,8 +240,9 @@ public partial class TerrainRenderer : Node2D
 					if (type.Kind == MapCatalog.TerrainKind.Overlay)
 						return; // blight is drawn by terrain.gdshader from its mask
 					var uvs = new Vector2[points.Length];
+					float tile = TerrainTextures.TileSizeOf(type.Id);
 					for (int i = 0; i < points.Length; i++)
-						uvs[i] = points[i] / TerrainTextures.TileWorldSize;
+						uvs[i] = points[i] / tile;
 					var colors = Fill(points.Length, Colors.White);
 					if (alpha != null)
 						for (int i = 0; i < colors.Length; i++)
