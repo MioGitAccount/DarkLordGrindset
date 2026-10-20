@@ -52,7 +52,12 @@ public partial class map : Node2D
 			existing.Died += OnUnitDied;
 		StartField = fields.Values.FirstOrDefault(f => f.TypeName == "Castle") ?? fields.Values.FirstOrDefault();
 		if (StartField != null)
-			unitManager.setUnitLocation(units, StartField);
+			unitManager.setUnitLocation(units.Where(u => !fields.ContainsKey(u.StartFieldId)).ToList(), StartField);
+		foreach (var placed in units.Where(u => fields.ContainsKey(u.StartFieldId)))
+		{
+			placed.Position = fields[placed.StartFieldId].Position;
+			placed.EnterField(fields[placed.StartFieldId], fade: false);
+		}
 		foreach (var f in fields.Values)
 		{
 			var castleField = f;

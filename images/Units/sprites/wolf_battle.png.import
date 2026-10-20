@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://coj6logyekd4e"
-path="res://.godot/imported/mountain_4.png-905fda922b251d2b7c155f6bd0b83cad.ctex"
+uid="uid://c6r528bckoron"
+path="res://.godot/imported/wolf_battle.png-f309fdeee0cafd8ea1589b4d56d737b4.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://images/map_objects/mountain_4.png"
-dest_files=["res://.godot/imported/mountain_4.png-905fda922b251d2b7c155f6bd0b83cad.ctex"]
+source_file="res://images/Units/sprites/wolf_battle.png"
+dest_files=["res://.godot/imported/wolf_battle.png-f309fdeee0cafd8ea1589b4d56d737b4.ctex"]
 
 [params]
 
@@ -21,7 +21,7 @@ compress/lossy_quality=0.7
 compress/hdr_compression=1
 compress/normal_map=0
 compress/channel_pack=0
-mipmaps/generate=false
+mipmaps/generate=true
 mipmaps/limit=-1
 roughness/mode=0
 roughness/src_normal=""

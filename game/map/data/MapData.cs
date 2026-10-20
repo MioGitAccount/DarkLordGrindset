@@ -152,7 +152,8 @@ public class MapData
 				problems.Add($"terrain[{i}]: unknown type '{s.Type}'");
 			if (s.Shape is not ("polygon" or "stroke" or "circle"))
 				problems.Add($"terrain[{i}]: unknown shape '{s.Shape}'");
-			else if (s.Shape == "circle" ? s.Center == null : (s.Points == null || s.Points.Count < (s.Shape == "polygon" ? 3 : 2)))
+			// A stroke with one point is a round dab (a single click with the brush)
+			else if (s.Shape == "circle" ? s.Center == null : (s.Points == null || s.Points.Count < (s.Shape == "polygon" ? 3 : 1)))
 				problems.Add($"terrain[{i}]: {s.Shape} is missing its points");
 		}
 		for (int i = 0; i < Objects.Count; i++)

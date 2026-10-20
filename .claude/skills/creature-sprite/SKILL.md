@@ -1,9 +1,9 @@
 ---
 name: creature-sprite
-description: Turn a creature's concept art into an animated pixel-art world-map sprite (idle + walk) for DeathLand, and wire it into the unit template. Handles flat backgrounds automatically and busy backgrounds via a traced polygon mask. Use when the user wants a new unit or creature sprite, a map sprite from an image, or to redo or tune an existing one (imp, orc, wolf, knight, ...).
+description: Turn a creature's concept art into an animated pixel-art world-map sprite (idle + walk + attack) and a painted battle image for DeathLand, and wire both into the unit template. Handles flat backgrounds automatically and busy backgrounds via a traced polygon mask. Use when the user wants a new unit or creature sprite, a map or battle sprite from an image, or to redo or tune an existing one (imp, orc, wolf, knight, ...).
 ---
 
-# Creature map sprite from concept art
+# Creature sprites from concept art
 
 The pipeline lives in `tools/sprites/`. The `tools/` folder has a `.gdignore`, so
 Godot doesn't import it.
@@ -12,9 +12,15 @@ Godot doesn't import it.
 - `creatures/<name>.json`: per-creature settings. `imp.json` is the reference example.
 - `source/<name>_concept.<ext>`: the concept art (png/jpg/webp).
 
-Output goes to `images/Units/sprites/<name>_sheet.png` (all frames in one row) and
-`<name>_frames.tres` (SpriteFrames with `idle`, `walk` and `attack`). Regenerating rewrites
-the `.tres` but keeps its existing uid, so the templates referencing it keep working.
+Output goes to `images/Units/sprites/`:
+- `<name>_sheet.png` (all frames in one row) and `<name>_frames.tres` (SpriteFrames with
+  `idle`, `walk` and `attack`): the 64px pixel-art map sprite. Regenerating rewrites the
+  `.tres` but keeps its existing uid, so the templates referencing it keep working.
+- `<name>_battle.png`: the same cutout at `battle_size` (default 256), painted: no palette
+  reduction, eye repaint or outline. The battle screen shows this and animates it in code
+  (`BattleFighterView`: breathing, wind-up and lunge, knockback on hits, falling over), so
+  it needs no frames or parts. Check its edges for leftover background, since at 256px
+  mask mistakes are 4x more visible than on the map sprite.
 
 Godot 4.2 executable (use the console build to see output):
 `/c/Users/Miomir/Desktop/Godot_v4.2.1-stable_mono_win64/Godot_v4.2.1-stable_mono_win64_console.exe`
@@ -61,30 +67,51 @@ fine, because the `enhance` step brightens it.
    - Keep the imp's rhythm unless asked otherwise: idle = 2 frames (breathe down 1px);
      walk = left foot up, body down, right foot up, body down. Four-legged creatures
      (wolf): four leg boxes, and lift diagonal pairs together (front-left with back-right).
-   - `attack` (used by the battle screen; sprites face right, enemies are flipped):
-     3 frames, `"speed": 8.0, "loop": false` - wind-up, strike, follow-through. Give the
-     weapon or striking hand its own part box and move it at most 1-2px more than the
-     body; bigger offsets tear it off where the box edge crosses an arm or handle (see
-     `orc.json`, `imp.json`). Most of the attack feel comes from the battle lunge anyway.
-6. **Wire it into the game**: in `unit_templates/<name>.tres` (or
-   `unit_templates/neutral_unit_templates/`), add an ext_resource for
-   `res://images/Units/sprites/<name>_frames.tres` and set `MapSprite = ExtResource(...)`,
-   bumping `load_steps` by one. `unit.cs` then uses it automatically: idle/walk
-   switching, flipping when walking left, half-scale drawing (`unit.tscn` →
-   `AnimatedSprite` scale 0.5, linear filter), and the shadow and selection ring.
-   Units without a `MapSprite` keep showing their round `Icon`.
-   Note: neutral units (`NeutralUnit` resources on fields) are only shown in the UI,
-   not on the map, so their `MapSprite` has no visible effect yet; say so.
-7. **Import, then check in game**. New PNGs must be imported before the game can load them:
+   - `attack` (only used in battle when a template has no `BattleSprite`; sprites face
+     right, enemies are flipped): 3 frames, `"speed": 8.0, "loop": false` - wind-up,
+     strike, follow-through. Give the weapon or striking hand its own part box and move it
+     at most 1-2px more than the body; bigger offsets tear it off where the box edge
+     crosses an arm or handle (see `orc.json`, `imp.json`).
+6. **Import**. New PNGs must be imported before the game can load them. Plain
+   `--editor --quit` can exit before importing, so give it time:
    ```bash
-   "$G" --path . --headless --editor --quit
+   "$G" --path . --headless --editor --quit-after 300
    ```
+   Then turn on mipmaps for the battle image (it is drawn at about half size, and
+   without mipmaps it shimmers): in `<name>_battle.png.import` set
+   `mipmaps/generate=true` and run the import command again.
+7. **Wire it into the game**: in `unit_templates/<name>.tres` (or
+   `unit_templates/neutral_unit_templates/`), add ext_resources for
+   `res://images/Units/sprites/<name>_frames.tres` (SpriteFrames) and
+   `<name>_battle.png` (Texture2D, with the uid from its `.import` file), set
+   `MapSprite = ExtResource(...)` and `BattleSprite = ExtResource(...)`, and bump
+   `load_steps` by one per new ext_resource. A brand-new `_frames.tres` has no uid until
+   the editor saves it; reference it by path only (no `uid=""`).
+   `unit.cs` then uses the map sprite automatically: idle/walk switching, flipping when
+   walking left, half-scale drawing (`unit.tscn` → `AnimatedSprite` scale 0.5, linear
+   filter), and the shadow and selection ring. Units without a `MapSprite` keep showing
+   their round `Icon`. The battle screen uses `BattleSprite` for player units and
+   neutrals alike, so neutrals (only shown in the UI on the map) are visible there.
+   Its attack swing tilts the body; for four-legged creatures that looks like bending
+   over, so set `BattleAttackLean = false` on the template (the wolf has it).
+8. **Check in game**.
    If the creature has a unit node under `Map/UnitList` in `game/main/game.tscn`,
    screenshot it (needs a window, so no `--headless`):
    ```bash
    "$G" --path . -s "<abs path to>/.claude/skills/creature-sprite/capture_unit.gd" -- <UnitNodeName> <scratchpad>/<name>
    ```
    Look at `<name>_selected.png` and `<name>_walk.png`, and check it prints `animation=walk`.
+
+   For the battle image, put the creature on a test field (Field14 in
+   `maps/deathland.json` has neutrals, and the `Test*` units in `game.tscn` start there
+   via `StartFieldId`) and capture the fight:
+   ```bash
+   "$G" --path . -s "<abs path to>/.claude/skills/creature-sprite/capture_battle.gd" -- <scratchpad>/seq
+   "$G" --headless -s "<abs path to>/.claude/skills/creature-sprite/contact_sheet.gd" -- <scratchpad>/seq <scratchpad>/attack.png 30 12 560 120 440 300
+   ```
+   `start.png` shows the line-up; the contact sheet tiles 12 frames around one attack
+   (pick the first frame and the crop from the full frames). Check the feet sit on the
+   ring, nothing overlaps the next row's health bar, and the swing and fall look right.
 
 ## Busy backgrounds: tracing a mask
 
@@ -139,3 +166,18 @@ weapon) are removed by colour match, not flood fill.
 - Don't delete an existing `<name>_frames.tres`: rerunning the generator rewrites it in
   place with the same uid. A deleted one comes back with a new uid, and the template's
   ext_resource then needs its uid removed or updated.
+
+## Gameplay video of a battle
+
+`record_battle.gd` plays a battle on Field14 like a player would (drawn cursor and real
+clicks: pick the field, open the battle, move the Imp to the back row, give orders and a
+Firebolt, speed up, win or lose, return to the map), about 65s. Record it with Movie Maker
+into the git-ignored `recordings/` folder:
+```bash
+"$G" --path . --windowed --resolution 1280x720 --fixed-fps 30 --write-movie "$(pwd -W)/recordings/battle_demo.avi" -s "$(pwd -W)/.claude/skills/creature-sprite/record_battle.gd" -- Field14
+```
+It prints `outcome=victory` or `outcome=defeat or unfinished`; battles are random, so
+rerun until it wins if the video should end in victory. Run it first without
+`--write-movie` and with a screenshot dir (`-- Field14 <scratchpad>/rec`) to check each
+step. The output is MJPEG AVI (about 300 MB a minute at 1080p); there is no ffmpeg
+here to make an MP4 unless the user installs one.

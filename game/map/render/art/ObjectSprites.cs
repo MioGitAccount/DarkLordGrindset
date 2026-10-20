@@ -24,13 +24,13 @@ public static class ObjectSprites
 	// Area each type's sprite covers, in units: u across (0 = middle), v up (-1 = top, 0 = ground)
 	public static Rect2 UnitsOf(string type) => type switch
 	{
-		"mountain" or "snow_mountain" => R(-0.8f, 0.8f, -1.06f, 0.1f),
+		"mountain" or "snow_mountain" or "blight_mountain" or "green_mountain" => R(-0.8f, 0.8f, -1.06f, 0.1f),
 		"hill" => R(-0.85f, 0.85f, -1.06f, 0.12f),
-		"pine" => R(-0.4f, 0.4f, -1.06f, 0.1f),
-		"oak" => R(-0.55f, 0.55f, -1.06f, 0.1f),
+		"pine" or "spruce" => R(-0.4f, 0.4f, -1.06f, 0.1f),
+		"oak" or "birch" or "willow" => R(-0.55f, 0.55f, -1.06f, 0.1f),
 		"dead_tree" => R(-0.5f, 0.5f, -1.06f, 0.1f),
 		"bush" => R(-0.95f, 0.95f, -1.08f, 0.15f),
-		"rocks" => R(-0.95f, 0.95f, -1.08f, 0.12f),
+		"rocks" or "mossy_rocks" or "rock_spire" => R(-0.95f, 0.95f, -1.08f, 0.12f),
 		"castle" => R(-0.78f, 0.78f, -1.06f, 0.1f),
 		"dark_tower" => R(-0.5f, 0.5f, -1.06f, 0.1f),
 		"town" => R(-0.85f, 0.85f, -1.06f, 0.1f),
@@ -79,13 +79,20 @@ public static class ObjectSprites
 		switch (type)
 		{
 			case "mountain":
-			case "snow_mountain": painter.Mountain(); break;
+			case "snow_mountain":
+			case "blight_mountain":
+			case "green_mountain": painter.Mountain(); break; // blight_ and green_mountain normally use their PNGs
 			case "hill": painter.Hill(); break;
-			case "pine": painter.Pine(); break;
-			case "oak": painter.Oak(); break;
+			case "pine":
+			case "spruce": painter.Pine(); break; // spruce normally uses its PNG
+			case "oak":
+			case "birch":
+			case "willow": painter.Oak(); break; // birch and willow normally use their PNGs
 			case "dead_tree": painter.DeadTree(); break;
 			case "bush": painter.Bush(); break;
-			case "rocks": painter.Rocks(); break;
+			case "rocks":
+			case "mossy_rocks":
+			case "rock_spire": painter.Rocks(); break; // mossy_rocks and rock_spire normally use their PNGs
 			case "castle": painter.Castle(); break;
 			case "dark_tower": painter.DarkTower(); break;
 			case "town": painter.Town(); break;

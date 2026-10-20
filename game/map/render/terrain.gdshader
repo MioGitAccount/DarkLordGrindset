@@ -65,6 +65,12 @@ void fragment() {
 	float forest = smoothstep(gn - 0.22, gn + 0.22, g.r * 1.3) * land;
 	float rock = smoothstep(gn - 0.18, gn + 0.18, g.g * 1.25) * land;
 	float worn = smoothstep(gn - 0.18, gn + 0.18, g.b * 1.25) * land;
+	// Snow (bright, colorless ground) doesn't turn into green forest floor or brown foothills:
+	// trees only cast a faint cool shade, mountains show a few grey stones through the snow
+	float lum = dot(c.rgb, vec3(0.3, 0.5, 0.2));
+	float sat = max(c.r, max(c.g, c.b)) - min(c.r, min(c.g, c.b));
+	float snowy = smoothstep(0.62, 0.78, lum) * (1.0 - smoothstep(0.08, 0.2, sat));
+	vec3 snow_c = c.rgb;
 	c.rgb = mix(c.rgb, mix(c.rgb, forest_floor * (0.8 + 0.4 * fine), 0.7), forest * 0.75);
 	// Grit: small dark and light stones in the rocky ground
 	float grit = texture(variation_tex, world / 17.0 + 0.4).r;
@@ -74,6 +80,13 @@ void fragment() {
 	c.rgb = mix(c.rgb, rocky, rock * 0.85);
 	vec3 worn_paint = mix(texture(worn_tex, world / worn_tile).rgb, texture(worn_tex, world / worn_tile * 0.81 + vec2(0.37, 0.59)).rgb, pick);
 	c.rgb = mix(c.rgb, mix(worn_paint, worn_dirt, 0.3), worn * 0.8);
+	if (snowy > 0.0) {
+		vec3 on_snow = snow_c * (1.0 - 0.08 * forest) * mix(vec3(1.0), vec3(0.94, 0.97, 1.03), forest);
+		float stones = smoothstep(0.55, 0.7, grit) * rock;
+		on_snow = mix(on_snow, mix(snow_c, rock_ground * 1.15, 0.5), stones * 0.6 + rock * 0.12);
+		on_snow = mix(on_snow, mix(worn_paint, snow_c, 0.5), worn * 0.6);
+		c.rgb = mix(c.rgb, on_snow, snowy);
+	}
 
 	if (d > 0.0) {
 		// Lighter, shallow water along every coast

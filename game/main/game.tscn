@@ -55,6 +55,21 @@ position = Vector2(406, 303)
 Template = ExtResource("6_5s4c6")
 battleStats = SubResource("Resource_i543h")
 
+[node name="TestImp" parent="Map/UnitList" instance=ExtResource("4_63g25")]
+position = Vector2(743.9, 881.6)
+Template = ExtResource("5_buf6p")
+StartFieldId = "Field14"
+
+[node name="TestOrc" parent="Map/UnitList" instance=ExtResource("4_63g25")]
+position = Vector2(743.9, 881.6)
+Template = ExtResource("6_5s4c6")
+StartFieldId = "Field14"
+
+[node name="TestOrc2" parent="Map/UnitList" instance=ExtResource("4_63g25")]
+position = Vector2(743.9, 881.6)
+Template = ExtResource("6_5s4c6")
+StartFieldId = "Field14"
+
 [node name="UnitManager" type="Node" parent="Map"]
 script = ExtResource("4_lus3e")
 

@@ -14,6 +14,9 @@ public partial class unit : Node2D
 	// Per-unit attributes; falls back to Template.Attributes. From _Ready on: base + skill bonuses.
 	[Export] public SpecialAttributes Attributes;
 
+	// Field id (from the map file) the unit starts on; empty = the player's castle
+	[Export] public string StartFieldId = "";
+
 	[Export] public float VisibilityRadius = 200f; // Radius for visibility; skills can add to it
 
 	// Abilities the unit starts with; skills add more

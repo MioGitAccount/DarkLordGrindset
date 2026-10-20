@@ -24,6 +24,9 @@ public class Combatant
 	public Texture2D Icon;
 	// "idle"/"attack" animations; null shows Icon instead
 	public SpriteFrames Sprite;
+	// Painted cutout, animated in code; preferred over Sprite
+	public Texture2D BattleSprite;
+	public bool AttackLean = true;
 	public BattleSide Side;
 	// 0-4, see BattleFormation
 	public int Slot = -1;
@@ -72,6 +75,8 @@ public class Combatant
 			TypeKey = playerUnit.Template?.ResourcePath ?? playerUnit.Name,
 			Icon = playerUnit.GetIcon(),
 			Sprite = playerUnit.Template?.MapSprite,
+			BattleSprite = playerUnit.Template?.BattleSprite,
+			AttackLean = playerUnit.Template?.BattleAttackLean ?? true,
 			Side = BattleSide.Player,
 			PlayerUnit = playerUnit,
 			Quickness = playerUnit.Attributes?.Quickness ?? 0,
@@ -91,6 +96,8 @@ public class Combatant
 			TypeKey = template?.ResourcePath ?? "neutral",
 			Icon = neutral.GetIcon(),
 			Sprite = template?.MapSprite,
+			BattleSprite = template?.BattleSprite,
+			AttackLean = template?.BattleAttackLean ?? true,
 			Side = BattleSide.Enemy,
 			Neutral = neutral,
 			Quickness = neutral.GetAttributes()?.Quickness ?? 0,

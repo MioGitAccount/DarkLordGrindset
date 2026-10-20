@@ -1,4 +1,4 @@
-[gd_resource type="Resource" script_class="UnitTemplate" load_steps=12 format=3 uid="uid://bewribr222x3c"]
+[gd_resource type="Resource" script_class="UnitTemplate" load_steps=13 format=3 uid="uid://bewribr222x3c"]
 
 [ext_resource type="Script" path="res://game/units/BattleStats.cs" id="1_4tidt"]
 [ext_resource type="Texture2D" uid="uid://2emeyiwasn81" path="res://images/Units/orcIcon.png" id="1_jx0do"]
@@ -7,6 +7,7 @@
 [ext_resource type="SpriteFrames" uid="uid://dfvcb6ybv2ndj" path="res://images/Units/sprites/orc_frames.tres" id="4_frames"]
 [ext_resource type="Script" path="res://game/units/SpecialAttributes.cs" id="9_attrs"]
 [ext_resource type="Resource" uid="uid://2nlr2pmxihgv" path="res://resources/skill_trees/orc_skill_tree.tres" id="10_skills"]
+[ext_resource type="Texture2D" uid="uid://b70iayxwv87ox" path="res://images/Units/sprites/orc_battle.png" id="11_battle"]
 [ext_resource type="Resource" path="res://resources/combat/roar.tres" id="c_roar"]
 [ext_resource type="Resource" path="res://resources/combat/stun.tres" id="c_stun"]
 
@@ -34,6 +35,8 @@ script = ExtResource("1_on788")
 Name = "Orc"
 Icon = ExtResource("1_jx0do")
 MapSprite = ExtResource("4_frames")
+BattleSprite = ExtResource("11_battle")
+BattleAttackLean = true
 SelectSound = ExtResource("3_yi7qr")
 DefaultStats = SubResource("Resource_mlt17")
 Attributes = SubResource("Resource_attrs")

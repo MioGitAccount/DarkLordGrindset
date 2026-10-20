@@ -31,7 +31,7 @@ first and details (lakes, rivers, roads) after them.
 | `shape`     | keys                          | use for                                   |
 |-------------|-------------------------------|-------------------------------------------|
 | `"polygon"` | `points: [[x,y], ...]` (≥ 3)  | continents, islands, deserts, lakes       |
-| `"stroke"`  | `points` (≥ 2), `width`       | rivers, roads, fjords, coast touch-ups    |
+| `"stroke"`  | `points` (≥ 1), `width`       | rivers, roads, fjords, coast touch-ups; one point = round dab |
 | `"circle"`  | `center: [x,y]`, `radius`     | ponds, round patches                      |
 
 `"rough"` (default `true`) rounds the corners and wobbles the edges, so a polygon with
@@ -70,12 +70,19 @@ only) are optional. Objects are drawn sorted by `y`, so lower objects cover high
 |--------------|----------------|----------------------------------------------------------|
 | `pine`       | 22  | forests: 20–60 of them, 10–14 px apart                              |
 | `oak`        | 20  | leafy / autumn woods                                                |
+| `spruce`     | 28  | tall pine: old dark forests, mix with `pine`                        |
+| `birch`      | 24  | light woods, mix with pines or oaks                                 |
+| `willow`     | 22  | by lakes and rivers                                                 |
 | `dead_tree`  | 18  | blighted land                                                       |
 | `bush`       | 8   |                                                                     |
 | `mountain`   | 70  | ranges: overlapping rows ~40 px apart; even `variant` = snow cap    |
 | `snow_mountain` | 70 | grey, snowy: for cold regions                               |
+| `blight_mountain` | 70 | dark, purple-veined: inside `blight` areas                |
+| `green_mountain` | 70 | grass-covered: green highlands, mix with `hill`            |
 | `hill`       | 22  |                                                                     |
-| `rocks`      | 12  |                                                                     |
+| `rocks`      | 12  | cluster of boulders                                                 |
+| `mossy_rocks`| 14  | flat mossy stones, for grassland and hills                          |
+| `rock_spire` | 26  | tall jagged rock, near mountains or in wastelands                   |
 | `castle`     | 70  | even variant = red roofs, odd = blue                                |
 | `dark_tower` | 80  |                                                                     |
 | `town`       | 55  |                                                                     |

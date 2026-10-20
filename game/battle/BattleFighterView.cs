@@ -7,11 +7,13 @@ using System.Threading.Tasks;
 // so the bar doesn't drop before the attack animation reaches the target.
 public partial class BattleFighterView : Control
 {
-	public static readonly Vector2 ViewSize = new Vector2(130, 152);
+	public static readonly Vector2 ViewSize = new Vector2(150, 160);
 	// Where the unit's feet are inside the view
-	public static readonly Vector2 Feet = new Vector2(65, 136);
+	public static readonly Vector2 Feet = new Vector2(75, 152);
 	private const float SpriteScale = 1.5f;
 	private const float IconSize = 72;
+	// Painted battle sprites are scaled to this height
+	private const float PaintedHeight = 116;
 
 	private static readonly Color HealthColor = new Color(0.78f, 0.2f, 0.18f);
 	private static readonly Color HealthBack = new Color(0.12f, 0.08f, 0.08f, 0.9f);
@@ -34,6 +36,11 @@ public partial class BattleFighterView : Control
 	public string Status = "";
 
 	private AnimatedSprite2D _sprite;
+	// Painted sprite: a feet-anchored node animated with tweens (breathing, swings, knockback, falling)
+	private Node2D _rig;
+	private Tween _motion;
+	private float _speed = 1;
+	private bool _breathing; // idle breathing keeps its own pace, whatever the battle speed
 	private TextureRect _icon;
 	private Control _body; // the sprite or the icon; flashes and fades
 	private Control _overlay; // bars and text, drawn over the sprite
@@ -46,7 +53,7 @@ public partial class BattleFighterView : Control
 
 	public BattleFighterView() { }
 
-	public Vector2 Chest => Position + Feet + new Vector2(0, -45);
+	public Vector2 Chest => Position + Feet + new Vector2(0, _rig != null ? -60 : -45);
 
 	public override void _Ready()
 	{
@@ -57,7 +64,26 @@ public partial class BattleFighterView : Control
 		// The body is a plain Control so flashing/fading never tints the bars
 		_body = new Control { MouseFilter = MouseFilterEnum.Ignore, Size = ViewSize };
 		AddChild(_body);
-		if (Combatant.Sprite != null)
+		if (Combatant.BattleSprite != null)
+		{
+			var texture = Combatant.BattleSprite;
+			float scale = PaintedHeight / texture.GetHeight();
+			_rig = new Node2D { Position = Feet };
+			_rig.AddChild(new Sprite2D
+			{
+				Texture = texture,
+				Centered = false,
+				// The cutout's bottom edge has a small margin under the feet
+				Offset = new Vector2(-texture.GetWidth() / 2f, -texture.GetHeight() * 0.976f),
+				Scale = new Vector2(scale, scale),
+				TextureFilter = TextureFilterEnum.LinearWithMipmaps,
+				// Art faces right; enemies stand on the right and face left
+				FlipH = !Combatant.IsPlayer,
+			});
+			_body.AddChild(_rig);
+			PlayIdle();
+		}
+		else if (Combatant.Sprite != null)
 		{
 			_sprite = new AnimatedSprite2D
 			{
@@ -101,12 +127,17 @@ public partial class BattleFighterView : Control
 
 	public void SetAnimationSpeed(float speed)
 	{
+		_speed = speed;
 		if (_sprite != null)
 			_sprite.SpeedScale = speed;
+		if (!_breathing)
+			_motion?.SetSpeedScale(speed);
 	}
 
 	public void PlayIdle()
 	{
+		if (_rig != null && !Dead)
+			Breathe();
 		if (_sprite != null && _sprite.SpriteFrames.HasAnimation("idle"))
 			_sprite.Play("idle");
 	}
@@ -114,6 +145,8 @@ public partial class BattleFighterView : Control
 	// Plays the attack animation once; returns its length in seconds at speed 1 (0 without one)
 	public float PlayAttack()
 	{
+		if (_rig != null)
+			return Swing();
 		if (_sprite == null || !_sprite.SpriteFrames.HasAnimation("attack"))
 			return 0;
 		_sprite.Play("attack");
@@ -125,8 +158,108 @@ public partial class BattleFighterView : Control
 	public void Flash(Color color)
 	{
 		var tween = CreateTween();
-		_body.Modulate = color;
+		// Painted art is lit up past white so the flash reads on dark sprites
+		_body.Modulate = _rig != null ? new Color(color.R * 2.2f, color.G * 2.2f, color.B * 2.2f) : color;
 		tween.TweenProperty(_body, "modulate", Dead ? DeadModulate : Colors.White, 0.3);
+		if (_rig != null && !Dead)
+			Recoil();
+	}
+
+	// --- Painted sprite motion ------------------------------------------------
+	// Everything pivots on the feet. Facing: +1 for player units (face right), -1 for enemies.
+
+	private float Facing => Combatant.IsPlayer ? 1 : -1;
+
+	private Tween NewMotion()
+	{
+		_motion?.Kill();
+		_breathing = false;
+		_motion = CreateTween();
+		_motion.SetSpeedScale(_speed);
+		return _motion;
+	}
+
+	private void ResetRig()
+	{
+		_rig.Position = Feet;
+		_rig.Rotation = 0;
+		_rig.Scale = Vector2.One;
+		_rig.Skew = 0;
+	}
+
+	// Slow breathing: the body rises and leans a little, out of step with the others
+	private void Breathe()
+	{
+		ResetRig();
+		var tween = NewMotion().SetLoops().SetTrans(Tween.TransitionType.Sine).SetEase(Tween.EaseType.InOut);
+		tween.SetSpeedScale(1);
+		_breathing = true;
+		tween.TweenInterval(GD.Randf() * 0.8);
+		tween.TweenProperty(_rig, "scale", new Vector2(1.012f, 1.035f), 1.2);
+		tween.Parallel().TweenProperty(_rig, "skew", Mathf.DegToRad(-1.2f) * Facing, 1.2);
+		tween.TweenProperty(_rig, "scale", Vector2.One, 1.2);
+		tween.Parallel().TweenProperty(_rig, "skew", 0f, 1.2);
+	}
+
+	// Wind-up (lean back, crouch), strike (lunge forward, squash), recover. The blow lands at about half.
+	private float Swing()
+	{
+		ResetRig();
+		float f = Facing;
+		float lean = Combatant.AttackLean ? f : 0;
+		var tween = NewMotion();
+		tween.SetTrans(Tween.TransitionType.Quad).SetEase(Tween.EaseType.Out);
+		tween.TweenProperty(_rig, "rotation", Mathf.DegToRad(-7) * lean, 0.24);
+		tween.Parallel().TweenProperty(_rig, "scale", new Vector2(0.96f, 1.04f), 0.24);
+		tween.Parallel().TweenProperty(_rig, "position", Feet + new Vector2(-8 * f, 0), 0.24);
+		tween.SetTrans(Tween.TransitionType.Back);
+		tween.TweenProperty(_rig, "rotation", Mathf.DegToRad(9) * lean, 0.12);
+		tween.Parallel().TweenProperty(_rig, "scale", new Vector2(1.08f, 0.93f), 0.12);
+		tween.Parallel().TweenProperty(_rig, "position", Feet + new Vector2(16 * f, 0), 0.12);
+		tween.TweenInterval(0.12);
+		tween.SetTrans(Tween.TransitionType.Sine).SetEase(Tween.EaseType.InOut);
+		tween.TweenProperty(_rig, "rotation", 0f, 0.26);
+		tween.Parallel().TweenProperty(_rig, "scale", Vector2.One, 0.26);
+		tween.Parallel().TweenProperty(_rig, "position", Feet, 0.26);
+		return 0.74f;
+	}
+
+	// Knocked back by a hit, then settles
+	private void Recoil()
+	{
+		ResetRig();
+		float f = Facing;
+		var tween = NewMotion();
+		tween.SetTrans(Tween.TransitionType.Quad).SetEase(Tween.EaseType.Out);
+		tween.TweenProperty(_rig, "position", Feet + new Vector2(-14 * f, 0), 0.08);
+		tween.Parallel().TweenProperty(_rig, "rotation", Mathf.DegToRad(-6) * f, 0.08);
+		tween.Parallel().TweenProperty(_rig, "scale", new Vector2(1.04f, 0.96f), 0.08);
+		tween.SetTrans(Tween.TransitionType.Elastic);
+		tween.TweenProperty(_rig, "position", Feet, 0.45);
+		tween.Parallel().TweenProperty(_rig, "rotation", 0f, 0.45);
+		tween.Parallel().TweenProperty(_rig, "scale", Vector2.One, 0.45);
+		tween.TweenCallback(Callable.From(Breathe));
+	}
+
+	// Staggers, then falls over backwards
+	private void Fall(bool animate)
+	{
+		float f = Facing;
+		if (!animate)
+		{
+			_motion?.Kill();
+			ResetRig();
+			_rig.Rotation = Mathf.DegToRad(-80) * f;
+			return;
+		}
+		ResetRig();
+		var tween = NewMotion();
+		tween.SetTrans(Tween.TransitionType.Quad).SetEase(Tween.EaseType.Out);
+		tween.TweenProperty(_rig, "rotation", Mathf.DegToRad(-10) * f, 0.15);
+		tween.Parallel().TweenProperty(_rig, "position", Feet + new Vector2(-10 * f, 0), 0.15);
+		tween.SetTrans(Tween.TransitionType.Bounce).SetEase(Tween.EaseType.Out);
+		tween.TweenProperty(_rig, "rotation", Mathf.DegToRad(-80) * f, 0.6);
+		tween.Parallel().TweenProperty(_rig, "position", Feet + new Vector2(-24 * f, 0), 0.6);
 	}
 
 	private static readonly Color DeadModulate = new Color(0.45f, 0.45f, 0.45f, 0.45f);
@@ -137,6 +270,8 @@ public partial class BattleFighterView : Control
 		Selected = Targetable = Active = false;
 		Status = "";
 		MouseFilter = MouseFilterEnum.Ignore;
+		if (_rig != null)
+			Fall(animate);
 		if (animate)
 		{
 			var tween = CreateTween().SetParallel();
@@ -202,18 +337,20 @@ public partial class BattleFighterView : Control
 		var font = ThemeDB.FallbackFont;
 		var c = Combatant;
 
-		// Name, health and mana above the head
-		const float barWidth = 96;
+		// Name and health inside one bar, mana under it: a short header, so rows don't overlap
+		const float barWidth = 112;
 		float x = (ViewSize.X - barWidth) / 2;
-		_overlay.DrawString(font, new Vector2(0, 12), c.Name, HorizontalAlignment.Center, ViewSize.X, 13, Colors.White);
-		var healthRect = new Rect2(x, 17, barWidth, 7);
+		var healthRect = new Rect2(x, 14, barWidth, 14);
 		_overlay.DrawRect(healthRect.Grow(1), HealthBack);
-		_overlay.DrawRect(new Rect2(x, 17, barWidth * Mathf.Clamp(ShownHealth / (float)c.MaxHealth, 0, 1), 7), HealthColor);
-		_overlay.DrawString(font, new Vector2(0, 41), $"{ShownHealth}/{c.MaxHealth}", HorizontalAlignment.Center, ViewSize.X, 11, new Color(1, 1, 1, 0.85f));
+		_overlay.DrawRect(new Rect2(x, 14, barWidth * Mathf.Clamp(ShownHealth / (float)c.MaxHealth, 0, 1), 14), HealthColor);
+		var label = $"{c.Name}  {ShownHealth}/{c.MaxHealth}";
+		var labelAt = new Vector2(0, 25.5f);
+		_overlay.DrawStringOutline(font, labelAt, label, HorizontalAlignment.Center, ViewSize.X, 11, 3, HealthBack);
+		_overlay.DrawString(font, labelAt, label, HorizontalAlignment.Center, ViewSize.X, 11, Colors.White);
 		if (c.MaxMana > 0)
 		{
-			_overlay.DrawRect(new Rect2(x, 26, barWidth, 3).Grow(1), HealthBack);
-			_overlay.DrawRect(new Rect2(x, 26, barWidth * Mathf.Clamp(c.Mana / (float)c.MaxMana, 0, 1), 3), ManaColor);
+			_overlay.DrawRect(new Rect2(x, 30, barWidth, 3).Grow(1), HealthBack);
+			_overlay.DrawRect(new Rect2(x, 30, barWidth * Mathf.Clamp(c.Mana / (float)c.MaxMana, 0, 1), 3), ManaColor);
 		}
 
 		// Effects just under the bars, outlined so they read over the sprite

@@ -8,6 +8,10 @@ public partial class UnitTemplate : Resource
 	[Export] public Texture2D Icon;
 	// Animated map sprite with "idle" and "walk" animations; units without one show Icon instead
 	[Export] public SpriteFrames MapSprite;
+	// Painted cutout for the battle screen, animated in code; units without one use MapSprite there
+	[Export] public Texture2D BattleSprite;
+	// Tilt the battle sprite when it attacks; off where bending looks wrong (four-legged creatures)
+	[Export] public bool BattleAttackLean = true;
 
 	[Export] public AudioStream SelectSound;
 	[Export] public BattleStats DefaultStats;

@@ -36,7 +36,10 @@ public partial class BattleScreen : Control
 	private Combatant _selected;
 	private CombatAbility _armedAbility;
 	private Combatant _activeActor;
-	private float _speed = 1f;
+	private float _speed = 1f; // the speed button: 1x, 2x, 3x
+	// Everything in battle runs at this fraction of real time at 1x
+	private const float BasePace = 0.5f;
+	private float Pace => _speed * BasePace;
 	// Experience each survivor gets, worked out when the result is shown
 	private int _experience;
 	private bool _paused;
@@ -268,7 +271,7 @@ public partial class BattleScreen : Control
 		var view = new BattleFighterView(combatant);
 		view.Clicked += OnFighterClicked;
 		_fighters.AddChild(view);
-		view.SetAnimationSpeed(_speed);
+		view.SetAnimationSpeed(Pace);
 		_views[combatant] = view;
 	}
 
@@ -825,7 +828,7 @@ public partial class BattleScreen : Control
 			if (battleId != _battleId)
 				return;
 			if (!_paused)
-				left -= GetProcessDeltaTime() * (ignoreSpeed ? 1 : _speed);
+				left -= GetProcessDeltaTime() * (ignoreSpeed ? 1 : Pace);
 		}
 	}
 
@@ -841,7 +844,7 @@ public partial class BattleScreen : Control
 		_speed = _speed >= 3 ? 1 : _speed + 1;
 		_speedButton.Text = $"Speed {_speed}x";
 		foreach (var view in _views.Values)
-			view.SetAnimationSpeed(_speed);
+			view.SetAnimationSpeed(Pace);
 	}
 
 	// --- Animations ----------------------------------------------------------
@@ -858,7 +861,7 @@ public partial class BattleScreen : Control
 			case BuffEvent buff:
 				Popup(actorView, buff.Ability.Name.ToUpper() + "!", Gold, 22);
 				actorView.PlayAttack();
-				await actorView.Pulse(_speed);
+				await actorView.Pulse(Pace);
 				foreach (var ally in buff.Affected)
 					if (_views.TryGetValue(ally, out var allyView))
 					{
@@ -885,7 +888,7 @@ public partial class BattleScreen : Control
 		if (melee)
 		{
 			Vector2 inFront = target.Position + new Vector2(hit.Actor.IsPlayer ? -70 : 70, 6);
-			await attacker.MoveTo(inFront, 0.3, _speed);
+			await attacker.MoveTo(inFront, 0.3, Pace);
 		}
 
 		float length = attacker.PlayAttack();
@@ -894,7 +897,7 @@ public partial class BattleScreen : Control
 			// The blow lands about halfway through the swing
 			await Wait(length > 0 ? length * 0.5f : 0.12, battleId);
 			if (length <= 0)
-				await attacker.MoveTo(attacker.Position + new Vector2(hit.Actor.IsPlayer ? 18 : -18, 0), 0.08, _speed);
+				await attacker.MoveTo(attacker.Position + new Vector2(hit.Actor.IsPlayer ? 18 : -18, 0), 0.08, Pace);
 		}
 		else
 		{
@@ -908,7 +911,7 @@ public partial class BattleScreen : Control
 		await Wait(Math.Max(0.35, length * 0.5f), battleId);
 		attacker.PlayIdle();
 		if (melee)
-			await attacker.MoveTo(home, 0.3, _speed);
+			await attacker.MoveTo(home, 0.3, Pace);
 		SortFighters();
 	}
 
@@ -944,7 +947,7 @@ public partial class BattleScreen : Control
 		label.Modulate = delay > 0 ? Colors.Transparent : Colors.White;
 		AddChild(label);
 		var tween = label.CreateTween();
-		tween.SetSpeedScale(_speed);
+		tween.SetSpeedScale(Pace);
 		if (delay > 0)
 			tween.TweenInterval(delay);
 		tween.TweenProperty(label, "modulate", Colors.White, 0.01);
@@ -960,7 +963,7 @@ public partial class BattleScreen : Control
 		bolt.Rotation = Mathf.Pi / 4;
 		AddChild(bolt);
 		var tween = bolt.CreateTween();
-		tween.SetSpeedScale(_speed);
+		tween.SetSpeedScale(Pace);
 		tween.TweenProperty(bolt, "position", to - bolt.PivotOffset, 0.35).SetTrans(Tween.TransitionType.Sine);
 		tween.Parallel().TweenProperty(bolt, "rotation", bolt.Rotation + Mathf.Tau, 0.35);
 		await ToSignal(tween, Tween.SignalName.Finished);

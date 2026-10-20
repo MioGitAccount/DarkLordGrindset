@@ -16,3 +16,5 @@ data_*/            # Godot 4+
 *.pdb
 *.exe
 *.vs/
+# Gameplay videos (record_battle.gd)
+recordings/

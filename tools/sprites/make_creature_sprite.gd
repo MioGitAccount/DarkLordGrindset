@@ -1,4 +1,4 @@
-# Builds a pixel-art map sprite sheet for a creature from its concept art.
+# Builds a pixel-art map sprite sheet and a painted battle image for a creature from its concept art.
 #
 #   Godot --path . --headless -s res://tools/sprites/make_creature_sprite.gd -- <name> [preview_dir]
 #
@@ -6,8 +6,10 @@
 # Steps: remove the background (flat colour, or "mask" polygons for busy art), crop, downscale, reduce to a small palette,
 # repaint the eyes, then animate by shifting body parts and add an outline.
 #
-# Writes <output_dir>/<name>_sheet.png (all frames in one row, in animation order)
-# and <output_dir>/<name>_frames.tres (SpriteFrames; an existing file keeps its uid).
+# Writes <output_dir>/<name>_sheet.png (all frames in one row, in animation order),
+# <output_dir>/<name>_frames.tres (SpriteFrames; an existing file keeps its uid) and
+# <output_dir>/<name>_battle.png (the same cutout at "battle_size", default 256, painted:
+# no palette reduction or outline; the battle screen animates it in code).
 # With preview_dir it also writes <name>_preview.png (sheet at 5x) and
 # <name>_grid.png (first frame at 10x with a grid every 4px, red every 8px).
 extends SceneTree
@@ -32,8 +34,6 @@ func _initialize() -> void:
 		push_error("Could not read " + config_path)
 		quit(1)
 		return
-	size = int(cfg.get("size", 64))
-	work_size = size * 4
 	bg_tolerance = cfg.get("bg_tolerance", 0.11)
 	for poly in cfg.get("mask", []):
 		var points := PackedVector2Array()
@@ -45,32 +45,9 @@ func _initialize() -> void:
 	src.convert(Image.FORMAT_RGBA8)
 	var bg := _background_colour(src)
 
-	# Find the character's bounding box on a coarse copy
-	var coarse := src.duplicate() as Image
-	coarse.resize(work_size, work_size * src.get_height() / src.get_width(), Image.INTERPOLATE_BILINEAR)
-	var k := float(src.get_width()) / coarse.get_width()
-	var box := _bbox(_background_mask(coarse, bg, Vector2.ZERO, k))
-	box = Rect2i(Vector2i(Vector2(box.position) * k), Vector2i(Vector2(box.size) * k))
-
-	# Square crop, bottom aligned, with a small margin for the outline
-	var side := int(max(box.size.x, box.size.y) * 1.04)
-	var crop := Rect2i(box.get_center().x - side / 2, box.end.y - side + side / 40, side, side)
-	var work := Image.create(side, side, false, Image.FORMAT_RGBA8)
-	work.fill(bg)
-	work.blit_rect(src, crop, Vector2i.ZERO)
-	work.resize(work_size, work_size, Image.INTERPOLATE_LANCZOS)
-
-	var base := _downsample(work, _background_mask(work, bg, Vector2(crop.position), float(side) / work_size))
-	_remove_ground(base, int(cfg.get("ground_y", size)))
-	_remove_islands(base, int(cfg.get("min_island", 16)))
-	_enhance(base, cfg.get("enhance", {}))
-	_quantize(base, int(cfg.get("palette_size", 24)))
-	var eye_colour := _colour(cfg.get("eye_colour", [255, 220, 70]))
-	var eye_rim := _colour(cfg.get("eye_rim", [230, 60, 40]))
-	for eye in cfg.get("eyes", []):
-		var p := Vector2i(((Vector2(eye[0], eye[1]) - Vector2(crop.position)) * size / side).round())
-		base.set_pixelv(p, eye_colour)
-		base.set_pixelv(p + Vector2i(0, 1), eye_rim)
+	size = int(cfg.get("size", 64))
+	work_size = size * 4
+	var base := _cutout(src, bg, true)
 
 	var outline := _colour(cfg.get("outline", [20, 24, 28]))
 	var frames: Array[Image] = []
@@ -99,7 +76,49 @@ func _initialize() -> void:
 				grid.set_pixel(i, j, col)
 				grid.set_pixel(j, i, col)
 		grid.save_png(args[1].path_join(creature + "_grid.png"))
+
+	# Painted battle image: same steps at a higher resolution, colours kept
+	size = int(cfg.get("battle_size", 256))
+	work_size = size * 4
+	var battle_path := out_dir.path_join(creature + "_battle.png")
+	_cutout(src, bg, false).save_png(battle_path)
+	print("Saved ", battle_path)
 	quit()
+
+
+# Cuts the creature out of the art at `size` px. Settings in sprite pixels (ground_y,
+# min_island) are given for 64px and scaled. `pixel` adds the palette reduction and eyes.
+func _cutout(src: Image, bg: Color, pixel: bool) -> Image:
+	var scale := size / 64.0
+	# Find the character's bounding box on a coarse copy
+	var coarse := src.duplicate() as Image
+	coarse.resize(work_size, work_size * src.get_height() / src.get_width(), Image.INTERPOLATE_BILINEAR)
+	var k := float(src.get_width()) / coarse.get_width()
+	var box := _bbox(_background_mask(coarse, bg, Vector2.ZERO, k))
+	box = Rect2i(Vector2i(Vector2(box.position) * k), Vector2i(Vector2(box.size) * k))
+
+	# Square crop, bottom aligned, with a small margin for the outline
+	var side := int(max(box.size.x, box.size.y) * 1.04)
+	var crop := Rect2i(box.get_center().x - side / 2, box.end.y - side + side / 40, side, side)
+	var work := Image.create(side, side, false, Image.FORMAT_RGBA8)
+	work.fill(bg)
+	work.blit_rect(src, crop, Vector2i.ZERO)
+	work.resize(work_size, work_size, Image.INTERPOLATE_LANCZOS)
+
+	var base := _downsample(work, _background_mask(work, bg, Vector2(crop.position), float(side) / work_size))
+	_remove_ground(base, int(cfg.get("ground_y", 64) * scale))
+	_remove_islands(base, int(cfg.get("min_island", 16) * scale * scale))
+	_enhance(base, cfg.get("enhance", {}))
+	if not pixel:
+		return base
+	_quantize(base, int(cfg.get("palette_size", 24)))
+	var eye_colour := _colour(cfg.get("eye_colour", [255, 220, 70]))
+	var eye_rim := _colour(cfg.get("eye_rim", [230, 60, 40]))
+	for eye in cfg.get("eyes", []):
+		var p := Vector2i(((Vector2(eye[0], eye[1]) - Vector2(crop.position)) * size / side).round())
+		base.set_pixelv(p, eye_colour)
+		base.set_pixelv(p + Vector2i(0, 1), eye_rim)
+	return base
 
 
 # --- Animation -------------------------------------------------------------
