@@ -893,8 +893,9 @@ public partial class BattleScreen : Control
 				bool curse = buff.Ability.IsCurse;
 				bool regrowth = buff.Ability.Kind == CombatAbilityKind.Rejuvenation;
 				bool taunt = buff.Ability.Kind == CombatAbilityKind.Taunt;
+				bool fortify = buff.Ability.Kind == CombatAbilityKind.Fortify;
 				Color buffColor = curse ? CurseColor : regrowth ? HealColor : taunt ? TauntColor : Gold;
-				string effect = curse ? $"-{buff.Ability.Amount} ATK" : regrowth ? $"+{buff.Ability.Amount} HP/turn" : taunt ? "Taunted!" : $"+{buff.Ability.Amount} ATK";
+				string effect = curse ? $"-{buff.Ability.Amount} ATK" : regrowth ? $"+{buff.Ability.Amount} HP/turn" : taunt ? "Taunted!" : fortify ? $"+{buff.Ability.Amount} DEF" : $"+{buff.Ability.Amount} ATK";
 				Popup(actorView, buff.Ability.Name.ToUpper() + "!", buffColor, 22);
 				actorView.PlayAttack();
 				await actorView.Pulse(Pace);

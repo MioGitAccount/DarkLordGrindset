@@ -1,0 +1,43 @@
+[gd_resource type="Resource" script_class="UnitTemplate" load_steps=10 format=3]
+
+[ext_resource type="Script" path="res://game/units/UnitTemplate.cs" id="1_template"]
+[ext_resource type="Script" path="res://game/units/BattleStats.cs" id="2_stats"]
+[ext_resource type="Script" path="res://game/units/SpecialAttributes.cs" id="3_attrs"]
+[ext_resource type="Texture2D" uid="uid://b4nyfkefafxub" path="res://images/Units/dwarf_runepriestIcon.png" id="4_icon"]
+[ext_resource type="SpriteFrames" path="res://images/Units/sprites/dwarf_runepriest_frames.tres" id="5_frames"]
+[ext_resource type="Texture2D" uid="uid://doxey3atyes6v" path="res://images/Units/sprites/dwarf_runepriest_battle.png" id="6_battle"]
+[ext_resource type="Resource" path="res://resources/combat/rune_of_stone.tres" id="c_rune_of_stone"]
+[ext_resource type="Resource" path="res://resources/combat/runic_mending.tres" id="c_runic_mending"]
+
+[sub_resource type="Resource" id="Resource_attrs"]
+script = ExtResource("3_attrs")
+Deadliness = 3
+Strength = 4
+Durability = 5
+Cleverness = 6
+Quickness = 2
+
+[sub_resource type="Resource" id="Resource_stats"]
+script = ExtResource("2_stats")
+attack = 4
+defence = 4
+health = 24
+maxHealth = 24
+mana = 14
+maxMana = 14
+initiative = 0
+rangeUnit = false
+
+[resource]
+script = ExtResource("1_template")
+Name = "Dwarf Runepriest"
+Level = 3
+Biome = 3
+Icon = ExtResource("4_icon")
+MapSprite = ExtResource("5_frames")
+BattleSprite = ExtResource("6_battle")
+BattleAttackLean = true
+DefaultStats = SubResource("Resource_stats")
+Attributes = SubResource("Resource_attrs")
+CombatPassives = []
+CombatAbilities = [ExtResource("c_rune_of_stone"), ExtResource("c_runic_mending")]

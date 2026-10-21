@@ -321,7 +321,7 @@ public class BattleSimulation
 		CombatAbilityKind.Taunt => OpponentsOf(actor).Any(enemy => enemy != null && enemy.IsAlive && (enemy.TauntTurns == 0 || enemy.TauntedBy?.IsAlive != true)),
 		CombatAbilityKind.Rejuvenation => AlliesOf(actor).Any(ally => ally != null && ally.IsAlive && ally.Health < ally.MaxHealth
 			&& !ally.Buffs.Any(buff => buff.Source == ability.Name)),
-		CombatAbilityKind.Roar => !actor.Buffs.Any(buff => buff.Source == ability.Name),
+		CombatAbilityKind.Roar or CombatAbilityKind.Fortify => !actor.Buffs.Any(buff => buff.Source == ability.Name),
 		CombatAbilityKind.Heal or CombatAbilityKind.HealAll => AlliesOf(actor).Any(ally => ally != null && ally.IsAlive && ally.Health < ally.MaxHealth),
 		_ => true,
 	};
@@ -334,6 +334,8 @@ public class BattleSimulation
 		switch (ability.Kind)
 		{
 			case CombatAbilityKind.Roar:
+			case CombatAbilityKind.Fortify:
+				bool fortify = ability.Kind == CombatAbilityKind.Fortify;
 				var buff = new BuffEvent { Actor = actor, Ability = ability };
 				foreach (var ally in AlliesOf(actor))
 				{
@@ -343,13 +345,14 @@ public class BattleSimulation
 					ally.Buffs.Add(new CombatBuff
 					{
 						Source = ability.Name,
-						AttackBonus = ability.Amount,
+						AttackBonus = fortify ? 0 : ability.Amount,
+						DefenceBonus = fortify ? ability.Amount : 0,
 						TurnsLeft = ability.Duration,
 						SkipNextCountdown = ally == actor,
 					});
 					buff.Affected.Add(ally);
 				}
-				buff.Message = $"{Label(actor)} uses {ability.Name}: +{ability.Amount} attack to {buff.Affected.Count} allies for {ability.Duration} turns";
+				buff.Message = $"{Label(actor)} uses {ability.Name}: +{ability.Amount} {(fortify ? "defence" : "attack")} to {buff.Affected.Count} allies for {ability.Duration} turns";
 				events.Add(buff);
 				break;
 			case CombatAbilityKind.Firebolt:
@@ -445,7 +448,7 @@ public class BattleSimulation
 	private HitEvent Hit(Combatant attacker, Combatant target, CombatAbility ability)
 	{
 		int attack = EffectiveAttack(attacker);
-		int defence = target.Defence + (target.GetPassive(CombatPassiveKind.BarkSkin)?.Amount ?? 0);
+		int defence = target.Defence + target.BuffDefence + (target.GetPassive(CombatPassiveKind.BarkSkin)?.Amount ?? 0);
 		bool contempt = false;
 		if (ability != null && ability.IsSpell)
 		{

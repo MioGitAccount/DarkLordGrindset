@@ -15,9 +15,7 @@ public static class ObjectArt
 		var type = MapCatalog.ObjectTypes.GetValueOrDefault(obj.Type ?? "");
 		float s = (type?.Size ?? 20f) * obj.Scale;
 		var custom = type != null ? CustomTexture(type.Id, obj.Variant) : null;
-		var units = custom != null
-			? new Rect2(-custom.GetWidth() / (2f * custom.GetHeight()), -1f, custom.GetWidth() / (float)custom.GetHeight(), 1f)
-			: ObjectSprites.UnitsOf(obj.Type);
+		var units = custom != null ? CustomRect(custom, type.Turnable) : ObjectSprites.UnitsOf(obj.Type);
 		if (type?.Turnable == true)
 		{
 			// It turns, so be generous
@@ -40,8 +38,7 @@ public static class ObjectArt
 		var custom = CustomTexture(type.Id, obj.Variant);
 		if (custom != null)
 		{
-			float aspect = custom.GetWidth() / (float)custom.GetHeight();
-			ci.DrawTextureRect(custom, new Rect2(-aspect / 2f, -1f, aspect, 1f), false, new Color(1, 1, 1, alpha));
+			ci.DrawTextureRect(custom, CustomRect(custom, type.Turnable), false, new Color(1, 1, 1, alpha));
 		}
 		else
 		{
@@ -49,6 +46,14 @@ public static class ObjectArt
 			ci.DrawTextureRect(sprite.Texture, sprite.Units, false, new Color(1, 1, 1, alpha));
 		}
 		ci.DrawSetTransform(Vector2.Zero, 0, Vector2.One);
+	}
+
+	// Where an image is drawn, in units of the type's Size: standing on the position (bottom middle),
+	// or centred on it for things that lie flat and turn (bridges)
+	private static Rect2 CustomRect(Texture2D texture, bool centred)
+	{
+		float aspect = texture.GetWidth() / (float)texture.GetHeight();
+		return new Rect2(-aspect / 2f, centred ? -0.5f : -1f, aspect, 1f);
 	}
 
 	private static Texture2D CustomTexture(string id, int variant)

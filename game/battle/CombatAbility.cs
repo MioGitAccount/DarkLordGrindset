@@ -17,6 +17,7 @@ public enum CombatAbilityKind
 	          // no abilities, and only ranged units can still attack
 	Rejuvenation, // Every living ally (the caster too) heals Amount at the end of each of its next Duration turns
 	Taunt,    // For their next Duration turns, enemies that can reach the caster must aim their normal attacks at it
+	Fortify,  // Every living unit on the caster's side gets +Amount defence for its next Duration turns
 }
 
 // An action a unit takes instead of its normal attack. Player units use it when ordered to
@@ -32,12 +33,12 @@ public partial class CombatAbility : Resource
 	[Export] public int ManaCost;
 	// Own turns to wait before it can be used again (0 = every turn)
 	[Export] public int Cooldown;
-	// Attack bonus (Roar), spell base power (Firebolt, Fireball; see BattleSimulation.SpellAttack),
+	// Attack bonus (Roar), defence bonus (Fortify), spell base power (Firebolt, Fireball; see BattleSimulation.SpellAttack),
 	// mana taken (ManaSteal), base healing (Heal, HealAll), attack taken away (Curse, CurseAll)
 	// attack added to the hit (AimedShot, WhirlingBlades), taken off each arrow (Volley),
 	// damage per rooted turn (Roots) or healing per turn (Rejuvenation)
 	[Export] public int Amount = 2;
-	// Turns the effect lasts (Roar, Curse, CurseAll, Roots, Rejuvenation, Taunt)
+	// Turns the effect lasts (Roar, Fortify, Curse, CurseAll, Roots, Rejuvenation, Taunt)
 	[Export] public int Duration = 2;
 	// Damage dealt (no defence) when Mana Steal hits an enemy without mana
 	[Export] public int EmptyDamage = 3;

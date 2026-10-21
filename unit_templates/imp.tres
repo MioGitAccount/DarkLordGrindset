@@ -32,6 +32,8 @@ rangeUnit = false
 [resource]
 script = ExtResource("1_y4khv")
 Name = "Imp"
+Level = 1
+Biome = 0
 Icon = ExtResource("2_vajrq")
 MapSprite = ExtResource("4_frames")
 BattleSprite = ExtResource("11_battle")

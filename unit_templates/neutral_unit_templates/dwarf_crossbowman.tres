@@ -1,0 +1,43 @@
+[gd_resource type="Resource" script_class="UnitTemplate" load_steps=9 format=3]
+
+[ext_resource type="Script" path="res://game/units/UnitTemplate.cs" id="1_template"]
+[ext_resource type="Script" path="res://game/units/BattleStats.cs" id="2_stats"]
+[ext_resource type="Script" path="res://game/units/SpecialAttributes.cs" id="3_attrs"]
+[ext_resource type="Texture2D" uid="uid://srxak8bt4smb" path="res://images/Units/dwarf_crossbowmanIcon.png" id="4_icon"]
+[ext_resource type="SpriteFrames" path="res://images/Units/sprites/dwarf_crossbowman_frames.tres" id="5_frames"]
+[ext_resource type="Texture2D" uid="uid://bt02fv55q7b2c" path="res://images/Units/sprites/dwarf_crossbowman_battle.png" id="6_battle"]
+[ext_resource type="Resource" path="res://resources/combat/aimed_shot.tres" id="c_aimed_shot"]
+
+[sub_resource type="Resource" id="Resource_attrs"]
+script = ExtResource("3_attrs")
+Deadliness = 5
+Strength = 3
+Durability = 3
+Cleverness = 3
+Quickness = 3
+
+[sub_resource type="Resource" id="Resource_stats"]
+script = ExtResource("2_stats")
+attack = 5
+defence = 2
+health = 16
+maxHealth = 16
+mana = 0
+maxMana = 0
+initiative = 0
+rangeUnit = true
+
+[resource]
+script = ExtResource("1_template")
+Name = "Dwarf Crossbowman"
+Level = 2
+Biome = 3
+Icon = ExtResource("4_icon")
+MapSprite = ExtResource("5_frames")
+BattleSprite = ExtResource("6_battle")
+BattleAttackLean = true
+AttackProjectileColor = Color(0.75, 0.75, 0.8, 1)
+DefaultStats = SubResource("Resource_stats")
+Attributes = SubResource("Resource_attrs")
+CombatPassives = []
+CombatAbilities = [ExtResource("c_aimed_shot")]

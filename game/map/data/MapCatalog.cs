@@ -73,7 +73,7 @@ public static class MapCatalog
 		new ObjectType { Id = "rocks", Name = "Rocks", Category = "Nature", Size = 12, ScatterSpacing = 20, Ground = GroundKind.Rock, GroundRadius = 1.6f, GroundStrength = 0.5f },
 		new ObjectType { Id = "mossy_rocks", Name = "Mossy rocks", Category = "Nature", Size = 14, ScatterSpacing = 22, Ground = GroundKind.Rock, GroundRadius = 1.5f, GroundStrength = 0.45f },
 		new ObjectType { Id = "rock_spire", Name = "Rock spire", Category = "Nature", Size = 26, ScatterSpacing = 30, Ground = GroundKind.Rock, GroundRadius = 1.2f, GroundStrength = 0.6f },
-		new ObjectType { Id = "castle", Name = "Castle", Category = "Buildings", Size = 70, SuggestsField = "Castle", Ground = GroundKind.Settlement, GroundRadius = 1.15f, GroundStrength = 1.0f },
+		new ObjectType { Id = "castle", Name = "Castle", Category = "Buildings", Size = 85, SuggestsField = "Castle", Ground = GroundKind.Settlement, GroundRadius = 1.15f, GroundStrength = 1.0f },
 		new ObjectType { Id = "dark_tower", Name = "Dark tower", Category = "Buildings", Size = 80, SuggestsField = "Castle", Ground = GroundKind.Rock, GroundRadius = 0.75f, GroundStrength = 0.7f },
 		new ObjectType { Id = "town", Name = "Town", Category = "Buildings", Size = 55, SuggestsField = "Village", Ground = GroundKind.Settlement, GroundRadius = 1.25f, GroundStrength = 1.0f },
 		new ObjectType { Id = "village", Name = "Village", Category = "Buildings", Size = 32, SuggestsField = "Village", Ground = GroundKind.Settlement, GroundRadius = 1.6f, GroundStrength = 0.9f },

@@ -363,6 +363,8 @@ public partial class BattleFighterView : Control
 			effects += "TAUNTED  ";
 		if (c.BuffAttack > 0)
 			effects += $"+{c.BuffAttack} ATK  ";
+		if (c.BuffDefence > 0)
+			effects += $"+{c.BuffDefence} DEF  ";
 		if (Status != "")
 			effects += Status;
 		if (effects != "")

@@ -83,7 +83,7 @@ only) are optional. Objects are drawn sorted by `y`, so lower objects cover high
 | `rocks`      | 12  | cluster of boulders                                                 |
 | `mossy_rocks`| 14  | flat mossy stones, for grassland and hills                          |
 | `rock_spire` | 26  | tall jagged rock, near mountains or in wastelands                   |
-| `castle`     | 70  | even variant = red roofs, odd = blue                                |
+| `castle`     | 85  | a landmark: the biggest building                                    |
 | `dark_tower` | 80  |                                                                     |
 | `town`       | 55  |                                                                     |
 | `village`    | 32  |                                                                     |

@@ -4,12 +4,13 @@ using System.Collections.Generic;
 
 public enum BattleSide { Player, Enemy }
 
-// Temporary attack bonus (e.g. from Roar), malus (Curse) or healing (Rejuvenation), counted down
+// Temporary attack bonus (e.g. from Roar), defence bonus (Fortify), malus (Curse) or healing (Rejuvenation), counted down
 // at the end of its owner's turns
 public class CombatBuff
 {
 	public string Source;
 	public int AttackBonus;
+	public int DefenceBonus;
 	// Health given back at the end of each of the owner's turns
 	public int HealPerTurn;
 	public int TurnsLeft;
@@ -72,6 +73,17 @@ public class Combatant
 			int bonus = 0;
 			foreach (var buff in Buffs)
 				bonus += buff.AttackBonus;
+			return bonus;
+		}
+	}
+
+	public int BuffDefence
+	{
+		get
+		{
+			int bonus = 0;
+			foreach (var buff in Buffs)
+				bonus += buff.DefenceBonus;
 			return bonus;
 		}
 	}
