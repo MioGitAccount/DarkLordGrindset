@@ -51,6 +51,9 @@ public static class UIText
 		return text;
 	}
 
+	// "Threat: level 2 of 5" for a neutral unit's level
+	public static string Threat(int level) => $"Threat: level {Mathf.Clamp(level, 1, 5)} of 5";
+
 	public static string AbilityTooltip(Ability ability, bool running)
 	{
 		string text = ability.Name ?? "Ability";

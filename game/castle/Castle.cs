@@ -45,6 +45,11 @@ public class Castle
 
 	public float VisionRadius => Tree.BaseVision + _built.Sum(b => b.BonusVision);
 
+	public float GoldPerTick => _built.Sum(b => b.GoldPerTick);
+
+	// Called by the castle's field every tick
+	public void CollectIncome() => PlayerResources.Add(ResourceType.Gold, GoldPerTick);
+
 	public BuildingStatus GetStatus(BuildingDefinition building)
 	{
 		if (IsBuilt(building))

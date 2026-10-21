@@ -6,7 +6,7 @@
 [sub_resource type="Resource" id="Yield_0"]
 script = ExtResource("2_yield")
 Type = 0
-PerTick = 2.0
+PerTick = 0.6667
 Capacity = 1000.0
 
 [resource]

@@ -73,12 +73,14 @@ public static class BattleFormation
 		return best;
 	}
 
-	// Puts units into the free slots: melee into the front row first, ranged into the back row first
+	// Puts units into the free slots: melee into the front row first, ranged and then Long Reach
+	// units into the back row first (Long Reach melee loses nothing there)
 	public static void AutoPlace(Combatant[] side, IEnumerable<Combatant> units)
 	{
-		foreach (var unit in units.OrderBy(unit => unit.Ranged))
+		static bool LongReach(Combatant unit) => !unit.Ranged && unit.GetPassive(CombatPassiveKind.LongReach) != null;
+		foreach (var unit in units.OrderBy(unit => unit.Ranged ? 1 : LongReach(unit) ? 2 : 0))
 		{
-			var order = unit.Ranged ? BackSlots.Concat(FrontSlots) : FillOrder;
+			var order = unit.Ranged || LongReach(unit) ? BackSlots.Concat(FrontSlots) : FillOrder;
 			foreach (int slot in order)
 			{
 				if (side[slot] != null)

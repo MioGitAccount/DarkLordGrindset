@@ -31,6 +31,8 @@ rangeUnit = false
 [resource]
 script = ExtResource("1_fw6kh")
 Name = "Wolf"
+Level = 1
+Biome = 2
 Icon = ExtResource("2_p5xed")
 MapSprite = ExtResource("10_sprite")
 BattleSprite = ExtResource("11_battle")

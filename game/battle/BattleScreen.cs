@@ -22,6 +22,8 @@ public partial class BattleScreen : Control
 	private static readonly Color SkyBottom = new Color(0.17f, 0.13f, 0.18f);
 	private static readonly Color GroundTop = new Color(0.2f, 0.19f, 0.14f);
 	private static readonly Color GroundBottom = new Color(0.1f, 0.1f, 0.08f);
+	// Laid over a painted battleground so the fighters stand out from it
+	private static readonly Color BackgroundDim = new Color(0, 0, 0, 0.25f);
 	private static readonly Color Gold = new Color(1f, 0.82f, 0.4f);
 	private static readonly Color Muted = new Color(1f, 1f, 1f, 0.35f);
 	private static readonly Color SpellColor = new Color(0.45f, 1f, 0.4f);
@@ -29,8 +31,12 @@ public partial class BattleScreen : Control
 	private static readonly Color ManaColor = new Color(0.4f, 0.65f, 1f);
 	private static readonly Color HealColor = new Color(0.55f, 1f, 0.55f);
 	private static readonly Color CurseColor = new Color(0.75f, 0.45f, 1f);
+	private static readonly Color RootColor = new Color(0.6f, 0.8f, 0.3f);
+	private static readonly Color TauntColor = new Color(1f, 0.5f, 0.25f);
 
 	private field _field;
+	// Painted backdrop of the field (see Battlegrounds); null draws the plain sky and ground
+	private Texture2D _background;
 	private BattleSimulation _sim;
 	private Phase _phase;
 	// Every player unit on the field; those not in a slot sit out
@@ -216,6 +222,7 @@ public partial class BattleScreen : Control
 			return;
 		_battleId++;
 		_field = battleField;
+		_background = Battlegrounds.For(battleField);
 		ClearBattle();
 
 		foreach (var playerUnit in battleField.presentPlayerUnits)
@@ -333,11 +340,23 @@ public partial class BattleScreen : Control
 	{
 		if (_sim == null)
 			return;
-		float horizon = Size.Y * 0.3f;
-		DrawPolygon(new[] { Vector2.Zero, new Vector2(Size.X, 0), new Vector2(Size.X, horizon), new Vector2(0, horizon) },
-			new[] { SkyTop, SkyTop, SkyBottom, SkyBottom });
-		DrawPolygon(new[] { new Vector2(0, horizon), new Vector2(Size.X, horizon), Size, new Vector2(0, Size.Y) },
-			new[] { GroundTop, GroundTop, GroundBottom, GroundBottom });
+		if (_background != null)
+		{
+			// Cover the screen, keeping the picture's shape (cropped at the sides or top and bottom)
+			Vector2 picture = _background.GetSize();
+			float scale = Mathf.Max(Size.X / picture.X, Size.Y / picture.Y);
+			Vector2 drawn = picture * scale;
+			DrawTextureRect(_background, new Rect2((Size - drawn) / 2, drawn), false);
+			DrawRect(new Rect2(Vector2.Zero, Size), BackgroundDim);
+		}
+		else
+		{
+			float horizon = Size.Y * 0.3f;
+			DrawPolygon(new[] { Vector2.Zero, new Vector2(Size.X, 0), new Vector2(Size.X, horizon), new Vector2(0, horizon) },
+				new[] { SkyTop, SkyTop, SkyBottom, SkyBottom });
+			DrawPolygon(new[] { new Vector2(0, horizon), new Vector2(Size.X, horizon), Size, new Vector2(0, Size.Y) },
+				new[] { GroundTop, GroundTop, GroundBottom, GroundBottom });
+		}
 
 		foreach (BattleSide side in new[] { BattleSide.Player, BattleSide.Enemy })
 		{
@@ -872,19 +891,52 @@ public partial class BattleScreen : Control
 				break;
 			case BuffEvent buff:
 				bool curse = buff.Ability.IsCurse;
-				Popup(actorView, buff.Ability.Name.ToUpper() + "!", curse ? CurseColor : Gold, 22);
+				bool regrowth = buff.Ability.Kind == CombatAbilityKind.Rejuvenation;
+				bool taunt = buff.Ability.Kind == CombatAbilityKind.Taunt;
+				Color buffColor = curse ? CurseColor : regrowth ? HealColor : taunt ? TauntColor : Gold;
+				string effect = curse ? $"-{buff.Ability.Amount} ATK" : regrowth ? $"+{buff.Ability.Amount} HP/turn" : taunt ? "Taunted!" : $"+{buff.Ability.Amount} ATK";
+				Popup(actorView, buff.Ability.Name.ToUpper() + "!", buffColor, 22);
 				actorView.PlayAttack();
 				await actorView.Pulse(Pace);
 				foreach (var affected in buff.Affected)
 					if (_views.TryGetValue(affected, out var affectedView))
 					{
-						if (curse)
-							affectedView.Flash(CurseColor);
-						Popup(affectedView, curse ? $"-{buff.Ability.Amount} ATK" : $"+{buff.Ability.Amount} ATK", curse ? CurseColor : Gold, 16, 0.25f);
+						if (curse || regrowth || taunt)
+							affectedView.Flash(buffColor);
+						Popup(affectedView, effect, buffColor, 16, 0.25f);
 						affectedView.Refresh();
 					}
 				await Wait(0.6, battleId);
 				actorView.PlayIdle();
+				break;
+			case HealEvent { Ability: null } tick:
+				// Rejuvenation at the end of the healed unit's turn
+				actorView.ShownHealth = tick.Actor.Health;
+				Popup(actorView, $"+{tick.Healed[0].Amount} HP", HealColor, 18);
+				actorView.Refresh();
+				await Wait(0.4, battleId);
+				break;
+			case RootEvent root:
+				Popup(actorView, root.Ability.Name.ToUpper() + "!", HealColor, 22);
+				actorView.PlayAttack();
+				if (_views.TryGetValue(root.Target, out var rootedView))
+				{
+					await Projectile(actorView.Chest, rootedView.Chest, RootColor);
+					rootedView.Flash(RootColor);
+					Popup(rootedView, "Rooted!", RootColor, 22);
+					rootedView.Refresh();
+				}
+				await Wait(0.6, battleId);
+				actorView.PlayIdle();
+				break;
+			case RootedTurnEvent rooted:
+				actorView.ShownHealth = Math.Max(0, actorView.ShownHealth - rooted.Damage);
+				actorView.Flash(RootColor);
+				Popup(actorView, rooted.Damage > 0 ? $"Rooted  -{rooted.Damage}" : "Rooted", RootColor, 20);
+				if (rooted.Killed)
+					actorView.SetDead();
+				actorView.Refresh();
+				await Wait(0.7, battleId);
 				break;
 			case HealEvent heal:
 				Popup(actorView, heal.Ability.Name.ToUpper() + "!", HealColor, 22);
@@ -915,6 +967,8 @@ public partial class BattleScreen : Control
 		_fighters.MoveChild(attacker, -1); // draw the attacker on top while it acts
 		bool melee = hit.Ability == null && !hit.Actor.Ranged;
 		Vector2 home = attacker.Position;
+		if (hit.Ability?.Kind == CombatAbilityKind.AimedShot)
+			Popup(attacker, hit.Ability.Name.ToUpper() + "!", Gold, 22);
 		if (melee)
 		{
 			Vector2 inFront = target.Position + new Vector2(hit.Actor.IsPlayer ? -70 : 70, 6);
@@ -947,24 +1001,34 @@ public partial class BattleScreen : Control
 
 	private static Color ProjectileColor(HitEvent hit) => hit.Ability?.Kind switch
 	{
-		null => hit.Actor.ProjectileColor,
+		null or CombatAbilityKind.AimedShot => hit.Actor.ProjectileColor,
 		CombatAbilityKind.Fireball => FireColor,
 		CombatAbilityKind.ManaSteal => ManaColor,
 		_ => SpellColor,
 	};
 
-	// Fireball: one cast, a projectile to every target at the same time
+	// Fireball, Volley: one cast, a projectile to every target at the same time.
+	// Whirling Blades: one spin in place, every reachable target is hit at once
 	private async Task AnimateArea(AreaEvent area, BattleFighterView attacker, int battleId)
 	{
 		_fighters.MoveChild(attacker, -1);
-		Popup(attacker, area.Ability.Name.ToUpper() + "!", FireColor, 22);
+		bool spin = area.Ability.Kind == CombatAbilityKind.WhirlingBlades;
+		Color color = area.Ability.Kind == CombatAbilityKind.Fireball ? FireColor : Gold;
+		Popup(attacker, area.Ability.Name.ToUpper() + "!", color, 22);
 		float length = attacker.PlayAttack();
 		await Wait(length * 0.5f, battleId);
-		var flights = new List<Task>();
-		foreach (var hit in area.Hits)
-			if (_views.TryGetValue(hit.Target, out var target))
-				flights.Add(Projectile(attacker.Chest, target.Chest, FireColor));
-		await Task.WhenAll(flights);
+		if (spin)
+		{
+			await attacker.Pulse(Pace);
+		}
+		else
+		{
+			var flights = new List<Task>();
+			foreach (var hit in area.Hits)
+				if (_views.TryGetValue(hit.Target, out var target))
+					flights.Add(Projectile(attacker.Chest, target.Chest, area.Ability.Kind == CombatAbilityKind.Volley ? area.Actor.ProjectileColor : FireColor));
+			await Task.WhenAll(flights);
+		}
 		if (battleId != _battleId)
 			return;
 		foreach (var hit in area.Hits)
@@ -989,7 +1053,7 @@ public partial class BattleScreen : Control
 		}
 		else if (hit.Damage == 0)
 		{
-			Popup(target, "Blocked", new Color(0.8f, 0.8f, 0.8f), 18);
+			Popup(target, hit.ShieldBlocked ? "Shield block!" : hit.Dodged ? "Dodged!" : "Blocked", new Color(0.8f, 0.8f, 0.8f), hit.ShieldBlocked || hit.Dodged ? 22 : 18);
 		}
 		else
 		{

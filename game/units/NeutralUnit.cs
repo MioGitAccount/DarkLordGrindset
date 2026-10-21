@@ -30,5 +30,8 @@ public partial class NeutralUnit : Resource
 		return Template?.Icon;
 	}
 
+	// Threat level 1-5 (UnitTemplate.Level)
+	public int Level => Template?.Level ?? 1;
+
 
 }

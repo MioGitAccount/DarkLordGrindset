@@ -357,6 +357,10 @@ public partial class BattleFighterView : Control
 		string effects = "";
 		if (c.StunnedTurns > 0)
 			effects += "STUNNED  ";
+		if (c.RootedTurns > 0)
+			effects += "ROOTED  ";
+		if (c.TauntTurns > 0 && c.TauntedBy?.IsAlive == true)
+			effects += "TAUNTED  ";
 		if (c.BuffAttack > 0)
 			effects += $"+{c.BuffAttack} ATK  ";
 		if (Status != "")

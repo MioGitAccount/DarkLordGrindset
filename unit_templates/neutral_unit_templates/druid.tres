@@ -1,0 +1,44 @@
+[gd_resource type="Resource" script_class="UnitTemplate" load_steps=10 format=3]
+
+[ext_resource type="Script" path="res://game/units/UnitTemplate.cs" id="1_template"]
+[ext_resource type="Script" path="res://game/units/BattleStats.cs" id="2_stats"]
+[ext_resource type="Script" path="res://game/units/SpecialAttributes.cs" id="3_attrs"]
+[ext_resource type="Texture2D" uid="uid://c1ykqmq0ru6wv" path="res://images/Units/druidIcon.png" id="4_icon"]
+[ext_resource type="SpriteFrames" path="res://images/Units/sprites/druid_frames.tres" id="5_frames"]
+[ext_resource type="Texture2D" uid="uid://bhxk4h7wxt6yy" path="res://images/Units/sprites/druid_battle.png" id="6_battle"]
+[ext_resource type="Resource" path="res://resources/combat/rejuvenation.tres" id="c_rejuvenation"]
+[ext_resource type="Resource" path="res://resources/combat/thorn_bolt.tres" id="c_thorn_bolt"]
+
+[sub_resource type="Resource" id="Resource_attrs"]
+script = ExtResource("3_attrs")
+Deadliness = 3
+Strength = 1
+Durability = 2
+Cleverness = 7
+Quickness = 4
+
+[sub_resource type="Resource" id="Resource_stats"]
+script = ExtResource("2_stats")
+attack = 3
+defence = 2
+health = 18
+maxHealth = 18
+mana = 12
+maxMana = 12
+initiative = 0
+rangeUnit = true
+
+[resource]
+script = ExtResource("1_template")
+Name = "Druid"
+Level = 3
+Biome = 2
+Icon = ExtResource("4_icon")
+MapSprite = ExtResource("5_frames")
+BattleSprite = ExtResource("6_battle")
+BattleAttackLean = true
+AttackProjectileColor = Color(0.5, 1, 0.45, 1)
+DefaultStats = SubResource("Resource_stats")
+Attributes = SubResource("Resource_attrs")
+CombatPassives = []
+CombatAbilities = [ExtResource("c_rejuvenation"), ExtResource("c_thorn_bolt")]

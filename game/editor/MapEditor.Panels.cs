@@ -379,6 +379,14 @@ public partial class MapEditor
 		_rightPanel.Visible = _rightBox.GetChildCount() > 0;
 	}
 
+	// Up to three of the given unit types, 1-2 of each
+	private static List<NeutralData> RandomGuards(List<string> templates)
+	{
+		var rng = new Random();
+		return templates.OrderBy(_ => rng.Next()).Take(3)
+			.Select(name => new NeutralData { Template = name, Count = rng.Next(1, 3) }).ToList();
+	}
+
 	private OptionButton Options(IEnumerable<string> items, string selected, Action<string> changed)
 	{
 		var options = new OptionButton();
@@ -515,10 +523,21 @@ public partial class MapEditor
 
 		_rightBox.AddChild(new HSeparator());
 		_rightBox.AddChild(new Label { Text = "Neutral units" });
+		var biome = Biomes.Of(field.Type);
+		var fitting = MapCatalog.UnitTemplatesFor(biome);
+		if (biome != Biome.None)
+			_rightBox.AddChild(new Label
+			{
+				Text = $"Biome: {biome}" + (fitting.Count > 0 ? $" - fits {string.Join(", ", fitting)}" : " - no guards for it yet"),
+				ThemeTypeVariation = "MutedLabel",
+				AutowrapMode = TextServer.AutowrapMode.WordSmart,
+			});
+		// Guards that live in this biome first
+		var templateNames = fitting.Concat(MapCatalog.UnitTemplateNames.Except(fitting)).ToList();
 		foreach (var neutral in field.Neutrals ?? new List<NeutralData>())
 		{
 			var row = new HBoxContainer();
-			var template = Options(MapCatalog.UnitTemplateNames, neutral.Template, t => { PushUndo(); neutral.Template = t; });
+			var template = Options(templateNames, neutral.Template, t => { PushUndo(); neutral.Template = t; });
 			template.SizeFlagsHorizontal = Control.SizeFlags.ExpandFill;
 			row.AddChild(template);
 			var count = Spin(1, 99, 1, neutral.Count, v => { PushUndo(); neutral.Count = (int)v; _fieldOverlay.QueueRedraw(); });
@@ -539,10 +558,18 @@ public partial class MapEditor
 		{
 			PushUndo();
 			field.Neutrals ??= new List<NeutralData>();
-			field.Neutrals.Add(new NeutralData { Template = MapCatalog.UnitTemplateNames.FirstOrDefault() ?? "wolf", Count = 1 });
+			field.Neutrals.Add(new NeutralData { Template = templateNames.FirstOrDefault() ?? "wolf", Count = 1 });
 			_fieldOverlay.QueueRedraw();
 			RebuildRightPanel();
 		}));
+		if (fitting.Count > 0)
+			_rightBox.AddChild(MakeButton("Fill guards by biome", "Replace this field's guards with a random group of the units that live in its biome", () =>
+			{
+				PushUndo();
+				field.Neutrals = RandomGuards(fitting);
+				_fieldOverlay.QueueRedraw();
+				RebuildRightPanel();
+			}));
 
 		_rightBox.AddChild(new HSeparator());
 		var links = _data.Connections.Where(c => c[0] == field.Id || c[1] == field.Id).Select(c => c[0] == field.Id ? c[1] : c[0]).ToList();

@@ -57,6 +57,8 @@ public partial class field : Node2D
 		}
 		GlobalTickManager.Instance.OnTick += TickTimedPerks;
 		GlobalTickManager.Instance.OnTick += TickHealing;
+		if (Castle != null)
+			GlobalTickManager.Instance.OnTick += Castle.CollectIncome;
 	}
 
 	public override void _ExitTree()
@@ -65,6 +67,8 @@ public partial class field : Node2D
 		{
 			GlobalTickManager.Instance.OnTick -= TickTimedPerks;
 			GlobalTickManager.Instance.OnTick -= TickHealing;
+			if (Castle != null)
+				GlobalTickManager.Instance.OnTick -= Castle.CollectIncome;
 		}
 	}
 

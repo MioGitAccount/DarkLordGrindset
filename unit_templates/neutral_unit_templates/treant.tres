@@ -1,0 +1,43 @@
+[gd_resource type="Resource" script_class="UnitTemplate" load_steps=10 format=3]
+
+[ext_resource type="Script" path="res://game/units/UnitTemplate.cs" id="1_template"]
+[ext_resource type="Script" path="res://game/units/BattleStats.cs" id="2_stats"]
+[ext_resource type="Script" path="res://game/units/SpecialAttributes.cs" id="3_attrs"]
+[ext_resource type="Texture2D" uid="uid://cp4lyir0byex1" path="res://images/Units/treantIcon.png" id="4_icon"]
+[ext_resource type="SpriteFrames" path="res://images/Units/sprites/treant_frames.tres" id="5_frames"]
+[ext_resource type="Texture2D" uid="uid://ct75e2jabo8h3" path="res://images/Units/sprites/treant_battle.png" id="6_battle"]
+[ext_resource type="Resource" path="res://resources/combat/bark_skin.tres" id="c_bark_skin"]
+[ext_resource type="Resource" path="res://resources/combat/entangling_roots.tres" id="c_roots"]
+
+[sub_resource type="Resource" id="Resource_attrs"]
+script = ExtResource("3_attrs")
+Deadliness = 4
+Strength = 7
+Durability = 7
+Cleverness = 1
+Quickness = 1
+
+[sub_resource type="Resource" id="Resource_stats"]
+script = ExtResource("2_stats")
+attack = 6
+defence = 4
+health = 30
+maxHealth = 30
+mana = 0
+maxMana = 0
+initiative = 0
+rangeUnit = false
+
+[resource]
+script = ExtResource("1_template")
+Name = "Treant"
+Level = 3
+Biome = 2
+Icon = ExtResource("4_icon")
+MapSprite = ExtResource("5_frames")
+BattleSprite = ExtResource("6_battle")
+BattleAttackLean = true
+DefaultStats = SubResource("Resource_stats")
+Attributes = SubResource("Resource_attrs")
+CombatPassives = [ExtResource("c_bark_skin")]
+CombatAbilities = [ExtResource("c_roots")]

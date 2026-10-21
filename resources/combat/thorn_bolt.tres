@@ -1,0 +1,13 @@
+[gd_resource type="Resource" script_class="CombatAbility" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://game/battle/CombatAbility.cs" id="1_script"]
+
+[resource]
+script = ExtResource("1_script")
+Name = "Thorn Bolt"
+Description = "Hurls thorns at any enemy, even behind guards. Spell attack 4 + Deadliness + Intelligence/2 against half its defence. Costs 3 mana."
+Kind = 1
+ManaCost = 3
+Cooldown = 0
+Amount = 4
+Duration = 0

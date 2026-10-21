@@ -150,7 +150,7 @@ Amount = 100.0
 [sub_resource type="Resource" id="Building_tower1"]
 script = ExtResource("2_building")
 Name = "Tower I"
-Description = "The dark lord's keep. Watches over the castle and lets you raise level 1 buildings."
+Description = "The dark lord's keep. Watches over the castle, lets you raise level 1 buildings and brings in a little gold."
 Level = 1
 Column = 1
 Cost = []
@@ -158,6 +158,7 @@ Requires = []
 BuiltAtStart = true
 TowerLevel = 1
 BonusVision = 50.0
+GoldPerTick = 0.25
 
 [sub_resource type="Resource" id="Building_imp_den"]
 script = ExtResource("2_building")
@@ -274,8 +275,8 @@ Amount = 60.0
 
 [sub_resource type="Resource" id="Cost_witch_4"]
 script = ExtResource("3_cost")
-Type = 4
-Amount = 10.0
+Type = 1
+Amount = 20.0
 
 [sub_resource type="Resource" id="Building_witch_hut"]
 script = ExtResource("2_building")

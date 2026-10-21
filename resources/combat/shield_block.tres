@@ -1,0 +1,12 @@
+[gd_resource type="Resource" script_class="CombatPassive" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://game/battle/CombatPassive.cs" id="1_script"]
+
+[resource]
+script = ExtResource("1_script")
+Name = "Shield Block"
+Description = "20% chance to block all damage of a weapon hit (normal attacks and shots, not spells)."
+Kind = 6
+Chance = 0.2
+Amount = 0
+Multiplier = 1.0

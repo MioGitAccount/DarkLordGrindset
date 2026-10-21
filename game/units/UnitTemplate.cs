@@ -5,6 +5,10 @@ public partial class UnitTemplate : Resource
 {
 
 	[Export] public string Name = "Imp";
+	// How big a threat a neutral of this type is, 1-5; shown to the player, does not change stats
+	[Export(PropertyHint.Range, "1,5")] public int Level = 1;
+	// Where neutrals of this type live (see Biomes.Of); the map editor suggests them for those fields
+	[Export] public Biome Biome = Biome.None;
 	[Export] public Texture2D Icon;
 	// Animated map sprite with "idle" and "walk" animations; units without one show Icon instead
 	[Export] public SpriteFrames MapSprite;

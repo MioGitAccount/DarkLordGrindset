@@ -19,11 +19,14 @@ public class HitEvent : BattleEvent
 	public bool Critical;
 	public bool Stunned;
 	public bool Killed;
+	// The target's Shield Block or Evasion stopped the whole hit
+	public bool ShieldBlocked;
+	public bool Dodged;
 	// Mana Steal: mana taken from the target
 	public int ManaStolen;
 }
 
-// One spell hitting several enemies at once (Fireball)
+// One action hitting several enemies at once (Fireball, Volley, Whirling Blades)
 public class AreaEvent : BattleEvent
 {
 	public CombatAbility Ability;
@@ -36,11 +39,25 @@ public class BuffEvent : BattleEvent
 	public List<Combatant> Affected = new();
 }
 
-// Health given back by Heal or HealAll
+// Health given back by Heal or HealAll, or by a Rejuvenation tick (Ability null; Actor is the healed unit)
 public class HealEvent : BattleEvent
 {
 	public CombatAbility Ability;
 	public List<(Combatant Target, int Amount)> Healed = new();
+}
+
+// Entangling Roots cast on Target
+public class RootEvent : BattleEvent
+{
+	public CombatAbility Ability;
+	public Combatant Target;
+}
+
+// A rooted unit takes the roots' damage; it can't use abilities or strike in melee this turn
+public class RootedTurnEvent : BattleEvent
+{
+	public int Damage;
+	public bool Killed;
 }
 
 public class SkipEvent : BattleEvent { }
@@ -142,6 +159,10 @@ public class BattleSimulation
 	// Who `attacker` would hit with a normal attack on its turn right now
 	public Combatant PlannedTarget(Combatant attacker)
 	{
+		// A taunt overrides orders while the taunter lives and can be reached
+		var taunter = attacker.TauntedBy;
+		if (attacker.TauntTurns > 0 && taunter != null && taunter.IsAlive && ReachableTargets(attacker).Contains(taunter))
+			return taunter;
 		var ordered = attacker.OrderedTarget;
 		if (ordered != null && ordered.IsAlive && ReachableTargets(attacker).Contains(ordered))
 			return ordered;
@@ -195,6 +216,8 @@ public class BattleSimulation
 	// Empty when the ability can be used now, otherwise why not
 	public string WhyCantUse(Combatant caster, CombatAbility ability)
 	{
+		if (caster.RootedTurns > 0)
+			return "Held by roots";
 		if (caster.CooldownLeft(ability) > 0)
 			return $"Ready in {caster.CooldownLeft(ability)} turns";
 		if (caster.Mana < ability.ManaCost)
@@ -212,11 +235,31 @@ public class BattleSimulation
 			actor.StunnedTurns--;
 			events.Add(new SkipEvent { Actor = actor, Message = $"{Label(actor)} is stunned and skips the turn" });
 		}
+		else if (actor.RootedTurns > 0)
+		{
+			// Held by roots: takes the damage, no abilities; ranged units can still shoot, melee units can't strike
+			actor.RootedTurns--;
+			int damage = Math.Min(actor.Health, actor.RootDamage);
+			actor.Health -= damage;
+			bool shoots = actor.IsAlive && actor.Ranged;
+			events.Add(new RootedTurnEvent
+			{
+				Actor = actor,
+				Damage = damage,
+				Killed = !actor.IsAlive,
+				Message = $"{Label(actor)} is held by roots: takes {damage} damage" + (!actor.IsAlive ? ", killed" : shoots ? " and can only shoot" : " and can't strike"),
+			});
+			actor.QueuedAbility = null;
+			actor.QueuedAbilityTarget = null;
+			var target = shoots ? PlannedTarget(actor) : null;
+			if (target != null)
+				events.Add(Hit(actor, target, null));
+		}
 		else
 		{
 			ChooseAndAct(actor, events);
 		}
-		EndTurn(actor);
+		EndTurn(actor, events);
 		return events;
 	}
 
@@ -247,6 +290,8 @@ public class BattleSimulation
 				if (target == null || !valid.Contains(target))
 					target = ability.TargetsAlly ? MostWounded(actor)
 						: actor.IsPlayer ? BattleFormation.DefaultTarget(actor, OpponentsOf(actor), true)
+						// Neutrals root the strongest melee enemy that isn't held already (rooted archers still shoot), and shoot the weakest
+						: ability.Kind == CombatAbilityKind.Roots ? valid.Where(enemy => enemy.RootedTurns == 0).OrderBy(enemy => enemy.Ranged).ThenByDescending(enemy => enemy.Attack).FirstOrDefault()
 						: valid.OrderBy(enemy => enemy.Health).FirstOrDefault();
 				if (target != null)
 				{
@@ -266,9 +311,16 @@ public class BattleSimulation
 			events.Add(Hit(actor, target, null));
 	}
 
-	// Neutral AI: don't roar while the side is still roaring, heal only the wounded
+	// Neutral AI: don't roar while the side is still roaring, heal only the wounded,
+	// save Volley and Whirling Blades for more than one target
 	private bool WorthUsing(Combatant actor, CombatAbility ability) => ability.Kind switch
 	{
+		CombatAbilityKind.Volley => OpponentsOf(actor).Count(enemy => enemy != null && enemy.IsAlive) > 1,
+		CombatAbilityKind.WhirlingBlades => ReachableTargets(actor).Count > 1,
+		CombatAbilityKind.Roots => OpponentsOf(actor).Any(enemy => enemy != null && enemy.IsAlive && enemy.RootedTurns == 0),
+		CombatAbilityKind.Taunt => OpponentsOf(actor).Any(enemy => enemy != null && enemy.IsAlive && (enemy.TauntTurns == 0 || enemy.TauntedBy?.IsAlive != true)),
+		CombatAbilityKind.Rejuvenation => AlliesOf(actor).Any(ally => ally != null && ally.IsAlive && ally.Health < ally.MaxHealth
+			&& !ally.Buffs.Any(buff => buff.Source == ability.Name)),
 		CombatAbilityKind.Roar => !actor.Buffs.Any(buff => buff.Source == ability.Name),
 		CombatAbilityKind.Heal or CombatAbilityKind.HealAll => AlliesOf(actor).Any(ally => ally != null && ally.IsAlive && ally.Health < ally.MaxHealth),
 		_ => true,
@@ -301,14 +353,18 @@ public class BattleSimulation
 				events.Add(buff);
 				break;
 			case CombatAbilityKind.Firebolt:
+			case CombatAbilityKind.AimedShot:
 				events.Add(Hit(actor, target, ability));
 				break;
 			case CombatAbilityKind.Fireball:
+			case CombatAbilityKind.Volley:
+			case CombatAbilityKind.WhirlingBlades:
 				var area = new AreaEvent { Actor = actor, Ability = ability };
-				foreach (var enemy in OpponentsOf(actor))
-					if (enemy != null && enemy.IsAlive)
-						area.Hits.Add(Hit(actor, enemy, ability));
-				area.Message = $"{Label(actor)} casts {ability.Name} at {area.Hits.Count} enemies";
+				var struck = ability.Kind == CombatAbilityKind.WhirlingBlades ? ReachableTargets(actor)
+					: OpponentsOf(actor).Where(enemy => enemy != null && enemy.IsAlive).ToList();
+				foreach (var enemy in struck)
+					area.Hits.Add(Hit(actor, enemy, ability));
+				area.Message = $"{Label(actor)} {(ability.IsSpell ? "casts" : "uses")} {ability.Name} at {area.Hits.Count} enemies";
 				events.Add(area);
 				break;
 			case CombatAbilityKind.ManaSteal:
@@ -326,6 +382,49 @@ public class BattleSimulation
 				}
 				heal.Message = $"{Label(actor)} casts {ability.Name}: " + string.Join(", ", heal.Healed.Select(h => $"{Label(h.Target)} +{h.Amount} health"));
 				events.Add(heal);
+				break;
+			case CombatAbilityKind.Roots:
+				target.RootedTurns = Math.Max(target.RootedTurns, ability.Duration);
+				target.RootDamage = ability.Amount;
+				events.Add(new RootEvent
+				{
+					Actor = actor,
+					Ability = ability,
+					Target = target,
+					Message = $"{Label(actor)} casts {ability.Name} at {Label(target)}: held for {ability.Duration} turns, {ability.Amount} damage each",
+				});
+				break;
+			case CombatAbilityKind.Taunt:
+				var taunt = new BuffEvent { Actor = actor, Ability = ability };
+				foreach (var enemy in OpponentsOf(actor))
+				{
+					if (enemy == null || !enemy.IsAlive)
+						continue;
+					enemy.TauntedBy = actor;
+					enemy.TauntTurns = ability.Duration;
+					taunt.Affected.Add(enemy);
+				}
+				taunt.Message = $"{Label(actor)} uses {ability.Name}: {taunt.Affected.Count} enemies must attack it for {ability.Duration} turns";
+				events.Add(taunt);
+				break;
+			case CombatAbilityKind.Rejuvenation:
+				var rejuvenation = new BuffEvent { Actor = actor, Ability = ability };
+				foreach (var ally in AlliesOf(actor))
+				{
+					if (ally == null || !ally.IsAlive)
+						continue;
+					ally.Buffs.RemoveAll(b => b.Source == ability.Name); // refresh, don't stack
+					ally.Buffs.Add(new CombatBuff
+					{
+						Source = ability.Name,
+						HealPerTurn = ability.Amount,
+						TurnsLeft = ability.Duration,
+						SkipNextCountdown = ally == actor,
+					});
+					rejuvenation.Affected.Add(ally);
+				}
+				rejuvenation.Message = $"{Label(actor)} casts {ability.Name}: {rejuvenation.Affected.Count} allies heal {ability.Amount} per turn for {ability.Duration} turns";
+				events.Add(rejuvenation);
 				break;
 			case CombatAbilityKind.Curse:
 			case CombatAbilityKind.CurseAll:
@@ -346,13 +445,22 @@ public class BattleSimulation
 	private HitEvent Hit(Combatant attacker, Combatant target, CombatAbility ability)
 	{
 		int attack = EffectiveAttack(attacker);
-		int defence = target.Defence;
+		int defence = target.Defence + (target.GetPassive(CombatPassiveKind.BarkSkin)?.Amount ?? 0);
 		bool contempt = false;
 		if (ability != null && ability.IsSpell)
 		{
 			attack = SpellAttack(attacker, ability);
 			defence /= 2;
 		}
+		else if (ability?.Kind == CombatAbilityKind.AimedShot)
+		{
+			attack += ability.Amount;
+			defence /= 2;
+		}
+		else if (ability?.Kind == CombatAbilityKind.Volley)
+			attack = Math.Max(0, attack - ability.Amount);
+		else if (ability?.Kind == CombatAbilityKind.WhirlingBlades)
+			attack += ability.Amount;
 		else if (ability == null && IsWeak(target))
 		{
 			var contemptPassive = attacker.GetPassive(CombatPassiveKind.ContemptForTheWeak);
@@ -373,6 +481,18 @@ public class BattleSimulation
 			hit.Damage = (int)MathF.Round(hit.Damage * critical.Multiplier);
 		}
 
+		if ((ability == null || !ability.IsSpell) && hit.Damage > 0)
+		{
+			var shield = target.GetPassive(CombatPassiveKind.ShieldBlock);
+			var evasion = target.GetPassive(CombatPassiveKind.Evasion);
+			if (shield != null && _rng.NextDouble() < shield.Chance)
+				hit.ShieldBlocked = true;
+			else if (evasion != null && _rng.NextDouble() < evasion.Chance)
+				hit.Dodged = true;
+			if (hit.ShieldBlocked || hit.Dodged)
+				hit.Damage = 0;
+		}
+
 		target.Health = Math.Max(0, target.Health - hit.Damage);
 		hit.Killed = !target.IsAlive;
 
@@ -383,8 +503,11 @@ public class BattleSimulation
 			target.StunnedTurns = Math.Max(target.StunnedTurns, stun.Amount);
 		}
 
-		string how = ability != null ? $"casts {ability.Name} at" : "hits";
-		string damage = hit.Critical ? $"{BattleMath.Damage(attack, hit.DefenceRoll)}, critical x{critical.Multiplier:0.#} = {hit.Damage}" : hit.Damage.ToString();
+		string how = ability == null ? "hits" : ability.IsSpell ? $"casts {ability.Name} at" : $"uses {ability.Name} on";
+		string damage = hit.ShieldBlocked ? "0 (shield block)"
+			: hit.Dodged ? "0 (dodged)"
+			: hit.Critical ? $"{BattleMath.Damage(attack, hit.DefenceRoll)}, critical x{critical.Multiplier:0.#} = {hit.Damage}"
+			: hit.Damage.ToString();
 		hit.Message = $"{Label(attacker)} {how} {Label(target)}{(contempt ? " (contempt for the weak)" : "")}: {attack} attack - {hit.DefenceRoll} defence = {damage}" + (hit.Stunned ? ", stunned" : "") + (hit.Killed ? ", killed" : "");
 		return hit;
 	}
@@ -411,8 +534,18 @@ public class BattleSimulation
 		return hit;
 	}
 
-	private void EndTurn(Combatant actor)
+	private void EndTurn(Combatant actor, List<BattleEvent> events)
 	{
+		// Rejuvenation heals before counting down; not on the turn it was cast by this unit
+		int heal = actor.IsAlive ? actor.Buffs.Where(buff => !buff.SkipNextCountdown).Sum(buff => buff.HealPerTurn) : 0;
+		heal = Math.Min(heal, actor.MaxHealth - actor.Health);
+		if (heal > 0)
+		{
+			actor.Health += heal;
+			var tick = new HealEvent { Actor = actor, Message = $"{Label(actor)} regrows {heal} health" };
+			tick.Healed.Add((actor, heal));
+			events.Add(tick);
+		}
 		foreach (var buff in actor.Buffs)
 		{
 			if (buff.SkipNextCountdown)
@@ -421,6 +554,8 @@ public class BattleSimulation
 				buff.TurnsLeft--;
 		}
 		actor.Buffs.RemoveAll(buff => buff.TurnsLeft <= 0);
+		if (actor.TauntTurns > 0)
+			actor.TauntTurns--;
 		foreach (var ability in actor.Cooldowns.Keys.ToList())
 			actor.Cooldowns[ability] = Math.Max(0, actor.Cooldowns[ability] - 1);
 		if (actor.IsAlive)

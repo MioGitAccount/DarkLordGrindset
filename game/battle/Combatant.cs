@@ -4,11 +4,14 @@ using System.Collections.Generic;
 
 public enum BattleSide { Player, Enemy }
 
-// Temporary attack bonus (e.g. from Roar) or malus (Curse), counted down at the end of its owner's turns
+// Temporary attack bonus (e.g. from Roar), malus (Curse) or healing (Rejuvenation), counted down
+// at the end of its owner's turns
 public class CombatBuff
 {
 	public string Source;
 	public int AttackBonus;
+	// Health given back at the end of each of the owner's turns
+	public int HealPerTurn;
 	public int TurnsLeft;
 	// Set on the caster's own buff, so the turn it was cast in doesn't count
 	public bool SkipNextCountdown;
@@ -44,6 +47,11 @@ public class Combatant
 	public readonly Dictionary<CombatAbility, int> Cooldowns = new();
 	public readonly List<CombatBuff> Buffs = new();
 	public int StunnedTurns;
+	// Entangling Roots: turns left held (no abilities, ranged attacks only), and the damage taken on each
+	public int RootedTurns, RootDamage;
+	// Taunt: the enemy this unit's normal attacks must go to (while it can reach it), for TauntTurns more turns
+	public Combatant TauntedBy;
+	public int TauntTurns;
 
 	// Where the outcome goes; exactly one of these is set
 	public unit PlayerUnit;

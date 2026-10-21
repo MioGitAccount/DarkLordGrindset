@@ -1,0 +1,42 @@
+[gd_resource type="Resource" script_class="UnitTemplate" load_steps=9 format=3]
+
+[ext_resource type="Script" path="res://game/units/UnitTemplate.cs" id="1_template"]
+[ext_resource type="Script" path="res://game/units/BattleStats.cs" id="2_stats"]
+[ext_resource type="Script" path="res://game/units/SpecialAttributes.cs" id="3_attrs"]
+[ext_resource type="Texture2D" uid="uid://bsoj0iqn6tcfs" path="res://images/Units/night_watchmanIcon.png" id="4_icon"]
+[ext_resource type="SpriteFrames" path="res://images/Units/sprites/night_watchman_frames.tres" id="5_frames"]
+[ext_resource type="Texture2D" uid="uid://ncns1xv1lqsw" path="res://images/Units/sprites/night_watchman_battle.png" id="6_battle"]
+[ext_resource type="Resource" path="res://resources/combat/long_reach.tres" id="c_long_reach"]
+
+[sub_resource type="Resource" id="Resource_attrs"]
+script = ExtResource("3_attrs")
+Deadliness = 4
+Strength = 4
+Durability = 4
+Cleverness = 2
+Quickness = 3
+
+[sub_resource type="Resource" id="Resource_stats"]
+script = ExtResource("2_stats")
+attack = 5
+defence = 3
+health = 20
+maxHealth = 20
+mana = 0
+maxMana = 0
+initiative = 0
+rangeUnit = false
+
+[resource]
+script = ExtResource("1_template")
+Name = "Night Watchman"
+Level = 2
+Biome = 1
+Icon = ExtResource("4_icon")
+MapSprite = ExtResource("5_frames")
+BattleSprite = ExtResource("6_battle")
+BattleAttackLean = true
+DefaultStats = SubResource("Resource_stats")
+Attributes = SubResource("Resource_attrs")
+CombatPassives = [ExtResource("c_long_reach")]
+CombatAbilities = []

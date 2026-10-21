@@ -79,7 +79,7 @@ public partial class FieldHoverCard : PanelContainer
 				_icons.AddChild(MakeIcon(playerUnit.GetIcon(), PlayerFrame));
 		}
 		foreach (var neutral in visible ? _field.presentNeutralUnits : _field.LastSeenNeutrals)
-			_icons.AddChild(MakeIcon(neutral.GetIcon(), HostileFrame));
+			_icons.AddChild(MakeIcon(neutral.GetIcon(), HostileFrame, neutral.Level));
 
 		bool empty = _icons.GetChildCount() == 0;
 		_icons.Visible = !empty;
@@ -87,7 +87,8 @@ public partial class FieldHoverCard : PanelContainer
 		ResetSize(); // shrink back to fit after showing a busier field
 	}
 
-	private static Control MakeIcon(Texture2D icon, StyleBox frame)
+	// level > 0 puts the threat level in the icon's corner (hostiles)
+	private static Control MakeIcon(Texture2D icon, StyleBox frame, int level = 0)
 	{
 		var panel = new PanelContainer { MouseFilter = MouseFilterEnum.Ignore };
 		panel.AddThemeStyleboxOverride("panel", frame);
@@ -99,8 +100,25 @@ public partial class FieldHoverCard : PanelContainer
 			StretchMode = TextureRect.StretchModeEnum.KeepAspectCentered,
 			MouseFilter = MouseFilterEnum.Ignore,
 		});
+		if (level > 0)
+			panel.AddChild(new Label
+			{
+				Text = level.ToString(),
+				HorizontalAlignment = HorizontalAlignment.Right,
+				VerticalAlignment = VerticalAlignment.Bottom,
+				MouseFilter = MouseFilterEnum.Ignore,
+				LabelSettings = LevelBadge,
+			});
 		return panel;
 	}
+
+	private static readonly LabelSettings LevelBadge = new()
+	{
+		FontSize = 11,
+		FontColor = new Color(1f, 0.82f, 0.4f),
+		OutlineSize = 4,
+		OutlineColor = Colors.Black,
+	};
 
 	private static StyleBoxFlat MakeFrame(Color border)
 	{

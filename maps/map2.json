@@ -4842,13 +4842,29 @@
     {
       "id": "Field3",
       "type": "Village",
-      "pos": [720,1420]
+      "pos": [720,1420],
+      "neutrals": [
+        {
+          "template": "villager_militia",
+          "count": 2
+        },
+        {
+          "template": "villager_archer",
+          "count": 1
+        }
+      ]
     },
     {
       "id": "Field4",
       "type": "SpringForest",
       "pos": [545,1450],
-      "perks": ["forest"]
+      "perks": ["forest"],
+      "neutrals": [
+        {
+          "template": "elf_archer",
+          "count": 1
+        }
+      ]
     },
     {
       "id": "Field5",
@@ -4864,7 +4880,17 @@
     {
       "id": "Field7",
       "type": "Village",
-      "pos": [860,1070]
+      "pos": [860,1070],
+      "neutrals": [
+        {
+          "template": "villager_militia",
+          "count": 1
+        },
+        {
+          "template": "villager_archer",
+          "count": 1
+        }
+      ]
     },
     {
       "id": "Field8",
@@ -4875,6 +4901,10 @@
         {
           "template": "wolf",
           "count": 2
+        },
+        {
+          "template": "elf_archer",
+          "count": 1
         }
       ]
     },
@@ -4904,6 +4934,18 @@
         {
           "template": "wolf",
           "count": 3
+        },
+        {
+          "template": "elf_archer",
+          "count": 1
+        },
+        {
+          "template": "treant",
+          "count": 1
+        },
+        {
+          "template": "druid",
+          "count": 1
         }
       ]
     },
@@ -4915,7 +4957,17 @@
     {
       "id": "Field13",
       "type": "Village",
-      "pos": [840,640]
+      "pos": [840,640],
+      "neutrals": [
+        {
+          "template": "villager_militia",
+          "count": 2
+        },
+        {
+          "template": "villager_archer",
+          "count": 1
+        }
+      ]
     },
     {
       "id": "Field14",
@@ -4948,7 +5000,17 @@
       "id": "Field18",
       "type": "Village",
       "pos": [1320,1240],
-      "perks": ["trade_hub"]
+      "perks": ["trade_hub"],
+      "neutrals": [
+        {
+          "template": "villager_militia",
+          "count": 2
+        },
+        {
+          "template": "villager_archer",
+          "count": 1
+        }
+      ]
     },
     {
       "id": "Field19",
@@ -4959,13 +5021,41 @@
       "id": "Field20",
       "type": "AutumnForest",
       "pos": [1190,1490],
-      "perks": ["forest"]
+      "perks": ["forest"],
+      "neutrals": [
+        {
+          "template": "elf_archer",
+          "count": 2
+        },
+        {
+          "template": "elf_blade_dancer",
+          "count": 1
+        },
+        {
+          "template": "treant",
+          "count": 1
+        },
+        {
+          "template": "druid",
+          "count": 1
+        }
+      ]
     },
     {
       "id": "Field21",
       "type": "Village",
       "pos": [1230,1640],
-      "perks": ["raided"]
+      "perks": ["raided"],
+      "neutrals": [
+        {
+          "template": "villager_militia",
+          "count": 2
+        },
+        {
+          "template": "villager_archer",
+          "count": 1
+        }
+      ]
     },
     {
       "id": "Field22",
@@ -5085,7 +5175,17 @@
     {
       "id": "Field32",
       "type": "Village",
-      "pos": [300,1810]
+      "pos": [300,1810],
+      "neutrals": [
+        {
+          "template": "villager_militia",
+          "count": 1
+        },
+        {
+          "template": "villager_archer",
+          "count": 1
+        }
+      ]
     },
     {
       "id": "Field33",
@@ -5110,7 +5210,13 @@
     {
       "id": "Field37",
       "type": "SpringForest",
-      "pos": [720,1530]
+      "pos": [720,1530],
+      "neutrals": [
+        {
+          "template": "elf_archer",
+          "count": 1
+        }
+      ]
     },
     {
       "id": "Field38",

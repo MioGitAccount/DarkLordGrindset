@@ -27,6 +27,8 @@ public partial class BuildingDefinition : Resource
 	[Export(PropertyHint.Range, "0,3,1")] public int TowerLevel;
 	// Added to the castle's vision range (fog of war)
 	[Export] public float BonusVision;
+	// Gold the castle earns every tick while this stands
+	[Export] public float GoldPerTick;
 	// Lets the player recruit this unit at the castle
 	[Export] public UnitTemplate RecruitsUnit;
 	[Export] public Godot.Collections.Array<ResourceCost> RecruitCost = new();

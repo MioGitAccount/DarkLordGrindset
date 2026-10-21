@@ -1,0 +1,13 @@
+[gd_resource type="Resource" script_class="CombatAbility" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://game/battle/CombatAbility.cs" id="1_script"]
+
+[resource]
+script = ExtResource("1_script")
+Name = "Taunt"
+Description = "Challenges the enemy: for their next 2 turns, every enemy that can reach this unit must aim its normal attacks at it. Usable every fourth turn."
+Kind = 13
+ManaCost = 0
+Cooldown = 3
+Amount = 0
+Duration = 2

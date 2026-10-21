@@ -1,0 +1,43 @@
+[gd_resource type="Resource" script_class="UnitTemplate" load_steps=10 format=3]
+
+[ext_resource type="Script" path="res://game/units/UnitTemplate.cs" id="1_template"]
+[ext_resource type="Script" path="res://game/units/BattleStats.cs" id="2_stats"]
+[ext_resource type="Script" path="res://game/units/SpecialAttributes.cs" id="3_attrs"]
+[ext_resource type="Texture2D" uid="uid://bbnumjolk2e0c" path="res://images/Units/elf_blade_dancerIcon.png" id="4_icon"]
+[ext_resource type="SpriteFrames" path="res://images/Units/sprites/elf_blade_dancer_frames.tres" id="5_frames"]
+[ext_resource type="Texture2D" uid="uid://b8di0ytc0tuk0" path="res://images/Units/sprites/elf_blade_dancer_battle.png" id="6_battle"]
+[ext_resource type="Resource" path="res://resources/combat/evasion.tres" id="c_evasion"]
+[ext_resource type="Resource" path="res://resources/combat/whirling_blades.tres" id="c_whirling_blades"]
+
+[sub_resource type="Resource" id="Resource_attrs"]
+script = ExtResource("3_attrs")
+Deadliness = 5
+Strength = 3
+Durability = 2
+Cleverness = 2
+Quickness = 7
+
+[sub_resource type="Resource" id="Resource_stats"]
+script = ExtResource("2_stats")
+attack = 5
+defence = 2
+health = 16
+maxHealth = 16
+mana = 0
+maxMana = 0
+initiative = 0
+rangeUnit = false
+
+[resource]
+script = ExtResource("1_template")
+Name = "Elf Blade Dancer"
+Level = 2
+Biome = 2
+Icon = ExtResource("4_icon")
+MapSprite = ExtResource("5_frames")
+BattleSprite = ExtResource("6_battle")
+BattleAttackLean = true
+DefaultStats = SubResource("Resource_stats")
+Attributes = SubResource("Resource_attrs")
+CombatPassives = [ExtResource("c_evasion")]
+CombatAbilities = [ExtResource("c_whirling_blades")]

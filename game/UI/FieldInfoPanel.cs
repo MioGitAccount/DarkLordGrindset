@@ -141,7 +141,7 @@ public partial class FieldInfoPanel : PanelContainer
 		{
 			var slot = IconSlotScene.Instantiate<IconSlot>();
 			string name = neutral.Template?.Name ?? "Unknown";
-			slot.Setup(neutral.GetIcon(), () => UIText.UnitTooltip(name, neutral.GetEffectiveStats(), neutral.GetAttributes()));
+			slot.Setup(neutral.GetIcon(), () => UIText.UnitTooltip(name, neutral.GetEffectiveStats(), neutral.GetAttributes()) + "\n" + UIText.Threat(neutral.Level));
 			NeutralUnitsRow.AddChild(slot);
 		}
 	}

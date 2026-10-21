@@ -1,0 +1,114 @@
+{
+	"source": "res://tools/sprites/source/elf_archer_concept.png",
+	"output_dir": "res://images/Units/sprites",
+	"size": 64,
+	"bg_tolerance": 0.14,
+	"palette_size": 32,
+	"outline": [
+		20,
+		24,
+		28
+	],
+	"ground_y": 56,
+	"min_island": 16,
+	"enhance": {
+		"saturation": 1.4,
+		"value_offset": 0.05,
+		"value_gain": 1.35
+	},
+	"eyes": [],
+	"eye_colour": [
+		255,
+		220,
+		70
+	],
+	"eye_rim": [
+		230,
+		60,
+		40
+	],
+	"parts": {
+		"left_leg": [
+			18,
+			54,
+			8,
+			10
+		],
+		"right_leg": [
+			30,
+			53,
+			11,
+			9
+		]
+	},
+	"animations": [
+		{
+			"name": "idle",
+			"speed": 2.5,
+			"frames": [
+				{},
+				{
+					"body": [
+						0,
+						1
+					]
+				}
+			]
+		},
+		{
+			"name": "walk",
+			"speed": 7.0,
+			"frames": [
+				{
+					"left_leg": [
+						0,
+						-2
+					]
+				},
+				{
+					"body": [
+						0,
+						1
+					]
+				},
+				{
+					"right_leg": [
+						0,
+						-2
+					]
+				},
+				{
+					"body": [
+						0,
+						1
+					]
+				}
+			]
+		},
+		{
+			"name": "attack",
+			"speed": 8.0,
+			"loop": false,
+			"frames": [
+				{
+					"body": [
+						-1,
+						0
+					]
+				},
+				{
+					"body": [
+						2,
+						0
+					]
+				},
+				{
+					"body": [
+						1,
+						0
+					]
+				}
+			]
+		}
+	]
+}

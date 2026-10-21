@@ -1,0 +1,43 @@
+[gd_resource type="Resource" script_class="UnitTemplate" load_steps=9 format=3]
+
+[ext_resource type="Script" path="res://game/units/UnitTemplate.cs" id="1_template"]
+[ext_resource type="Script" path="res://game/units/BattleStats.cs" id="2_stats"]
+[ext_resource type="Script" path="res://game/units/SpecialAttributes.cs" id="3_attrs"]
+[ext_resource type="Texture2D" uid="uid://3dtj64kd6gnw" path="res://images/Units/elf_archerIcon.png" id="4_icon"]
+[ext_resource type="SpriteFrames" path="res://images/Units/sprites/elf_archer_frames.tres" id="5_frames"]
+[ext_resource type="Texture2D" uid="uid://cguu045ciad7r" path="res://images/Units/sprites/elf_archer_battle.png" id="6_battle"]
+[ext_resource type="Resource" path="res://resources/combat/volley.tres" id="c_volley"]
+
+[sub_resource type="Resource" id="Resource_attrs"]
+script = ExtResource("3_attrs")
+Deadliness = 3
+Strength = 1
+Durability = 1
+Cleverness = 3
+Quickness = 5
+
+[sub_resource type="Resource" id="Resource_stats"]
+script = ExtResource("2_stats")
+attack = 4
+defence = 1
+health = 10
+maxHealth = 10
+mana = 0
+maxMana = 0
+initiative = 0
+rangeUnit = true
+
+[resource]
+script = ExtResource("1_template")
+Name = "Elf Archer"
+Level = 1
+Biome = 2
+Icon = ExtResource("4_icon")
+MapSprite = ExtResource("5_frames")
+BattleSprite = ExtResource("6_battle")
+BattleAttackLean = false
+AttackProjectileColor = Color(0.7, 0.9, 0.5, 1)
+DefaultStats = SubResource("Resource_stats")
+Attributes = SubResource("Resource_attrs")
+CombatPassives = []
+CombatAbilities = [ExtResource("c_volley")]

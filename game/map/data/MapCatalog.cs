@@ -108,6 +108,10 @@ public static class MapCatalog
 		return null;
 	}
 
+	// Templates whose Biome is `biome` (none for Biome.None)
+	public static List<string> UnitTemplatesFor(Biome biome) => biome == Biome.None ? new()
+		: UnitTemplateNames.Where(name => LoadUnitTemplate(name)?.Biome == biome).ToList();
+
 	private static List<string> ListResources(string dir)
 	{
 		var names = new List<string>();
