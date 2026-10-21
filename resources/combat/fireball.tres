@@ -1,0 +1,13 @@
+[gd_resource type="Resource" script_class="CombatAbility" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://game/battle/CombatAbility.cs" id="1_script"]
+
+[resource]
+script = ExtResource("1_script")
+Name = "Fireball"
+Description = "Engulfs every enemy in flame. Spell attack 2 + Deadliness + Intelligence/2 against half of each one's defence. Costs 5 mana, ready again 2 turns later."
+Kind = 2
+ManaCost = 5
+Cooldown = 2
+Amount = 2
+Duration = 0

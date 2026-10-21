@@ -1,33 +1,26 @@
-[gd_resource type="Resource" script_class="SkillTree" load_steps=22 format=3 uid="uid://dqn2enw377rth"]
+[gd_resource type="Resource" script_class="SkillTree" load_steps=33 format=3 uid="uid://dqn2enw377rth"]
 
 [ext_resource type="Script" path="res://game/units/skills/SkillTree.cs" id="1_tree"]
 [ext_resource type="Script" path="res://game/units/skills/SkillDefinition.cs" id="2_skill"]
-[ext_resource type="Resource" uid="uid://eef4tg2vrqhq" path="res://resources/abilities/CuttingTrees.tres" id="3_cut"]
-[ext_resource type="Resource" path="res://resources/abilities/Steal.tres" id="4_steal"]
-[ext_resource type="Resource" path="res://resources/abilities/ChannelMana.tres" id="5_mana"]
+[ext_resource type="Resource" path="res://resources/abilities/ChannelMana.tres" id="channel"]
+[ext_resource type="Resource" path="res://resources/combat/contempt_for_the_weak.tres" id="contempt1"]
+[ext_resource type="Resource" path="res://resources/combat/contempt_for_the_weak_2.tres" id="contempt2"]
+[ext_resource type="Resource" path="res://resources/combat/fireball.tres" id="fireball"]
+[ext_resource type="Resource" path="res://resources/combat/firebolt.tres" id="firebolt1"]
+[ext_resource type="Resource" path="res://resources/combat/firebolt_2.tres" id="firebolt2"]
+[ext_resource type="Resource" path="res://resources/combat/long_reach.tres" id="longreach"]
+[ext_resource type="Resource" path="res://resources/combat/lord.tres" id="lord"]
+[ext_resource type="Resource" path="res://resources/combat/mana_steal.tres" id="manasteal"]
+[ext_resource type="Resource" path="res://resources/abilities/MineOre.tres" id="mine"]
+[ext_resource type="Resource" path="res://resources/abilities/Raid.tres" id="raid"]
+[ext_resource type="Resource" path="res://resources/abilities/RaidII.tres" id="raid2"]
 
-[sub_resource type="Resource" id="Skill_wood_cutter"]
+[sub_resource type="Resource" id="Skill_quick"]
 script = ExtResource("2_skill")
-Name = "Wood Cutter"
-Description = "Small claws, sharp axe. Lets the imp cut trees for wood."
-Tier = 1
-Column = 0
-Cost = 1
-Requires = []
-BonusDeadliness = 0
-BonusStrength = 0
-BonusDurability = 0
-BonusCleverness = 0
-BonusQuickness = 0
-BonusVision = 0.0
-GrantedAbility = ExtResource("3_cut")
-
-[sub_resource type="Resource" id="Skill_sneaky"]
-script = ExtResource("2_skill")
-Name = "Sneaky"
+Name = "Quickness +1"
 Description = "Imps are hard to catch."
 Tier = 1
-Column = 1
+Column = 0
 Cost = 1
 Requires = []
 BonusDeadliness = 0
@@ -36,191 +29,30 @@ BonusDurability = 0
 BonusCleverness = 0
 BonusQuickness = 1
 BonusVision = 0.0
+ExperienceBonus = 0.0
+ExperienceBonusAbilities = []
 
-[sub_resource type="Resource" id="Skill_sharp_claws"]
+[sub_resource type="Resource" id="Skill_scout"]
 script = ExtResource("2_skill")
-Name = "Sharp Claws"
-Description = "Filed claws that bite deeper."
-Tier = 1
-Column = 2
-Cost = 1
-Requires = []
-BonusDeadliness = 1
-BonusStrength = 0
-BonusDurability = 0
-BonusCleverness = 0
-BonusQuickness = 0
-BonusVision = 0.0
-
-[sub_resource type="Resource" id="Skill_lumberjack"]
-script = ExtResource("2_skill")
-Name = "Lumberjack"
-Description = "Hauling logs all day builds muscle."
-Tier = 2
-Column = 0
-Cost = 1
-Requires = [SubResource("Skill_wood_cutter")]
-BonusDeadliness = 0
-BonusStrength = 1
-BonusDurability = 0
-BonusCleverness = 0
-BonusQuickness = 0
-BonusVision = 0.0
-
-[sub_resource type="Resource" id="Skill_scouter"]
-script = ExtResource("2_skill")
-Name = "Scouter"
+Name = "Scout"
 Description = "Climbs high and watches far. Longer range of vision."
-Tier = 2
+Tier = 1
 Column = 1
 Cost = 1
-Requires = [SubResource("Skill_sneaky")]
+Requires = []
 BonusDeadliness = 0
 BonusStrength = 0
 BonusDurability = 0
 BonusCleverness = 0
 BonusQuickness = 0
 BonusVision = 60.0
+ExperienceBonus = 0.0
+ExperienceBonusAbilities = []
 
-[sub_resource type="Resource" id="Skill_silent_killer"]
+[sub_resource type="Resource" id="Skill_raider1"]
 script = ExtResource("2_skill")
-Name = "Silent Killer"
-Description = "Strikes before the victim hears a thing."
-Tier = 2
-Column = 2
-Cost = 1
-Requires = [SubResource("Skill_sharp_claws")]
-BonusDeadliness = 1
-BonusStrength = 0
-BonusDurability = 0
-BonusCleverness = 0
-BonusQuickness = 0
-BonusVision = 0.0
-
-[sub_resource type="Resource" id="Skill_devils_cunning"]
-script = ExtResource("2_skill")
-Name = "Devil's Cunning"
-Description = "Learns the dark lord's tricks."
-Tier = 3
-Column = 0
-Cost = 1
-Requires = [SubResource("Skill_lumberjack")]
-BonusDeadliness = 0
-BonusStrength = 0
-BonusDurability = 0
-BonusCleverness = 2
-BonusQuickness = 0
-BonusVision = 0.0
-
-[sub_resource type="Resource" id="Skill_eagle_eye"]
-script = ExtResource("2_skill")
-Name = "Eagle Eye"
-Description = "Spots a rabbit three valleys away."
-Tier = 3
-Column = 1
-Cost = 1
-Requires = [SubResource("Skill_scouter")]
-BonusDeadliness = 0
-BonusStrength = 0
-BonusDurability = 0
-BonusCleverness = 0
-BonusQuickness = 0
-BonusVision = 80.0
-
-[sub_resource type="Resource" id="Skill_backstab"]
-script = ExtResource("2_skill")
-Name = "Backstab"
-Description = "Always aims for the soft spots."
-Tier = 3
-Column = 2
-Cost = 1
-Requires = [SubResource("Skill_silent_killer")]
-BonusDeadliness = 2
-BonusStrength = 0
-BonusDurability = 0
-BonusCleverness = 0
-BonusQuickness = 0
-BonusVision = 0.0
-
-[sub_resource type="Resource" id="Skill_thick_skin"]
-script = ExtResource("2_skill")
-Name = "Thick Skin"
-Description = "Brimstone-hardened hide."
-Tier = 4
-Column = 0
-Cost = 1
-Requires = [SubResource("Skill_devils_cunning")]
-BonusDeadliness = 0
-BonusStrength = 0
-BonusDurability = 2
-BonusCleverness = 0
-BonusQuickness = 0
-BonusVision = 0.0
-
-[sub_resource type="Resource" id="Skill_shadow_step"]
-script = ExtResource("2_skill")
-Name = "Shadow Step"
-Description = "Moves from shadow to shadow."
-Tier = 4
-Column = 1
-Cost = 1
-Requires = [SubResource("Skill_eagle_eye")]
-BonusDeadliness = 0
-BonusStrength = 0
-BonusDurability = 0
-BonusCleverness = 0
-BonusQuickness = 2
-BonusVision = 0.0
-
-[sub_resource type="Resource" id="Skill_bloodlust"]
-script = ExtResource("2_skill")
-Name = "Bloodlust"
-Description = "Every kill makes it hungrier."
-Tier = 4
-Column = 2
-Cost = 1
-Requires = [SubResource("Skill_backstab")]
-BonusDeadliness = 1
-BonusStrength = 1
-BonusDurability = 0
-BonusCleverness = 0
-BonusQuickness = 0
-BonusVision = 0.0
-
-[sub_resource type="Resource" id="Skill_lord_of_whispers"]
-script = ExtResource("2_skill")
-Name = "Lord of Whispers"
-Description = "Nothing happens in the land without the imp knowing."
-Tier = 5
-Column = 1
-Cost = 1
-Requires = [SubResource("Skill_shadow_step"), SubResource("Skill_devils_cunning")]
-BonusDeadliness = 0
-BonusStrength = 0
-BonusDurability = 0
-BonusCleverness = 2
-BonusQuickness = 0
-BonusVision = 100.0
-
-[sub_resource type="Resource" id="Skill_assassin"]
-script = ExtResource("2_skill")
-Name = "Assassin"
-Description = "The dark lord's own knife in the dark."
-Tier = 5
-Column = 2
-Cost = 1
-Requires = [SubResource("Skill_bloodlust"), SubResource("Skill_shadow_step")]
-BonusDeadliness = 3
-BonusStrength = 0
-BonusDurability = 0
-BonusCleverness = 0
-BonusQuickness = 0
-BonusVision = 0.0
-
-[sub_resource type="Resource" id="Skill_pickpocket"]
-script = ExtResource("2_skill")
-Name = "Pickpocket"
-Description = "Light fingers. Unlocks Steal: take a little gold from a field."
+Name = "Raider 1"
+Description = "Burn, loot, repeat. Unlocks Raid: plunder a town's gold fast, but it stops producing for a while."
 Tier = 1
 Column = 3
 Cost = 1
@@ -231,25 +63,277 @@ BonusDurability = 0
 BonusCleverness = 0
 BonusQuickness = 0
 BonusVision = 0.0
-GrantedAbility = ExtResource("4_steal")
+GrantedAbility = ExtResource("raid")
+ExperienceBonus = 0.0
+ExperienceBonusAbilities = []
 
-[sub_resource type="Resource" id="Skill_mana_siphon"]
+[sub_resource type="Resource" id="Skill_int1"]
 script = ExtResource("2_skill")
-Name = "Mana Siphon"
-Description = "If it isn't nailed down, an imp takes it - even magic. Unlocks Channel Mana."
-Tier = 2
-Column = 3
+Name = "Intelligence +1"
+Description = "Sharper than the average imp."
+Tier = 1
+Column = 5
 Cost = 1
-Requires = [SubResource("Skill_pickpocket")]
+Requires = []
+BonusDeadliness = 0
+BonusStrength = 0
+BonusDurability = 0
+BonusCleverness = 1
+BonusQuickness = 0
+BonusVision = 0.0
+ExperienceBonus = 0.0
+ExperienceBonusAbilities = []
+
+[sub_resource type="Resource" id="Skill_silent"]
+script = ExtResource("2_skill")
+Name = "Silent Killer"
+Description = "Strikes before the victim hears a thing."
+Tier = 2
+Column = 0
+Cost = 1
+Requires = [SubResource("Skill_quick")]
+BonusDeadliness = 1
+BonusStrength = 0
+BonusDurability = 0
+BonusCleverness = 0
+BonusQuickness = 1
+BonusVision = 0.0
+ExperienceBonus = 0.0
+ExperienceBonusAbilities = []
+
+[sub_resource type="Resource" id="Skill_contempt1"]
+script = ExtResource("2_skill")
+Name = "Contempt for the Weak"
+Description = "Kicks them while they're down: +2 attack on normal attacks against enemies below half health."
+Tier = 2
+Column = 2
+Cost = 1
+Requires = []
 BonusDeadliness = 0
 BonusStrength = 0
 BonusDurability = 0
 BonusCleverness = 0
 BonusQuickness = 0
 BonusVision = 0.0
-GrantedAbility = ExtResource("5_mana")
+GrantedCombatPassive = ExtResource("contempt1")
+ExperienceBonus = 0.0
+ExperienceBonusAbilities = []
+
+[sub_resource type="Resource" id="Skill_mining1"]
+script = ExtResource("2_skill")
+Name = "Mining 1"
+Description = "Small claws, deep tunnels. Unlocks Mine: dig ore out of a field."
+Tier = 2
+Column = 4
+Cost = 1
+Requires = []
+BonusDeadliness = 0
+BonusStrength = 0
+BonusDurability = 0
+BonusCleverness = 0
+BonusQuickness = 0
+BonusVision = 0.0
+GrantedAbility = ExtResource("mine")
+ExperienceBonus = 0.0
+ExperienceBonusAbilities = []
+
+[sub_resource type="Resource" id="Skill_firebolt1"]
+script = ExtResource("2_skill")
+Name = "Fire Bolt 1"
+Description = "Unlocks Firebolt: hurl fire at any enemy in battle."
+Tier = 2
+Column = 5
+Cost = 1
+Requires = [SubResource("Skill_int1")]
+BonusDeadliness = 0
+BonusStrength = 0
+BonusDurability = 0
+BonusCleverness = 0
+BonusQuickness = 0
+BonusVision = 0.0
+GrantedCombatAbility = ExtResource("firebolt1")
+ExperienceBonus = 0.0
+ExperienceBonusAbilities = []
+
+[sub_resource type="Resource" id="Skill_manadrain"]
+script = ExtResource("2_skill")
+Name = "Mana Drain"
+Description = "If it isn't nailed down, an imp takes it - even magic. Unlocks Channel Mana: drain mana from a field into your pool."
+Tier = 2
+Column = 7
+Cost = 1
+Requires = [SubResource("Skill_int1")]
+BonusDeadliness = 0
+BonusStrength = 0
+BonusDurability = 0
+BonusCleverness = 0
+BonusQuickness = 0
+BonusVision = 0.0
+GrantedAbility = ExtResource("channel")
+ExperienceBonus = 0.0
+ExperienceBonusAbilities = []
+
+[sub_resource type="Resource" id="Skill_longreach"]
+script = ExtResource("2_skill")
+Name = "Long Reach"
+Description = "Long arms, longer claws. No attack penalty from the back row (melee units normally lose 35% attack there)."
+Tier = 3
+Column = 1
+Cost = 1
+Requires = []
+BonusDeadliness = 0
+BonusStrength = 0
+BonusDurability = 0
+BonusCleverness = 0
+BonusQuickness = 0
+BonusVision = 0.0
+GrantedCombatPassive = ExtResource("longreach")
+ExperienceBonus = 0.0
+ExperienceBonusAbilities = []
+
+[sub_resource type="Resource" id="Skill_raider2"]
+script = ExtResource("2_skill")
+Name = "Raider 2"
+Description = "Knows where the coin is hidden. Raid becomes Raid II: 15 gold per second."
+Tier = 3
+Column = 3
+Cost = 1
+Requires = [SubResource("Skill_raider1")]
+BonusDeadliness = 0
+BonusStrength = 0
+BonusDurability = 0
+BonusCleverness = 0
+BonusQuickness = 0
+BonusVision = 0.0
+GrantedAbility = ExtResource("raid2")
+ExperienceBonus = 0.0
+ExperienceBonusAbilities = []
+
+[sub_resource type="Resource" id="Skill_greed"]
+script = ExtResource("2_skill")
+Name = "Greed"
+Description = "Every coin and nugget is a lesson. +50% experience from mining and raiding."
+Tier = 3
+Column = 4
+Cost = 1
+Requires = [SubResource("Skill_mining1"), SubResource("Skill_raider1")]
+BonusDeadliness = 0
+BonusStrength = 0
+BonusDurability = 0
+BonusCleverness = 0
+BonusQuickness = 0
+BonusVision = 0.0
+ExperienceBonus = 0.5
+ExperienceBonusAbilities = [ExtResource("mine"), ExtResource("raid"), ExtResource("raid2")]
+
+[sub_resource type="Resource" id="Skill_wicked"]
+script = ExtResource("2_skill")
+Name = "Wicked Mind"
+Description = "Every clever thought is a cruel one."
+Tier = 3
+Column = 6
+Cost = 1
+Requires = [SubResource("Skill_int1")]
+BonusDeadliness = 1
+BonusStrength = 0
+BonusDurability = 0
+BonusCleverness = 1
+BonusQuickness = 0
+BonusVision = 0.0
+ExperienceBonus = 0.0
+ExperienceBonusAbilities = []
+
+[sub_resource type="Resource" id="Skill_manasteal"]
+script = ExtResource("2_skill")
+Name = "Mana Steal"
+Description = "Unlocks Mana Steal: suck mana out of an enemy in battle (or its health, if it has none)."
+Tier = 3
+Column = 7
+Cost = 1
+Requires = [SubResource("Skill_manadrain")]
+BonusDeadliness = 0
+BonusStrength = 0
+BonusDurability = 0
+BonusCleverness = 0
+BonusQuickness = 0
+BonusVision = 0.0
+GrantedCombatAbility = ExtResource("manasteal")
+ExperienceBonus = 0.0
+ExperienceBonusAbilities = []
+
+[sub_resource type="Resource" id="Skill_contempt2"]
+script = ExtResource("2_skill")
+Name = "Contempt for the Weak 2"
+Description = "+4 attack (instead of +2) on normal attacks against enemies below half health."
+Tier = 4
+Column = 2
+Cost = 1
+Requires = [SubResource("Skill_contempt1")]
+BonusDeadliness = 0
+BonusStrength = 0
+BonusDurability = 0
+BonusCleverness = 0
+BonusQuickness = 0
+BonusVision = 0.0
+GrantedCombatPassive = ExtResource("contempt2")
+ExperienceBonus = 0.0
+ExperienceBonusAbilities = []
+
+[sub_resource type="Resource" id="Skill_firebolt2"]
+script = ExtResource("2_skill")
+Name = "Fire Bolt 2"
+Description = "Firebolt becomes Firebolt II: spell base power 8 instead of 5."
+Tier = 4
+Column = 5
+Cost = 1
+Requires = [SubResource("Skill_firebolt1"), SubResource("Skill_wicked")]
+BonusDeadliness = 0
+BonusStrength = 0
+BonusDurability = 0
+BonusCleverness = 0
+BonusQuickness = 0
+BonusVision = 0.0
+GrantedCombatAbility = ExtResource("firebolt2")
+ExperienceBonus = 0.0
+ExperienceBonusAbilities = []
+
+[sub_resource type="Resource" id="Skill_lord"]
+script = ExtResource("2_skill")
+Name = "Lord"
+Description = "The other imps bow. In battle every imp on its side (itself too) gets +1 Deadliness and +1 Strength."
+Tier = 5
+Column = 0
+Cost = 1
+Requires = [SubResource("Skill_silent")]
+BonusDeadliness = 0
+BonusStrength = 0
+BonusDurability = 0
+BonusCleverness = 0
+BonusQuickness = 0
+BonusVision = 0.0
+GrantedCombatPassive = ExtResource("lord")
+ExperienceBonus = 0.0
+ExperienceBonusAbilities = []
+
+[sub_resource type="Resource" id="Skill_fireball"]
+script = ExtResource("2_skill")
+Name = "Fireball"
+Description = "Unlocks Fireball: burn every enemy at once."
+Tier = 5
+Column = 5
+Cost = 1
+Requires = [SubResource("Skill_firebolt2")]
+BonusDeadliness = 0
+BonusStrength = 0
+BonusDurability = 0
+BonusCleverness = 0
+BonusQuickness = 0
+BonusVision = 0.0
+GrantedCombatAbility = ExtResource("fireball")
+ExperienceBonus = 0.0
+ExperienceBonusAbilities = []
 
 [resource]
 script = ExtResource("1_tree")
 Name = "Imp"
-Skills = [SubResource("Skill_wood_cutter"), SubResource("Skill_sneaky"), SubResource("Skill_sharp_claws"), SubResource("Skill_lumberjack"), SubResource("Skill_scouter"), SubResource("Skill_silent_killer"), SubResource("Skill_devils_cunning"), SubResource("Skill_eagle_eye"), SubResource("Skill_backstab"), SubResource("Skill_thick_skin"), SubResource("Skill_shadow_step"), SubResource("Skill_bloodlust"), SubResource("Skill_lord_of_whispers"), SubResource("Skill_assassin"), SubResource("Skill_pickpocket"), SubResource("Skill_mana_siphon")]
+Skills = [SubResource("Skill_quick"), SubResource("Skill_scout"), SubResource("Skill_raider1"), SubResource("Skill_int1"), SubResource("Skill_silent"), SubResource("Skill_contempt1"), SubResource("Skill_mining1"), SubResource("Skill_firebolt1"), SubResource("Skill_manadrain"), SubResource("Skill_longreach"), SubResource("Skill_raider2"), SubResource("Skill_greed"), SubResource("Skill_wicked"), SubResource("Skill_manasteal"), SubResource("Skill_contempt2"), SubResource("Skill_firebolt2"), SubResource("Skill_lord"), SubResource("Skill_fireball")]

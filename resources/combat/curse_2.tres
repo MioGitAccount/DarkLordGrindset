@@ -1,0 +1,15 @@
+[gd_resource type="Resource" script_class="CombatAbility" load_steps=3 format=3]
+
+[ext_resource type="Script" path="res://game/battle/CombatAbility.cs" id="1_script"]
+[ext_resource type="Resource" path="res://resources/combat/curse.tres" id="2_replaces"]
+
+[resource]
+script = ExtResource("1_script")
+Name = "Curse II"
+Description = "Hexes one enemy, even one behind guards: -5 attack for its next 3 turns. Costs 2 mana, ready again 2 turns later."
+Kind = 6
+ManaCost = 2
+Cooldown = 2
+Amount = 5
+Duration = 3
+Replaces = ExtResource("2_replaces")

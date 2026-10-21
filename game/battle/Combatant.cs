@@ -4,7 +4,7 @@ using System.Collections.Generic;
 
 public enum BattleSide { Player, Enemy }
 
-// Temporary attack bonus (e.g. from Roar), counted down at the end of its owner's turns
+// Temporary attack bonus (e.g. from Roar) or malus (Curse), counted down at the end of its owner's turns
 public class CombatBuff
 {
 	public string Source;
@@ -27,11 +27,17 @@ public class Combatant
 	// Painted cutout, animated in code; preferred over Sprite
 	public Texture2D BattleSprite;
 	public bool AttackLean = true;
+	// Bolt of a ranged unit's normal attack
+	public Color ProjectileColor = new Color(1f, 0.7f, 0.3f);
 	public BattleSide Side;
 	// 0-4, see BattleFormation
 	public int Slot = -1;
 
 	public int Attack, Defence, Health, MaxHealth, Mana, MaxMana, Initiative, Quickness;
+	// Attributes spells scale with (see BattleSimulation.SpellAttack)
+	public int Deadliness, Cleverness;
+	// Set once a Lord's bonus has been added to this unit
+	public bool HasLordBonus;
 	public bool Ranged;
 	public readonly List<CombatPassive> Passives = new();
 	public readonly List<CombatAbility> Abilities = new();
@@ -77,10 +83,11 @@ public class Combatant
 			Sprite = playerUnit.Template?.MapSprite,
 			BattleSprite = playerUnit.Template?.BattleSprite,
 			AttackLean = playerUnit.Template?.BattleAttackLean ?? true,
+			ProjectileColor = playerUnit.Template?.AttackProjectileColor ?? new Color(1f, 0.7f, 0.3f),
 			Side = BattleSide.Player,
 			PlayerUnit = playerUnit,
-			Quickness = playerUnit.Attributes?.Quickness ?? 0,
 		};
+		combatant.CopyAttributes(playerUnit.Attributes);
 		combatant.CopyStats(stats);
 		combatant.Passives.AddRange(playerUnit.CombatPassives);
 		combatant.Abilities.AddRange(playerUnit.CombatAbilities);
@@ -98,10 +105,11 @@ public class Combatant
 			Sprite = template?.MapSprite,
 			BattleSprite = template?.BattleSprite,
 			AttackLean = template?.BattleAttackLean ?? true,
+			ProjectileColor = template?.AttackProjectileColor ?? new Color(1f, 0.7f, 0.3f),
 			Side = BattleSide.Enemy,
 			Neutral = neutral,
-			Quickness = neutral.GetAttributes()?.Quickness ?? 0,
 		};
+		combatant.CopyAttributes(neutral.GetAttributes());
 		combatant.CopyStats(neutral.GetEffectiveStats());
 		if (template != null)
 		{
@@ -113,6 +121,13 @@ public class Combatant
 					combatant.Abilities.Add(ability);
 		}
 		return combatant;
+	}
+
+	private void CopyAttributes(SpecialAttributes attributes)
+	{
+		Quickness = attributes?.Quickness ?? 0;
+		Deadliness = attributes?.Deadliness ?? 0;
+		Cleverness = attributes?.Cleverness ?? 0;
 	}
 
 	private void CopyStats(BattleStats stats)

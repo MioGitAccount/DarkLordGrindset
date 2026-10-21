@@ -25,6 +25,10 @@ public partial class BattleScreen : Control
 	private static readonly Color Gold = new Color(1f, 0.82f, 0.4f);
 	private static readonly Color Muted = new Color(1f, 1f, 1f, 0.35f);
 	private static readonly Color SpellColor = new Color(0.45f, 1f, 0.4f);
+	private static readonly Color FireColor = new Color(1f, 0.45f, 0.15f);
+	private static readonly Color ManaColor = new Color(0.4f, 0.65f, 1f);
+	private static readonly Color HealColor = new Color(0.55f, 1f, 0.55f);
+	private static readonly Color CurseColor = new Color(0.75f, 0.45f, 1f);
 
 	private field _field;
 	private BattleSimulation _sim;
@@ -373,10 +377,10 @@ public partial class BattleScreen : Control
 			bool selected = combatant == _selected;
 			Combatant target;
 			Color color;
-			if (combatant.QueuedAbility != null && combatant.QueuedAbility.TargetsEnemy)
+			if (combatant.QueuedAbility != null && combatant.QueuedAbility.NeedsTarget)
 			{
 				target = combatant.QueuedAbilityTarget;
-				color = SpellColor;
+				color = combatant.QueuedAbility.TargetsAlly ? HealColor : SpellColor;
 			}
 			else
 			{
@@ -536,7 +540,9 @@ public partial class BattleScreen : Control
 			Select(null);
 			return;
 		}
-		if (clicked.IsPlayer)
+		// Clicking your own unit selects it, unless a heal is waiting for its target
+		bool pickingAlly = _armedAbility != null && _armedAbility.TargetsAlly && _selected != null && _selected.IsAlive;
+		if (clicked.IsPlayer && !pickingAlly)
 		{
 			Select(_selected == clicked ? null : clicked);
 			return;
@@ -560,7 +566,7 @@ public partial class BattleScreen : Control
 				return;
 			unit.QueuedAbility = _armedAbility;
 			unit.QueuedAbilityTarget = enemy;
-			Log($"{unit.Name} will cast {_armedAbility.Name} at {enemy.Name} on its turn");
+			Log($"{unit.Name} will cast {_armedAbility.Name} {(_armedAbility.TargetsAlly ? "on" : "at")} {(enemy == unit ? "itself" : enemy.Name)} on its turn");
 			_armedAbility = null;
 		}
 		else if (_sim.ReachableTargets(unit).Contains(enemy))
@@ -587,7 +593,7 @@ public partial class BattleScreen : Control
 			unit.QueuedAbilityTarget = null;
 			_armedAbility = null;
 		}
-		else if (ability.TargetsEnemy)
+		else if (ability.NeedsTarget)
 		{
 			_armedAbility = _armedAbility == ability ? null : ability;
 		}
@@ -762,6 +768,9 @@ public partial class BattleScreen : Control
 				break;
 			}
 			_activeActor = actor;
+			// A new round can change health (Lord)
+			foreach (var (combatant, view) in _views)
+				view.ShownHealth = combatant.Health;
 			RefreshAll();
 			await Wait(0.25, battleId);
 			if (battleId != _battleId)
@@ -858,15 +867,36 @@ public partial class BattleScreen : Control
 			case HitEvent hit:
 				await AnimateHit(hit, actorView, battleId);
 				break;
+			case AreaEvent area:
+				await AnimateArea(area, actorView, battleId);
+				break;
 			case BuffEvent buff:
-				Popup(actorView, buff.Ability.Name.ToUpper() + "!", Gold, 22);
+				bool curse = buff.Ability.IsCurse;
+				Popup(actorView, buff.Ability.Name.ToUpper() + "!", curse ? CurseColor : Gold, 22);
 				actorView.PlayAttack();
 				await actorView.Pulse(Pace);
-				foreach (var ally in buff.Affected)
-					if (_views.TryGetValue(ally, out var allyView))
+				foreach (var affected in buff.Affected)
+					if (_views.TryGetValue(affected, out var affectedView))
 					{
-						Popup(allyView, $"+{buff.Ability.Amount} ATK", Gold, 16, 0.25f);
-						allyView.Refresh();
+						if (curse)
+							affectedView.Flash(CurseColor);
+						Popup(affectedView, curse ? $"-{buff.Ability.Amount} ATK" : $"+{buff.Ability.Amount} ATK", curse ? CurseColor : Gold, 16, 0.25f);
+						affectedView.Refresh();
+					}
+				await Wait(0.6, battleId);
+				actorView.PlayIdle();
+				break;
+			case HealEvent heal:
+				Popup(actorView, heal.Ability.Name.ToUpper() + "!", HealColor, 22);
+				actorView.PlayAttack();
+				await actorView.Pulse(Pace);
+				foreach (var (patient, amount) in heal.Healed)
+					if (_views.TryGetValue(patient, out var patientView))
+					{
+						patientView.Flash(HealColor);
+						patientView.ShownHealth = patient.Health;
+						Popup(patientView, $"+{amount} HP", HealColor, 20, 0.15f);
+						patientView.Refresh();
 					}
 				await Wait(0.6, battleId);
 				actorView.PlayIdle();
@@ -902,7 +932,7 @@ public partial class BattleScreen : Control
 		else
 		{
 			await Wait(length * 0.5f, battleId);
-			await Projectile(attacker.Chest, target.Chest, hit.Ability != null ? SpellColor : new Color(1f, 0.7f, 0.3f));
+			await Projectile(attacker.Chest, target.Chest, ProjectileColor(hit));
 		}
 		if (battleId != _battleId)
 			return;
@@ -915,10 +945,49 @@ public partial class BattleScreen : Control
 		SortFighters();
 	}
 
+	private static Color ProjectileColor(HitEvent hit) => hit.Ability?.Kind switch
+	{
+		null => hit.Actor.ProjectileColor,
+		CombatAbilityKind.Fireball => FireColor,
+		CombatAbilityKind.ManaSteal => ManaColor,
+		_ => SpellColor,
+	};
+
+	// Fireball: one cast, a projectile to every target at the same time
+	private async Task AnimateArea(AreaEvent area, BattleFighterView attacker, int battleId)
+	{
+		_fighters.MoveChild(attacker, -1);
+		Popup(attacker, area.Ability.Name.ToUpper() + "!", FireColor, 22);
+		float length = attacker.PlayAttack();
+		await Wait(length * 0.5f, battleId);
+		var flights = new List<Task>();
+		foreach (var hit in area.Hits)
+			if (_views.TryGetValue(hit.Target, out var target))
+				flights.Add(Projectile(attacker.Chest, target.Chest, FireColor));
+		await Task.WhenAll(flights);
+		if (battleId != _battleId)
+			return;
+		foreach (var hit in area.Hits)
+			if (_views.TryGetValue(hit.Target, out var target))
+				ShowImpact(hit, target);
+		await Wait(Math.Max(0.35, length * 0.5f), battleId);
+		attacker.PlayIdle();
+		SortFighters();
+	}
+
 	private void ShowImpact(HitEvent hit, BattleFighterView target)
 	{
 		target.ShownHealth = hit.Target.Health;
-		if (hit.Damage == 0)
+		if (hit.ManaStolen > 0)
+		{
+			Popup(target, $"-{hit.ManaStolen} MP", ManaColor, 22);
+			if (_views.TryGetValue(hit.Actor, out var casterView))
+			{
+				Popup(casterView, $"+{hit.ManaStolen} MP", ManaColor, 18, 0.2f);
+				casterView.Refresh();
+			}
+		}
+		else if (hit.Damage == 0)
 		{
 			Popup(target, "Blocked", new Color(0.8f, 0.8f, 0.8f), 18);
 		}

@@ -1,0 +1,13 @@
+[gd_resource type="Resource" script_class="CombatAbility" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://game/battle/CombatAbility.cs" id="1_script"]
+
+[resource]
+script = ExtResource("1_script")
+Name = "Mending Circle"
+Description = "Every ally (herself too) gets back 2 + Cleverness/2 health. Costs 5 mana, ready again 3 turns later."
+Kind = 5
+ManaCost = 5
+Cooldown = 3
+Amount = 2
+Duration = 0

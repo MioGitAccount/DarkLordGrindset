@@ -11,6 +11,18 @@ public partial class RaidAbility : ResourceDrainAbility
 	[Export] public int RaidedTicksPerTick = 3;
 	// Upper limit of the field's raided time
 	[Export] public int MaxRaidedTicks = 300;
+	// Only towns (Village fields) can be raided
+	[Export] public bool TownsOnly = true;
+
+	public override bool Start(AbilityExecutionContext context)
+	{
+		if (TownsOnly && context.Source?.currentField?.IsTown != true)
+		{
+			GD.Print($"{Name}: only towns can be raided");
+			return false;
+		}
+		return base.Start(context);
+	}
 
 	protected override void OnCollected(AbilityExecutionContext context, field field, float taken)
 	{

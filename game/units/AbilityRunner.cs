@@ -42,7 +42,7 @@ public partial class AbilityRunner : Node
 			_timeAccumulator -= 1f;
 			var context = _context;
 			if (_ability.OnTick(context))
-				context.Source?.AddExperience(ExperiencePerTick);
+				context.Source?.AddExperience((int)MathF.Round(ExperiencePerTick * context.Source.ExperienceMultiplier(_ability)));
 			else if (_context == context)
 				StopAbility();
 		}

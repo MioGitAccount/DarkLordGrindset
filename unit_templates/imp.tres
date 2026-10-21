@@ -1,4 +1,4 @@
-[gd_resource type="Resource" script_class="UnitTemplate" load_steps=13 format=3 uid="uid://cwtq0y8xsda4m"]
+[gd_resource type="Resource" script_class="UnitTemplate" load_steps=12 format=3 uid="uid://cwtq0y8xsda4m"]
 
 [ext_resource type="Script" path="res://game/units/BattleStats.cs" id="1_e1v2y"]
 [ext_resource type="Script" path="res://game/units/UnitTemplate.cs" id="1_y4khv"]
@@ -9,7 +9,6 @@
 [ext_resource type="Resource" uid="uid://dqn2enw377rth" path="res://resources/skill_trees/imp_skill_tree.tres" id="10_skills"]
 [ext_resource type="Texture2D" uid="uid://c7oxkwre2vv1w" path="res://images/Units/sprites/imp_battle.png" id="11_battle"]
 [ext_resource type="Resource" path="res://resources/combat/critical.tres" id="c_critical"]
-[ext_resource type="Resource" path="res://resources/combat/firebolt.tres" id="c_firebolt"]
 
 [sub_resource type="Resource" id="Resource_attrs"]
 script = ExtResource("9_attrs")
@@ -42,4 +41,4 @@ DefaultStats = SubResource("Resource_geemo")
 Attributes = SubResource("Resource_attrs")
 SkillTree = ExtResource("10_skills")
 CombatPassives = [ExtResource("c_critical")]
-CombatAbilities = [ExtResource("c_firebolt")]
+CombatAbilities = []

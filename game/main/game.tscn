@@ -1,4 +1,4 @@
-[gd_scene load_steps=14 format=3 uid="uid://bmw3037w1kmrt"]
+[gd_scene load_steps=15 format=3 uid="uid://bmw3037w1kmrt"]
 
 [ext_resource type="Script" path="res://game/main/game.cs" id="1_64kao"]
 [ext_resource type="PackedScene" uid="uid://var6frhqr00x" path="res://game/map/map.tscn" id="1_h6xol"]
@@ -8,6 +8,7 @@
 [ext_resource type="Resource" uid="uid://cwtq0y8xsda4m" path="res://unit_templates/imp.tres" id="5_buf6p"]
 [ext_resource type="PackedScene" uid="uid://d2oqmhsdb8fn3" path="res://game/UI/UI.tscn" id="5_n8336"]
 [ext_resource type="Resource" uid="uid://bewribr222x3c" path="res://unit_templates/orc.tres" id="6_5s4c6"]
+[ext_resource type="Resource" path="res://unit_templates/witch.tres" id="7_witch"]
 [ext_resource type="Script" path="res://game/units/BattleStats.cs" id="8_1outy"]
 [ext_resource type="Script" path="res://game/map/FogOfWar.cs" id="14_ho7uh"]
 [ext_resource type="Script" path="res://game/main/GlobalTickManager.cs" id="16_nryd8"]
@@ -68,6 +69,11 @@ StartFieldId = "Field14"
 [node name="TestOrc2" parent="Map/UnitList" instance=ExtResource("4_63g25")]
 position = Vector2(743.9, 881.6)
 Template = ExtResource("6_5s4c6")
+StartFieldId = "Field14"
+
+[node name="TestWitch" parent="Map/UnitList" instance=ExtResource("4_63g25")]
+position = Vector2(743.9, 881.6)
+Template = ExtResource("7_witch")
 StartFieldId = "Field14"
 
 [node name="UnitManager" type="Node" parent="Map"]

@@ -1,0 +1,43 @@
+[gd_resource type="Resource" script_class="UnitTemplate" load_steps=9 format=3]
+
+[ext_resource type="Script" path="res://game/units/BattleStats.cs" id="1_stats"]
+[ext_resource type="Script" path="res://game/units/UnitTemplate.cs" id="2_template"]
+[ext_resource type="Texture2D" uid="uid://bwl5xu3jrwbja" path="res://images/Units/sprites/witch_battle.png" id="3_battle"]
+[ext_resource type="SpriteFrames" path="res://images/Units/sprites/witch_frames.tres" id="4_frames"]
+[ext_resource type="AudioStream" uid="uid://djn8mnlxgewb" path="res://sound/unitSound/click2.ogg" id="5_sound"]
+[ext_resource type="Script" path="res://game/units/SpecialAttributes.cs" id="6_attrs"]
+[ext_resource type="Resource" path="res://resources/skill_trees/witch_skill_tree.tres" id="7_skills"]
+
+[sub_resource type="Resource" id="Resource_attrs"]
+script = ExtResource("6_attrs")
+Deadliness = 6
+Strength = 1
+Durability = 1
+Cleverness = 7
+Quickness = 4
+
+[sub_resource type="Resource" id="Resource_stats"]
+script = ExtResource("1_stats")
+attack = 2
+defence = 1
+health = 10
+maxHealth = 10
+mana = 0
+maxMana = 0
+initiative = 0
+rangeUnit = true
+
+[resource]
+script = ExtResource("2_template")
+Name = "Witch"
+Icon = ExtResource("3_battle")
+MapSprite = ExtResource("4_frames")
+BattleSprite = ExtResource("3_battle")
+BattleAttackLean = true
+AttackProjectileColor = Color(0.45, 1, 0.35, 1)
+SelectSound = ExtResource("5_sound")
+DefaultStats = SubResource("Resource_stats")
+Attributes = SubResource("Resource_attrs")
+SkillTree = ExtResource("7_skills")
+CombatPassives = []
+CombatAbilities = []

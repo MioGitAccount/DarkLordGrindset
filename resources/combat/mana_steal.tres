@@ -1,0 +1,14 @@
+[gd_resource type="Resource" script_class="CombatAbility" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://game/battle/CombatAbility.cs" id="1_script"]
+
+[resource]
+script = ExtResource("1_script")
+Name = "Mana Steal"
+Description = "Sucks up to 3 mana out of any enemy, even one behind guards. An enemy without mana loses 3 health instead. Free, ready again 2 turns later."
+Kind = 3
+ManaCost = 0
+Cooldown = 2
+Amount = 3
+Duration = 0
+EmptyDamage = 3

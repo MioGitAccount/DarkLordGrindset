@@ -1,10 +1,11 @@
-[gd_resource type="Resource" script_class="BuildingTree" load_steps=44 format=3]
+[gd_resource type="Resource" script_class="BuildingTree" load_steps=50 format=3]
 
 [ext_resource type="Script" path="res://game/castle/BuildingTree.cs" id="1_tree"]
 [ext_resource type="Script" path="res://game/castle/BuildingDefinition.cs" id="2_building"]
 [ext_resource type="Script" path="res://game/castle/ResourceCost.cs" id="3_cost"]
 [ext_resource type="Resource" uid="uid://cwtq0y8xsda4m" path="res://unit_templates/imp.tres" id="4_imp"]
 [ext_resource type="Resource" uid="uid://bewribr222x3c" path="res://unit_templates/orc.tres" id="5_orc"]
+[ext_resource type="Resource" path="res://unit_templates/witch.tres" id="6_witch"]
 
 [sub_resource type="Resource" id="Cost_1"]
 script = ExtResource("3_cost")
@@ -256,8 +257,39 @@ Cost = [SubResource("Cost_26"), SubResource("Cost_27"), SubResource("Cost_28")]
 Requires = []
 BonusRecruitLevel = 1
 
+[sub_resource type="Resource" id="Cost_witch_1"]
+script = ExtResource("3_cost")
+Type = 1
+Amount = 50.0
+
+[sub_resource type="Resource" id="Cost_witch_2"]
+script = ExtResource("3_cost")
+Type = 0
+Amount = 30.0
+
+[sub_resource type="Resource" id="Cost_witch_3"]
+script = ExtResource("3_cost")
+Type = 0
+Amount = 60.0
+
+[sub_resource type="Resource" id="Cost_witch_4"]
+script = ExtResource("3_cost")
+Type = 4
+Amount = 10.0
+
+[sub_resource type="Resource" id="Building_witch_hut"]
+script = ExtResource("2_building")
+Name = "Witch's Hut"
+Description = "A crooked hut at the edge of the woods, smoke curling from its chimney. Lets you recruit witches."
+Level = 1
+Column = 3
+Cost = [SubResource("Cost_witch_1"), SubResource("Cost_witch_2")]
+Requires = []
+RecruitsUnit = ExtResource("6_witch")
+RecruitCost = [SubResource("Cost_witch_3"), SubResource("Cost_witch_4")]
+
 [resource]
 script = ExtResource("1_tree")
 Name = "Castle"
 BaseVision = 250.0
-Buildings = [SubResource("Building_tower1"), SubResource("Building_imp_den"), SubResource("Building_orc_pit"), SubResource("Building_tower2"), SubResource("Building_imp_academy"), SubResource("Building_orc_war_camp"), SubResource("Building_tower3"), SubResource("Building_infernal_library"), SubResource("Building_warlords_hall"), SubResource("Building_dark_throne")]
+Buildings = [SubResource("Building_tower1"), SubResource("Building_imp_den"), SubResource("Building_orc_pit"), SubResource("Building_tower2"), SubResource("Building_imp_academy"), SubResource("Building_orc_war_camp"), SubResource("Building_tower3"), SubResource("Building_infernal_library"), SubResource("Building_warlords_hall"), SubResource("Building_dark_throne"), SubResource("Building_witch_hut")]

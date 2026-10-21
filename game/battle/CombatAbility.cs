@@ -3,7 +3,13 @@ using Godot;
 public enum CombatAbilityKind
 {
 	Roar,     // Every living unit on the caster's side gets +Amount attack for its next Duration turns
-	Firebolt, // Spell at any enemy (guards don't block it): attack + Amount against half the target's defence
+	Firebolt, // Spell at any enemy (guards don't block it): spell attack against half the target's defence
+	Fireball, // Spell at every enemy at once: spell attack against half of each target's defence
+	ManaSteal, // Takes up to Amount mana from any enemy; one without mana takes EmptyDamage instead
+	Heal,     // One ally (or the caster) gets back Amount + half the caster's Cleverness health
+	HealAll,  // Every living ally (the caster too) gets back Amount + half the caster's Cleverness health
+	Curse,    // One enemy (guards don't block it) gets -Amount attack for its next Duration turns
+	CurseAll, // Every enemy gets -Amount attack for its next Duration turns
 }
 
 // An action a unit takes instead of its normal attack. Player units use it when ordered to
@@ -19,11 +25,21 @@ public partial class CombatAbility : Resource
 	[Export] public int ManaCost;
 	// Own turns to wait before it can be used again (0 = every turn)
 	[Export] public int Cooldown;
-	// Attack bonus (Roar) or extra damage (Firebolt)
+	// Attack bonus (Roar), spell base power (Firebolt, Fireball; see BattleSimulation.SpellAttack),
+	// mana taken (ManaSteal), base healing (Heal, HealAll) or attack taken away (Curse, CurseAll)
 	[Export] public int Amount = 2;
-	// Turns the effect lasts (Roar)
+	// Turns the effect lasts (Roar, Curse, CurseAll)
 	[Export] public int Duration = 2;
+	// Damage dealt (no defence) when Mana Steal hits an enemy without mana
+	[Export] public int EmptyDamage = 3;
+	// A weaker version of this ability; a unit that has both keeps only this one
+	[Export] public CombatAbility Replaces;
 
 	// True when the ability needs an enemy picked as its target
-	public bool TargetsEnemy => Kind == CombatAbilityKind.Firebolt;
+	public bool TargetsEnemy => Kind == CombatAbilityKind.Firebolt || Kind == CombatAbilityKind.ManaSteal || Kind == CombatAbilityKind.Curse;
+	// True when the ability needs an ally (or the caster) picked as its target
+	public bool TargetsAlly => Kind == CombatAbilityKind.Heal;
+	public bool NeedsTarget => TargetsEnemy || TargetsAlly;
+	public bool IsCurse => Kind == CombatAbilityKind.Curse || Kind == CombatAbilityKind.CurseAll;
+	public bool IsSpell => Kind == CombatAbilityKind.Firebolt || Kind == CombatAbilityKind.Fireball;
 }

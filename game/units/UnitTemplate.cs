@@ -12,6 +12,8 @@ public partial class UnitTemplate : Resource
 	[Export] public Texture2D BattleSprite;
 	// Tilt the battle sprite when it attacks; off where bending looks wrong (four-legged creatures)
 	[Export] public bool BattleAttackLean = true;
+	// Colour of the bolt a ranged unit shoots with its normal attack
+	[Export] public Color AttackProjectileColor = new Color(1f, 0.7f, 0.3f);
 
 	[Export] public AudioStream SelectSound;
 	[Export] public BattleStats DefaultStats;

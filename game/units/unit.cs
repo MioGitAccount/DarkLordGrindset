@@ -30,6 +30,10 @@ public partial class unit : Node2D
 	// Battle traits and actions from the template plus unlocked skills, see RecalculateStats
 	public List<CombatPassive> CombatPassives { get; private set; } = new();
 	public List<CombatAbility> CombatAbilities { get; private set; } = new();
+	// Seconds between the 1 HP this unit heals every player unit on its field (0 = doesn't heal), see field
+	public int FieldHealInterval { get; private set; }
+	// Experience multiplier per ability from skills like Greed (missing = 1)
+	private Dictionary<Ability, float> _experienceMultipliers = new();
 	// Raised when the unit dies (in battle), right before it is removed from the game
 	public event Action<unit> Died;
 
@@ -110,6 +114,8 @@ public partial class unit : Node2D
 		var abilities = new Godot.Collections.Array<Ability>(_baseAbilities);
 		var combatPassives = new List<CombatPassive>();
 		var combatAbilities = new List<CombatAbility>();
+		var experienceMultipliers = new Dictionary<Ability, float>();
+		int fieldHealInterval = 0;
 		if (Template != null)
 		{
 			foreach (var passive in Template.CombatPassives)
@@ -130,7 +136,16 @@ public partial class unit : Node2D
 				combatPassives.Add(skill.GrantedCombatPassive);
 			if (skill.GrantedCombatAbility != null && !combatAbilities.Contains(skill.GrantedCombatAbility))
 				combatAbilities.Add(skill.GrantedCombatAbility);
+			if (skill.FieldHealInterval > 0 && (fieldHealInterval == 0 || skill.FieldHealInterval < fieldHealInterval))
+				fieldHealInterval = skill.FieldHealInterval;
+			foreach (var ability in skill.ExperienceBonusAbilities)
+				if (ability != null)
+					experienceMultipliers[ability] = experienceMultipliers.GetValueOrDefault(ability, 1f) + skill.ExperienceBonus;
 		}
+		// Upgrades (Raid II, Firebolt II, ...) take the place of the version they replace
+		RemoveReplaced(abilities, a => a.Replaces);
+		RemoveReplaced(combatPassives, p => p.Replaces);
+		RemoveReplaced(combatAbilities, a => a.Replaces);
 
 		var stats = attributes.ApplyTo(_baseStats);
 		if (battleStats != null)
@@ -146,8 +161,24 @@ public partial class unit : Node2D
 		Abilities = abilities;
 		CombatPassives = combatPassives;
 		CombatAbilities = combatAbilities;
+		_experienceMultipliers = experienceMultipliers;
+		FieldHealInterval = fieldHealInterval;
 		Revision++;
 	}
+
+	private static void RemoveReplaced<T>(IList<T> items, Func<T, T> replaces) where T : class
+	{
+		var replaced = new HashSet<T>();
+		foreach (var item in items)
+			if (replaces(item) != null)
+				replaced.Add(replaces(item));
+		for (int i = items.Count - 1; i >= 0; i--)
+			if (replaced.Contains(items[i]))
+				items.RemoveAt(i);
+	}
+
+	public float ExperienceMultiplier(Ability ability) =>
+		ability != null ? _experienceMultipliers.GetValueOrDefault(ability, 1f) : 1f;
 
 	// Health and mana left after a battle the unit survived
 	public void ApplyBattleOutcome(int health, int mana)
@@ -155,6 +186,16 @@ public partial class unit : Node2D
 		battleStats.health = Math.Clamp(health, 0, battleStats.maxHealth);
 		battleStats.mana = Math.Clamp(mana, 0, battleStats.maxMana);
 		Revision++;
+	}
+
+	// Gives back up to `amount` health; false when the unit was already at full health
+	public bool Heal(int amount)
+	{
+		if (amount <= 0 || battleStats.health >= battleStats.maxHealth)
+			return false;
+		battleStats.health = Math.Min(battleStats.maxHealth, battleStats.health + amount);
+		Revision++;
+		return true;
 	}
 
 	// Killed in battle: leaves its field and the game

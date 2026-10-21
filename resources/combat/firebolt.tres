@@ -5,9 +5,9 @@
 [resource]
 script = ExtResource("1_script")
 Name = "Firebolt"
-Description = "Hurls fire at any enemy, even one behind guards: attack +3 against half its defence. Costs 3 mana."
+Description = "Hurls fire at any enemy, even one behind guards. Spell attack 5 + Deadliness + Intelligence/2 against half its defence. Costs 3 mana."
 Kind = 1
 ManaCost = 3
 Cooldown = 0
-Amount = 3
+Amount = 5
 Duration = 0

@@ -19,12 +19,28 @@ public class HitEvent : BattleEvent
 	public bool Critical;
 	public bool Stunned;
 	public bool Killed;
+	// Mana Steal: mana taken from the target
+	public int ManaStolen;
+}
+
+// One spell hitting several enemies at once (Fireball)
+public class AreaEvent : BattleEvent
+{
+	public CombatAbility Ability;
+	public List<HitEvent> Hits = new();
 }
 
 public class BuffEvent : BattleEvent
 {
 	public CombatAbility Ability;
 	public List<Combatant> Affected = new();
+}
+
+// Health given back by Heal or HealAll
+public class HealEvent : BattleEvent
+{
+	public CombatAbility Ability;
+	public List<(Combatant Target, int Amount)> Healed = new();
 }
 
 public class SkipEvent : BattleEvent { }
@@ -35,6 +51,10 @@ public class SkipEvent : BattleEvent { }
 public class BattleSimulation
 {
 	public const int ManaRegenPerTurn = 1;
+	// Melee units attacking from the back row deal 35% less attack (Long Reach removes this)
+	public const float BackRowMeleeFactor = 0.65f;
+	// Contempt for the Weak works on targets below this share of their health
+	public const float WeakHealthShare = 0.5f;
 
 	public readonly Combatant[] PlayerSlots = new Combatant[BattleFormation.SlotCount];
 	public Combatant[] EnemySlots { get; private set; } = new Combatant[BattleFormation.SlotCount];
@@ -91,6 +111,7 @@ public class BattleSimulation
 			_turnOrder.Dequeue();
 		if (_turnOrder.Count == 0)
 		{
+			ApplyLordBonuses();
 			Round++;
 			foreach (var combatant in All.Where(c => c.IsAlive).OrderByDescending(c => c.Initiative)
 					.ThenByDescending(c => c.Quickness).ThenBy(_ => _rng.Next()))
@@ -101,10 +122,22 @@ public class BattleSimulation
 
 	public List<Combatant> ReachableTargets(Combatant attacker) => BattleFormation.Reachable(attacker, OpponentsOf(attacker));
 
-	public List<Combatant> ValidTargets(Combatant caster, CombatAbility ability) =>
-		BattleFormation.Reachable(caster, OpponentsOf(caster), ignoreGuards: ability != null && IgnoresGuards(ability));
+	public List<Combatant> ValidTargets(Combatant caster, CombatAbility ability)
+	{
+		if (ability != null && ability.TargetsAlly)
+			return AlliesOf(caster).Where(ally => ally != null && ally.IsAlive).ToList();
+		return BattleFormation.Reachable(caster, OpponentsOf(caster), ignoreGuards: ability != null && IgnoresGuards(ability));
+	}
 
-	private static bool IgnoresGuards(CombatAbility ability) => ability.Kind == CombatAbilityKind.Firebolt;
+	// The ally that needs healing most: the lowest share of its health left
+	private Combatant MostWounded(Combatant caster) =>
+		AlliesOf(caster).Where(ally => ally != null && ally.IsAlive)
+			.OrderBy(ally => ally.Health / (float)ally.MaxHealth).FirstOrDefault();
+
+	public static int HealAmount(Combatant caster, CombatAbility ability) => ability.Amount + caster.Cleverness / 2;
+
+	// Targeted spells (Firebolt, Mana Steal) fly over the guards
+	private static bool IgnoresGuards(CombatAbility ability) => ability.TargetsEnemy;
 
 	// Who `attacker` would hit with a normal attack on its turn right now
 	public Combatant PlannedTarget(Combatant attacker)
@@ -121,7 +154,42 @@ public class BattleSimulation
 		var packHunter = combatant.GetPassive(CombatPassiveKind.PackHunter);
 		if (packHunter != null && AlliesOf(combatant).Any(ally => ally != null && ally != combatant && ally.IsAlive && ally.TypeKey == combatant.TypeKey))
 			attack += packHunter.Amount;
-		return attack;
+		if (HasBackRowPenalty(combatant))
+			attack = (int)MathF.Round(attack * BackRowMeleeFactor);
+		return Math.Max(0, attack);
+	}
+
+	public static bool HasBackRowPenalty(Combatant combatant) =>
+		!combatant.Ranged && BattleFormation.IsBack(combatant.Slot) && combatant.GetPassive(CombatPassiveKind.LongReach) == null;
+
+	// Attack of Firebolt and Fireball: the spell's base power + Deadliness + half the Cleverness
+	public static int SpellAttack(Combatant caster, CombatAbility ability) =>
+		ability.Amount + caster.Deadliness + caster.Cleverness / 2;
+
+	public static bool IsWeak(Combatant target) => target.Health < target.MaxHealth * WeakHealthShare;
+
+	// Lord: every unit of the Lord's type on its side gets +Amount Deadliness and Strength, once per battle.
+	// Several Lords don't stack.
+	private void ApplyLordBonuses()
+	{
+		foreach (var side in new[] { BattleSide.Player, BattleSide.Enemy })
+		{
+			var units = SlotsOf(side).Where(c => c != null && c.IsAlive).ToList();
+			foreach (var lord in units)
+			{
+				var passive = lord.GetPassive(CombatPassiveKind.Lord);
+				if (passive == null)
+					continue;
+				foreach (var subject in units.Where(c => c.TypeKey == lord.TypeKey && !c.HasLordBonus))
+				{
+					subject.HasLordBonus = true;
+					subject.Deadliness += passive.Amount;
+					subject.Attack += passive.Amount * SpecialAttributes.AttackPerDeadliness;
+					subject.MaxHealth += passive.Amount * SpecialAttributes.HealthPerStrength;
+					subject.Health += passive.Amount * SpecialAttributes.HealthPerStrength;
+				}
+			}
+		}
 	}
 
 	// Empty when the ability can be used now, otherwise why not
@@ -173,11 +241,12 @@ public class BattleSimulation
 
 		if (ability != null)
 		{
-			if (ability.TargetsEnemy)
+			if (ability.NeedsTarget)
 			{
 				var valid = ValidTargets(actor, ability);
 				if (target == null || !valid.Contains(target))
-					target = actor.IsPlayer ? BattleFormation.DefaultTarget(actor, OpponentsOf(actor), true)
+					target = ability.TargetsAlly ? MostWounded(actor)
+						: actor.IsPlayer ? BattleFormation.DefaultTarget(actor, OpponentsOf(actor), true)
 						: valid.OrderBy(enemy => enemy.Health).FirstOrDefault();
 				if (target != null)
 				{
@@ -197,9 +266,13 @@ public class BattleSimulation
 			events.Add(Hit(actor, target, null));
 	}
 
-	// Neutral AI: don't roar while the side is still roaring
-	private static bool WorthUsing(Combatant actor, CombatAbility ability) =>
-		ability.Kind != CombatAbilityKind.Roar || !actor.Buffs.Any(buff => buff.Source == ability.Name);
+	// Neutral AI: don't roar while the side is still roaring, heal only the wounded
+	private bool WorthUsing(Combatant actor, CombatAbility ability) => ability.Kind switch
+	{
+		CombatAbilityKind.Roar => !actor.Buffs.Any(buff => buff.Source == ability.Name),
+		CombatAbilityKind.Heal or CombatAbilityKind.HealAll => AlliesOf(actor).Any(ally => ally != null && ally.IsAlive && ally.Health < ally.MaxHealth),
+		_ => true,
+	};
 
 	private void Use(Combatant actor, CombatAbility ability, Combatant target, List<BattleEvent> events)
 	{
@@ -230,6 +303,43 @@ public class BattleSimulation
 			case CombatAbilityKind.Firebolt:
 				events.Add(Hit(actor, target, ability));
 				break;
+			case CombatAbilityKind.Fireball:
+				var area = new AreaEvent { Actor = actor, Ability = ability };
+				foreach (var enemy in OpponentsOf(actor))
+					if (enemy != null && enemy.IsAlive)
+						area.Hits.Add(Hit(actor, enemy, ability));
+				area.Message = $"{Label(actor)} casts {ability.Name} at {area.Hits.Count} enemies";
+				events.Add(area);
+				break;
+			case CombatAbilityKind.ManaSteal:
+				events.Add(StealMana(actor, target, ability));
+				break;
+			case CombatAbilityKind.Heal:
+			case CombatAbilityKind.HealAll:
+				var heal = new HealEvent { Actor = actor, Ability = ability };
+				var patients = ability.Kind == CombatAbilityKind.Heal ? new[] { target } : AlliesOf(actor).Where(ally => ally != null && ally.IsAlive).ToArray();
+				foreach (var patient in patients)
+				{
+					int healed = Math.Min(HealAmount(actor, ability), patient.MaxHealth - patient.Health);
+					patient.Health += healed;
+					heal.Healed.Add((patient, healed));
+				}
+				heal.Message = $"{Label(actor)} casts {ability.Name}: " + string.Join(", ", heal.Healed.Select(h => $"{Label(h.Target)} +{h.Amount} health"));
+				events.Add(heal);
+				break;
+			case CombatAbilityKind.Curse:
+			case CombatAbilityKind.CurseAll:
+				var curse = new BuffEvent { Actor = actor, Ability = ability };
+				var victims = ability.Kind == CombatAbilityKind.Curse ? new[] { target } : OpponentsOf(actor).Where(enemy => enemy != null && enemy.IsAlive).ToArray();
+				foreach (var victim in victims)
+				{
+					victim.Buffs.RemoveAll(b => b.Source == ability.Name); // refresh, don't stack
+					victim.Buffs.Add(new CombatBuff { Source = ability.Name, AttackBonus = -ability.Amount, TurnsLeft = ability.Duration });
+					curse.Affected.Add(victim);
+				}
+				curse.Message = $"{Label(actor)} casts {ability.Name}: -{ability.Amount} attack to {string.Join(", ", victims.Select(Label))} for {ability.Duration} turns";
+				events.Add(curse);
+				break;
 		}
 	}
 
@@ -237,10 +347,20 @@ public class BattleSimulation
 	{
 		int attack = EffectiveAttack(attacker);
 		int defence = target.Defence;
-		if (ability?.Kind == CombatAbilityKind.Firebolt)
+		bool contempt = false;
+		if (ability != null && ability.IsSpell)
 		{
-			attack += ability.Amount;
+			attack = SpellAttack(attacker, ability);
 			defence /= 2;
+		}
+		else if (ability == null && IsWeak(target))
+		{
+			var contemptPassive = attacker.GetPassive(CombatPassiveKind.ContemptForTheWeak);
+			if (contemptPassive != null)
+			{
+				attack += contemptPassive.Amount;
+				contempt = true;
+			}
 		}
 		var hit = new HitEvent { Actor = attacker, Target = target, Ability = ability, AttackValue = attack };
 		hit.DefenceRoll = BattleMath.RollDefence(defence, _rng);
@@ -265,7 +385,29 @@ public class BattleSimulation
 
 		string how = ability != null ? $"casts {ability.Name} at" : "hits";
 		string damage = hit.Critical ? $"{BattleMath.Damage(attack, hit.DefenceRoll)}, critical x{critical.Multiplier:0.#} = {hit.Damage}" : hit.Damage.ToString();
-		hit.Message = $"{Label(attacker)} {how} {Label(target)}: {attack} attack - {hit.DefenceRoll} defence = {damage}" + (hit.Stunned ? ", stunned" : "") + (hit.Killed ? ", killed" : "");
+		hit.Message = $"{Label(attacker)} {how} {Label(target)}{(contempt ? " (contempt for the weak)" : "")}: {attack} attack - {hit.DefenceRoll} defence = {damage}" + (hit.Stunned ? ", stunned" : "") + (hit.Killed ? ", killed" : "");
+		return hit;
+	}
+
+	// Mana Steal: takes the target's mana; a target without any takes damage instead
+	private HitEvent StealMana(Combatant caster, Combatant target, CombatAbility ability)
+	{
+		var hit = new HitEvent { Actor = caster, Target = target, Ability = ability };
+		int stolen = Math.Min(ability.Amount, target.Mana);
+		if (stolen > 0)
+		{
+			target.Mana -= stolen;
+			caster.Mana = Math.Min(caster.MaxMana, caster.Mana + stolen);
+			hit.ManaStolen = stolen;
+			hit.Message = $"{Label(caster)} casts {ability.Name} at {Label(target)}: steals {stolen} mana";
+		}
+		else
+		{
+			hit.Damage = Math.Min(target.Health, ability.EmptyDamage);
+			target.Health -= hit.Damage;
+			hit.Killed = !target.IsAlive;
+			hit.Message = $"{Label(caster)} casts {ability.Name} at {Label(target)}: no mana to steal, drains {hit.Damage} health instead" + (hit.Killed ? ", killed" : "");
+		}
 		return hit;
 	}
 

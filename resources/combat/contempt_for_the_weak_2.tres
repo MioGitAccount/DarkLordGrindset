@@ -1,0 +1,14 @@
+[gd_resource type="Resource" script_class="CombatPassive" load_steps=3 format=3]
+
+[ext_resource type="Script" path="res://game/battle/CombatPassive.cs" id="1_script"]
+[ext_resource type="Resource" path="res://resources/combat/contempt_for_the_weak.tres" id="2_contempt"]
+
+[resource]
+script = ExtResource("1_script")
+Name = "Contempt for the Weak II"
+Description = "+4 attack on normal attacks against enemies below half health."
+Kind = 3
+Chance = 0.0
+Amount = 4
+Multiplier = 1.0
+Replaces = ExtResource("2_contempt")

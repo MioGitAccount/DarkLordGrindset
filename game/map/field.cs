@@ -19,6 +19,8 @@ public partial class field : Node2D
 	[Export] public Godot.Collections.Array<FieldPerk> ExtraPerks = new();
 	// Perks that wear off: perk -> ticks left (e.g. "Raided")
 	private readonly Dictionary<FieldPerk, int> _timedPerks = new();
+	// Ticks since the healers standing here (e.g. a Witch with Herbalist) last healed the units here
+	private int _ticksSinceHeal;
 	public Godot.Collections.Array<unit> presentPlayerUnits = new();
 	[Export] public Godot.Collections.Array<NeutralUnit> presentNeutralUnits = new();
 	// Raised when units enter or leave this field, or its fog state changes
@@ -29,6 +31,8 @@ public partial class field : Node2D
 	// The player's castle when one of the field's perks has Buildings; null on other fields
 	public Castle Castle { get; private set; }
 	public bool IsPlayerOwned => Castle != null;
+	// Towns can be raided (see RaidAbility)
+	public bool IsTown => type?.FieldTypeEnum == FieldTypeEnum.Village;
 	public override void _Ready()
 	{
 		type = FieldTypeManager.GetFieldType(TypeName);
@@ -52,12 +56,16 @@ public partial class field : Node2D
 			break;
 		}
 		GlobalTickManager.Instance.OnTick += TickTimedPerks;
+		GlobalTickManager.Instance.OnTick += TickHealing;
 	}
 
 	public override void _ExitTree()
 	{
 		if (GlobalTickManager.Instance != null)
+		{
 			GlobalTickManager.Instance.OnTick -= TickTimedPerks;
+			GlobalTickManager.Instance.OnTick -= TickHealing;
+		}
 	}
 
 	// The field type's perks followed by this field's ExtraPerks
@@ -115,6 +123,29 @@ public partial class field : Node2D
 			UpdateGeneration();
 			ContentsChanged?.Invoke();
 		}
+	}
+
+	// Player units standing here get 1 health every FieldHealInterval ticks of the fastest healer here
+	private void TickHealing()
+	{
+		int interval = 0;
+		foreach (var playerUnit in presentPlayerUnits)
+			if (IsInstanceValid(playerUnit) && playerUnit.FieldHealInterval > 0 && (interval == 0 || playerUnit.FieldHealInterval < interval))
+				interval = playerUnit.FieldHealInterval;
+		if (interval == 0)
+		{
+			_ticksSinceHeal = 0;
+			return;
+		}
+		if (++_ticksSinceHeal < interval)
+			return;
+		_ticksSinceHeal = 0;
+		bool healed = false;
+		foreach (var playerUnit in presentPlayerUnits)
+			if (IsInstanceValid(playerUnit))
+				healed |= playerUnit.Heal(1);
+		if (healed)
+			ContentsChanged?.Invoke();
 	}
 
 	private void UpdateGeneration()

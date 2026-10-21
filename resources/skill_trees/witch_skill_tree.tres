@@ -1,0 +1,189 @@
+[gd_resource type="Resource" script_class="SkillTree" load_steps=21 format=3]
+
+[ext_resource type="Script" path="res://game/units/skills/SkillTree.cs" id="1_tree"]
+[ext_resource type="Script" path="res://game/units/skills/SkillDefinition.cs" id="2_skill"]
+[ext_resource type="Resource" path="res://resources/abilities/ChannelMana.tres" id="channel"]
+[ext_resource type="Resource" path="res://resources/combat/heal.tres" id="heal"]
+[ext_resource type="Resource" path="res://resources/combat/heal_2.tres" id="heal2"]
+[ext_resource type="Resource" path="res://resources/combat/mending_circle.tres" id="mending"]
+[ext_resource type="Resource" path="res://resources/combat/curse.tres" id="curse"]
+[ext_resource type="Resource" path="res://resources/combat/curse_2.tres" id="curse2"]
+[ext_resource type="Resource" path="res://resources/combat/plague.tres" id="plague"]
+
+[sub_resource type="Resource" id="Skill_heal"]
+script = ExtResource("2_skill")
+Name = "Heal"
+Description = "Herbs, spit and a whispered word. Unlocks Heal: mend one ally in battle."
+Tier = 1
+Column = 0
+Cost = 1
+Requires = []
+BonusDeadliness = 0
+BonusStrength = 0
+BonusDurability = 0
+BonusCleverness = 0
+BonusQuickness = 0
+BonusVision = 0.0
+GrantedCombatAbility = ExtResource("heal")
+
+[sub_resource type="Resource" id="Skill_curse"]
+script = ExtResource("2_skill")
+Name = "Curse"
+Description = "A crooked finger and a muttered name. Unlocks Curse: weaken one enemy's attack in battle."
+Tier = 1
+Column = 1
+Cost = 1
+Requires = []
+BonusDeadliness = 0
+BonusStrength = 0
+BonusDurability = 0
+BonusCleverness = 0
+BonusQuickness = 0
+BonusVision = 0.0
+GrantedCombatAbility = ExtResource("curse")
+
+[sub_resource type="Resource" id="Skill_herbalist"]
+script = ExtResource("2_skill")
+Name = "Herbalist"
+Description = "Brews poultices wherever she camps. Units on her field heal 1 HP every 10 seconds."
+Tier = 1
+Column = 2
+Cost = 1
+Requires = []
+BonusDeadliness = 0
+BonusStrength = 0
+BonusDurability = 0
+BonusCleverness = 0
+BonusQuickness = 0
+BonusVision = 0.0
+FieldHealInterval = 10
+
+[sub_resource type="Resource" id="Skill_manadrain"]
+script = ExtResource("2_skill")
+Name = "Mana Drain"
+Description = "Draws the land's magic up through her bare feet. Unlocks Channel Mana: drain mana from a field into your pool."
+Tier = 1
+Column = 3
+Cost = 1
+Requires = []
+BonusDeadliness = 0
+BonusStrength = 0
+BonusDurability = 0
+BonusCleverness = 0
+BonusQuickness = 0
+BonusVision = 0.0
+GrantedAbility = ExtResource("channel")
+
+[sub_resource type="Resource" id="Skill_lore"]
+script = ExtResource("2_skill")
+Name = "Forbidden Lore"
+Description = "Pages no one else dares to read."
+Tier = 2
+Column = 0
+Cost = 1
+Requires = []
+BonusDeadliness = 0
+BonusStrength = 0
+BonusDurability = 0
+BonusCleverness = 1
+BonusQuickness = 0
+BonusVision = 0.0
+
+[sub_resource type="Resource" id="Skill_darkarts"]
+script = ExtResource("2_skill")
+Name = "Dark Arts"
+Description = "Her magic learns to bite."
+Tier = 2
+Column = 1
+Cost = 1
+Requires = []
+BonusDeadliness = 1
+BonusStrength = 0
+BonusDurability = 0
+BonusCleverness = 0
+BonusQuickness = 0
+BonusVision = 0.0
+
+[sub_resource type="Resource" id="Skill_evileye"]
+script = ExtResource("2_skill")
+Name = "Evil Eye"
+Description = "Nothing in the woods escapes her stare. Longer range of vision."
+Tier = 2
+Column = 2
+Cost = 1
+Requires = []
+BonusDeadliness = 0
+BonusStrength = 0
+BonusDurability = 0
+BonusCleverness = 0
+BonusQuickness = 0
+BonusVision = 60.0
+
+[sub_resource type="Resource" id="Skill_heal2"]
+script = ExtResource("2_skill")
+Name = "Heal 2"
+Description = "Heal becomes Heal II: base healing 6 instead of 3."
+Tier = 3
+Column = 0
+Cost = 1
+Requires = [SubResource("Skill_heal"), SubResource("Skill_lore")]
+BonusDeadliness = 0
+BonusStrength = 0
+BonusDurability = 0
+BonusCleverness = 0
+BonusQuickness = 0
+BonusVision = 0.0
+GrantedCombatAbility = ExtResource("heal2")
+
+[sub_resource type="Resource" id="Skill_curse2"]
+script = ExtResource("2_skill")
+Name = "Curse 2"
+Description = "Curse becomes Curse II: -5 attack instead of -3."
+Tier = 3
+Column = 1
+Cost = 1
+Requires = [SubResource("Skill_curse"), SubResource("Skill_darkarts")]
+BonusDeadliness = 0
+BonusStrength = 0
+BonusDurability = 0
+BonusCleverness = 0
+BonusQuickness = 0
+BonusVision = 0.0
+GrantedCombatAbility = ExtResource("curse2")
+
+[sub_resource type="Resource" id="Skill_mending"]
+script = ExtResource("2_skill")
+Name = "Mending Circle"
+Description = "Unlocks Mending Circle: heal every ally at once."
+Tier = 4
+Column = 0
+Cost = 1
+Requires = [SubResource("Skill_heal2")]
+BonusDeadliness = 0
+BonusStrength = 0
+BonusDurability = 0
+BonusCleverness = 0
+BonusQuickness = 0
+BonusVision = 0.0
+GrantedCombatAbility = ExtResource("mending")
+
+[sub_resource type="Resource" id="Skill_plague"]
+script = ExtResource("2_skill")
+Name = "Plague"
+Description = "Unlocks Plague: weaken every enemy's attack at once."
+Tier = 5
+Column = 1
+Cost = 1
+Requires = [SubResource("Skill_curse2")]
+BonusDeadliness = 0
+BonusStrength = 0
+BonusDurability = 0
+BonusCleverness = 0
+BonusQuickness = 0
+BonusVision = 0.0
+GrantedCombatAbility = ExtResource("plague")
+
+[resource]
+script = ExtResource("1_tree")
+Name = "Witch"
+Skills = [SubResource("Skill_heal"), SubResource("Skill_curse"), SubResource("Skill_herbalist"), SubResource("Skill_manadrain"), SubResource("Skill_lore"), SubResource("Skill_darkarts"), SubResource("Skill_evileye"), SubResource("Skill_heal2"), SubResource("Skill_curse2"), SubResource("Skill_mending"), SubResource("Skill_plague")]

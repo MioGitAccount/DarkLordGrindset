@@ -1,0 +1,15 @@
+[gd_resource type="Resource" script_class="CombatAbility" load_steps=3 format=3]
+
+[ext_resource type="Script" path="res://game/battle/CombatAbility.cs" id="1_script"]
+[ext_resource type="Resource" path="res://resources/combat/firebolt.tres" id="2_bolt"]
+
+[resource]
+script = ExtResource("1_script")
+Name = "Firebolt II"
+Description = "A white-hot bolt at any enemy, even one behind guards. Spell attack 8 + Deadliness + Intelligence/2 against half its defence. Costs 3 mana."
+Kind = 1
+ManaCost = 3
+Cooldown = 0
+Amount = 8
+Duration = 0
+Replaces = ExtResource("2_bolt")
