@@ -1,12 +1,12 @@
-[gd_resource type="Resource" script_class="UnitTemplate" load_steps=9 format=3]
+[gd_resource type="Resource" script_class="UnitTemplate" load_steps=10 format=3 uid="uid://nabuwucekvmd"]
 
 [ext_resource type="Script" path="res://game/units/BattleStats.cs" id="1_stats"]
 [ext_resource type="Script" path="res://game/units/UnitTemplate.cs" id="2_template"]
-[ext_resource type="Texture2D" uid="uid://bwl5xu3jrwbja" path="res://images/Units/sprites/witch_battle.png" id="3_battle"]
-[ext_resource type="SpriteFrames" path="res://images/Units/sprites/witch_frames.tres" id="4_frames"]
+[ext_resource type="Texture2D" path="res://images/Units/sprites/witch_battle.png" id="3_battle"]
+[ext_resource type="SpriteFrames" uid="uid://d0jmu4a1d8tmj" path="res://images/Units/sprites/witch_frames.tres" id="4_frames"]
 [ext_resource type="AudioStream" uid="uid://djn8mnlxgewb" path="res://sound/unitSound/click2.ogg" id="5_sound"]
 [ext_resource type="Script" path="res://game/units/SpecialAttributes.cs" id="6_attrs"]
-[ext_resource type="Resource" path="res://resources/skill_trees/witch_skill_tree.tres" id="7_skills"]
+[ext_resource type="Resource" uid="uid://b103d78iqvnhe" path="res://resources/skill_trees/witch_skill_tree.tres" id="7_skills"]
 
 [sub_resource type="Resource" id="Resource_attrs"]
 script = ExtResource("6_attrs")

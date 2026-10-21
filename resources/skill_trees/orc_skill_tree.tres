@@ -21,6 +21,9 @@ BonusCleverness = 0
 BonusQuickness = 0
 BonusVision = 0.0
 GrantedAbility = ExtResource("3_cut")
+FieldHealInterval = 0
+ExperienceBonus = 0.0
+ExperienceBonusAbilities = []
 
 [sub_resource type="Resource" id="Skill_brawler"]
 script = ExtResource("2_skill")
@@ -36,6 +39,9 @@ BonusDurability = 0
 BonusCleverness = 0
 BonusQuickness = 0
 BonusVision = 0.0
+FieldHealInterval = 0
+ExperienceBonus = 0.0
+ExperienceBonusAbilities = []
 
 [sub_resource type="Resource" id="Skill_thick_hide"]
 script = ExtResource("2_skill")
@@ -51,6 +57,9 @@ BonusDurability = 1
 BonusCleverness = 0
 BonusQuickness = 0
 BonusVision = 0.0
+FieldHealInterval = 0
+ExperienceBonus = 0.0
+ExperienceBonusAbilities = []
 
 [sub_resource type="Resource" id="Skill_lumberjack"]
 script = ExtResource("2_skill")
@@ -66,6 +75,9 @@ BonusDurability = 0
 BonusCleverness = 0
 BonusQuickness = 0
 BonusVision = 0.0
+FieldHealInterval = 0
+ExperienceBonus = 0.0
+ExperienceBonusAbilities = []
 
 [sub_resource type="Resource" id="Skill_berserker"]
 script = ExtResource("2_skill")
@@ -81,6 +93,9 @@ BonusDurability = 0
 BonusCleverness = 0
 BonusQuickness = 0
 BonusVision = 0.0
+FieldHealInterval = 0
+ExperienceBonus = 0.0
+ExperienceBonusAbilities = []
 
 [sub_resource type="Resource" id="Skill_iron_skin"]
 script = ExtResource("2_skill")
@@ -96,6 +111,9 @@ BonusDurability = 1
 BonusCleverness = 0
 BonusQuickness = 0
 BonusVision = 0.0
+FieldHealInterval = 0
+ExperienceBonus = 0.0
+ExperienceBonusAbilities = []
 
 [sub_resource type="Resource" id="Skill_forced_march"]
 script = ExtResource("2_skill")
@@ -111,6 +129,9 @@ BonusDurability = 0
 BonusCleverness = 0
 BonusQuickness = 1
 BonusVision = 0.0
+FieldHealInterval = 0
+ExperienceBonus = 0.0
+ExperienceBonusAbilities = []
 
 [sub_resource type="Resource" id="Skill_war_cry"]
 script = ExtResource("2_skill")
@@ -126,6 +147,9 @@ BonusDurability = 0
 BonusCleverness = 0
 BonusQuickness = 0
 BonusVision = 0.0
+FieldHealInterval = 0
+ExperienceBonus = 0.0
+ExperienceBonusAbilities = []
 
 [sub_resource type="Resource" id="Skill_stone_wall"]
 script = ExtResource("2_skill")
@@ -141,6 +165,9 @@ BonusDurability = 2
 BonusCleverness = 0
 BonusQuickness = 0
 BonusVision = 0.0
+FieldHealInterval = 0
+ExperienceBonus = 0.0
+ExperienceBonusAbilities = []
 
 [sub_resource type="Resource" id="Skill_scouter"]
 script = ExtResource("2_skill")
@@ -156,6 +183,9 @@ BonusDurability = 0
 BonusCleverness = 0
 BonusQuickness = 0
 BonusVision = 60.0
+FieldHealInterval = 0
+ExperienceBonus = 0.0
+ExperienceBonusAbilities = []
 
 [sub_resource type="Resource" id="Skill_bone_crusher"]
 script = ExtResource("2_skill")
@@ -171,6 +201,9 @@ BonusDurability = 0
 BonusCleverness = 0
 BonusQuickness = 0
 BonusVision = 0.0
+FieldHealInterval = 0
+ExperienceBonus = 0.0
+ExperienceBonusAbilities = []
 
 [sub_resource type="Resource" id="Skill_unbreakable"]
 script = ExtResource("2_skill")
@@ -186,6 +219,9 @@ BonusDurability = 2
 BonusCleverness = 0
 BonusQuickness = 0
 BonusVision = 0.0
+FieldHealInterval = 0
+ExperienceBonus = 0.0
+ExperienceBonusAbilities = []
 
 [sub_resource type="Resource" id="Skill_warchief"]
 script = ExtResource("2_skill")
@@ -201,6 +237,9 @@ BonusDurability = 0
 BonusCleverness = 0
 BonusQuickness = 0
 BonusVision = 0.0
+FieldHealInterval = 0
+ExperienceBonus = 0.0
+ExperienceBonusAbilities = []
 
 [sub_resource type="Resource" id="Skill_juggernaut"]
 script = ExtResource("2_skill")
@@ -216,6 +255,9 @@ BonusDurability = 3
 BonusCleverness = 0
 BonusQuickness = 0
 BonusVision = 0.0
+FieldHealInterval = 0
+ExperienceBonus = 0.0
+ExperienceBonusAbilities = []
 
 [sub_resource type="Resource" id="Skill_miner"]
 script = ExtResource("2_skill")
@@ -232,6 +274,9 @@ BonusCleverness = 0
 BonusQuickness = 0
 BonusVision = 0.0
 GrantedAbility = ExtResource("4_mine")
+FieldHealInterval = 0
+ExperienceBonus = 0.0
+ExperienceBonusAbilities = []
 
 [sub_resource type="Resource" id="Skill_raider"]
 script = ExtResource("2_skill")
@@ -248,6 +293,9 @@ BonusCleverness = 0
 BonusQuickness = 0
 BonusVision = 0.0
 GrantedAbility = ExtResource("5_raid")
+FieldHealInterval = 0
+ExperienceBonus = 0.0
+ExperienceBonusAbilities = []
 
 [resource]
 script = ExtResource("1_tree")

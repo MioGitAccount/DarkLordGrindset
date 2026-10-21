@@ -36,6 +36,7 @@ Icon = ExtResource("2_vajrq")
 MapSprite = ExtResource("4_frames")
 BattleSprite = ExtResource("11_battle")
 BattleAttackLean = true
+AttackProjectileColor = Color(1, 0.7, 0.3, 1)
 SelectSound = ExtResource("3_h5yr5")
 DefaultStats = SubResource("Resource_geemo")
 Attributes = SubResource("Resource_attrs")

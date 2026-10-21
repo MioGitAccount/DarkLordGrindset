@@ -29,6 +29,7 @@ BonusDurability = 0
 BonusCleverness = 0
 BonusQuickness = 1
 BonusVision = 0.0
+FieldHealInterval = 0
 ExperienceBonus = 0.0
 ExperienceBonusAbilities = []
 
@@ -46,6 +47,7 @@ BonusDurability = 0
 BonusCleverness = 0
 BonusQuickness = 0
 BonusVision = 60.0
+FieldHealInterval = 0
 ExperienceBonus = 0.0
 ExperienceBonusAbilities = []
 
@@ -64,6 +66,7 @@ BonusCleverness = 0
 BonusQuickness = 0
 BonusVision = 0.0
 GrantedAbility = ExtResource("raid")
+FieldHealInterval = 0
 ExperienceBonus = 0.0
 ExperienceBonusAbilities = []
 
@@ -81,6 +84,7 @@ BonusDurability = 0
 BonusCleverness = 1
 BonusQuickness = 0
 BonusVision = 0.0
+FieldHealInterval = 0
 ExperienceBonus = 0.0
 ExperienceBonusAbilities = []
 
@@ -98,6 +102,7 @@ BonusDurability = 0
 BonusCleverness = 0
 BonusQuickness = 1
 BonusVision = 0.0
+FieldHealInterval = 0
 ExperienceBonus = 0.0
 ExperienceBonusAbilities = []
 
@@ -116,6 +121,7 @@ BonusCleverness = 0
 BonusQuickness = 0
 BonusVision = 0.0
 GrantedCombatPassive = ExtResource("contempt1")
+FieldHealInterval = 0
 ExperienceBonus = 0.0
 ExperienceBonusAbilities = []
 
@@ -134,6 +140,7 @@ BonusCleverness = 0
 BonusQuickness = 0
 BonusVision = 0.0
 GrantedAbility = ExtResource("mine")
+FieldHealInterval = 0
 ExperienceBonus = 0.0
 ExperienceBonusAbilities = []
 
@@ -152,6 +159,7 @@ BonusCleverness = 0
 BonusQuickness = 0
 BonusVision = 0.0
 GrantedCombatAbility = ExtResource("firebolt1")
+FieldHealInterval = 0
 ExperienceBonus = 0.0
 ExperienceBonusAbilities = []
 
@@ -170,6 +178,7 @@ BonusCleverness = 0
 BonusQuickness = 0
 BonusVision = 0.0
 GrantedAbility = ExtResource("channel")
+FieldHealInterval = 0
 ExperienceBonus = 0.0
 ExperienceBonusAbilities = []
 
@@ -188,6 +197,7 @@ BonusCleverness = 0
 BonusQuickness = 0
 BonusVision = 0.0
 GrantedCombatPassive = ExtResource("longreach")
+FieldHealInterval = 0
 ExperienceBonus = 0.0
 ExperienceBonusAbilities = []
 
@@ -206,6 +216,7 @@ BonusCleverness = 0
 BonusQuickness = 0
 BonusVision = 0.0
 GrantedAbility = ExtResource("raid2")
+FieldHealInterval = 0
 ExperienceBonus = 0.0
 ExperienceBonusAbilities = []
 
@@ -223,6 +234,7 @@ BonusDurability = 0
 BonusCleverness = 0
 BonusQuickness = 0
 BonusVision = 0.0
+FieldHealInterval = 0
 ExperienceBonus = 0.5
 ExperienceBonusAbilities = [ExtResource("mine"), ExtResource("raid"), ExtResource("raid2")]
 
@@ -240,6 +252,7 @@ BonusDurability = 0
 BonusCleverness = 1
 BonusQuickness = 0
 BonusVision = 0.0
+FieldHealInterval = 0
 ExperienceBonus = 0.0
 ExperienceBonusAbilities = []
 
@@ -258,6 +271,7 @@ BonusCleverness = 0
 BonusQuickness = 0
 BonusVision = 0.0
 GrantedCombatAbility = ExtResource("manasteal")
+FieldHealInterval = 0
 ExperienceBonus = 0.0
 ExperienceBonusAbilities = []
 
@@ -276,6 +290,7 @@ BonusCleverness = 0
 BonusQuickness = 0
 BonusVision = 0.0
 GrantedCombatPassive = ExtResource("contempt2")
+FieldHealInterval = 0
 ExperienceBonus = 0.0
 ExperienceBonusAbilities = []
 
@@ -294,6 +309,7 @@ BonusCleverness = 0
 BonusQuickness = 0
 BonusVision = 0.0
 GrantedCombatAbility = ExtResource("firebolt2")
+FieldHealInterval = 0
 ExperienceBonus = 0.0
 ExperienceBonusAbilities = []
 
@@ -312,6 +328,7 @@ BonusCleverness = 0
 BonusQuickness = 0
 BonusVision = 0.0
 GrantedCombatPassive = ExtResource("lord")
+FieldHealInterval = 0
 ExperienceBonus = 0.0
 ExperienceBonusAbilities = []
 
@@ -330,6 +347,7 @@ BonusCleverness = 0
 BonusQuickness = 0
 BonusVision = 0.0
 GrantedCombatAbility = ExtResource("fireball")
+FieldHealInterval = 0
 ExperienceBonus = 0.0
 ExperienceBonusAbilities = []
 
