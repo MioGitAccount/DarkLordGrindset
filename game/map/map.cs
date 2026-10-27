@@ -32,6 +32,7 @@ public partial class map : Node2D
 	public override void _Ready()
 	{
 		Data = MapSelection.LoadSelected() ?? new MapData();
+		PlayerAgents.Reset();
 		var view = new MapView { Name = "MapView", ShowBehindParent = true };
 		AddChild(view);
 		MoveChild(view, 0);
@@ -49,7 +50,10 @@ public partial class map : Node2D
 		unitManager = GetNode<UnitManager>("UnitManager");
 		units = unitManager.findAllUnits();
 		foreach (var existing in units)
+		{
 			existing.Died += OnUnitDied;
+			PlayerAgents.AddUnit(existing);
+		}
 		StartField = fields.Values.FirstOrDefault(f => f.TypeName == "Castle") ?? fields.Values.FirstOrDefault();
 		if (StartField != null)
 			unitManager.setUnitLocation(units.Where(u => !fields.ContainsKey(u.StartFieldId)).ToList(), StartField);
@@ -61,8 +65,10 @@ public partial class map : Node2D
 		foreach (var f in fields.Values)
 		{
 			var castleField = f;
-			if (castleField.Castle != null)
-				castleField.Castle.UnitRecruited += (template, level) => SpawnUnit(template, castleField, level);
+			if (castleField.Castle == null)
+				continue;
+			castleField.Castle.UnitRecruited += (template, level) => SpawnUnit(template, castleField, level);
+			PlayerAgents.AddCastle(castleField.Castle);
 		}
 		GD.Print("There are " + fields.Count + " fields on map");
 		QueueRedraw();
@@ -164,6 +170,7 @@ public partial class map : Node2D
 		newUnit.Progression.LevelUpTo(level);
 		units.Add(newUnit);
 		newUnit.Died += OnUnitDied;
+		PlayerAgents.AddUnit(newUnit);
 		newUnit.EnterField(place, fade: false);
 		GD.Print($"Recruited {newUnit.Name} (level {level}) at {place.Name}");
 		return newUnit;
@@ -172,6 +179,7 @@ public partial class map : Node2D
 	private void OnUnitDied(unit deadUnit)
 	{
 		units.Remove(deadUnit);
+		PlayerAgents.RemoveUnit(deadUnit);
 		if (unitManager.selectedUnit == deadUnit)
 			unitManager.selectedUnit = null;
 	}

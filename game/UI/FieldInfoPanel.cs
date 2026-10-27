@@ -4,6 +4,7 @@ using System;
 // Right-side panel describing the selected field: biome, resources, neutral and player units.
 // Refreshes itself while units enter or leave the shown field and when its fog changes.
 // In grey fog it shows the hostiles as last seen and hides live resource amounts.
+// Every section keeps a fixed height, so the panel never changes size between fields.
 public partial class FieldInfoPanel : PanelContainer
 {
 	public event Action<unit> UnitClicked;
@@ -18,8 +19,10 @@ public partial class FieldInfoPanel : PanelContainer
 	[Export] private Container ResourcesRow;
 	[Export] private Control NeutralSection;
 	[Export] private Container NeutralUnitsRow;
-	[Export] private Label PlayerUnitsEmptyLabel;
+	[Export] private Label PlayerHeader;
 	[Export] private Container PlayerUnitsRow;
+
+	private const int UnitSlotSize = 34;
 
 	private field _field;
 	private Label _neutralHeader;
@@ -29,21 +32,26 @@ public partial class FieldInfoPanel : PanelContainer
 	public override void _Ready()
 	{
 		_neutralHeader = NeutralSection.GetNode<Label>("NeutralHeader");
-		// Created in code so saving UI.tscn in the editor can't drop it; sits right under the resources
+		// Created in code so saving UI.tscn in the editor can't drop them; one fixed-height row
+		// right under the resources: perks on the left, the castle button (castle fields only) on the right
+		var perksRow = new HBoxContainer { Name = "PerksRow", CustomMinimumSize = new Vector2(0, 30) };
+		perksRow.AddThemeConstantOverride("separation", 6);
 		_perksLabel = new Label
 		{
 			Name = "PerksLabel",
 			ThemeTypeVariation = "MutedLabel",
-			AutowrapMode = TextServer.AutowrapMode.WordSmart,
+			ClipText = true, // one line; the tooltip has the full list
+			SizeFlagsHorizontal = SizeFlags.ExpandFill,
+			SizeFlagsVertical = SizeFlags.ShrinkCenter,
 			MouseFilter = MouseFilterEnum.Pass, // so the tooltip shows
 		};
-		ResourcesRow.GetParent().AddChild(_perksLabel);
-		ResourcesRow.GetParent().MoveChild(_perksLabel, ResourcesRow.GetIndex() + 1);
+		perksRow.AddChild(_perksLabel);
 		// Shown on fields with the Castle perk; opens the build window
-		_castleButton = new Button { Name = "CastleButton", Text = "Enter castle", FocusMode = FocusModeEnum.None };
+		_castleButton = new Button { Name = "CastleButton", Text = "Enter castle", FocusMode = FocusModeEnum.None, SizeFlagsVertical = SizeFlags.ShrinkCenter };
 		_castleButton.Pressed += () => CastleRequested?.Invoke(_field?.Castle);
-		ResourcesRow.GetParent().AddChild(_castleButton);
-		ResourcesRow.GetParent().MoveChild(_castleButton, _perksLabel.GetIndex() + 1);
+		perksRow.AddChild(_castleButton);
+		ResourcesRow.GetParent().AddChild(perksRow);
+		ResourcesRow.GetParent().MoveChild(perksRow, ResourcesRow.GetIndex() + 1);
 		ShowField(null);
 	}
 
@@ -86,7 +94,10 @@ public partial class FieldInfoPanel : PanelContainer
 		TitleLabel.Text = (_field.type?.Name ?? _field.Name) + (_field.IsPlayerOwned ? " (yours)" : InSight ? "" : " (last seen)");
 		_castleButton.Visible = _field.Castle != null;
 		if (_field.Castle != null)
-			_castleButton.Text = $"Enter castle (Tower {_field.Castle.TowerLevel})";
+		{
+			_castleButton.Text = "Enter castle";
+			_castleButton.TooltipText = $"Tower {_field.Castle.TowerLevel}";
+		}
 		RefreshResources();
 		RefreshPerks();
 		RefreshNeutralUnits();
@@ -97,9 +108,11 @@ public partial class FieldInfoPanel : PanelContainer
 	{
 		UIText.ClearChildren(ResourcesRow);
 		var resources = _field.resourcesHolder?.Resources;
-		ResourcesRow.Visible = InSight && resources != null && resources.Count > 0;
-		if (!ResourcesRow.Visible)
+		if (!InSight || resources == null || resources.Count == 0)
+		{
+			ResourcesRow.AddChild(new Label { Text = InSight ? "No resources" : "Resources unknown", ThemeTypeVariation = "MutedLabel" });
 			return;
+		}
 
 		foreach (var resource in resources)
 		{
@@ -113,9 +126,12 @@ public partial class FieldInfoPanel : PanelContainer
 	private void RefreshPerks()
 	{
 		var perks = new System.Collections.Generic.List<FieldPerk>(_field.Perks);
-		_perksLabel.Visible = perks.Count > 0;
 		if (perks.Count == 0)
+		{
+			_perksLabel.Text = "No perks";
+			_perksLabel.TooltipText = "";
 			return;
+		}
 		var names = new System.Collections.Generic.List<string>();
 		var details = new System.Collections.Generic.List<string>();
 		foreach (var perk in perks)
@@ -132,14 +148,15 @@ public partial class FieldInfoPanel : PanelContainer
 	{
 		UIText.ClearChildren(NeutralUnitsRow);
 		var neutrals = InSight ? _field.presentNeutralUnits : _field.LastSeenNeutrals;
-		_neutralHeader.Text = InSight ? "Hostiles" : "Hostiles (last seen)";
-		NeutralSection.Visible = neutrals != null && neutrals.Count > 0;
-		if (!NeutralSection.Visible)
+		bool any = neutrals != null && neutrals.Count > 0;
+		_neutralHeader.Text = (InSight ? "Hostiles" : "Hostiles (last seen)") + (any ? $": {neutrals.Count}" : ": none");
+		if (!any)
 			return;
 
 		foreach (var neutral in neutrals)
 		{
 			var slot = IconSlotScene.Instantiate<IconSlot>();
+			slot.CustomMinimumSize = new Vector2(UnitSlotSize, UnitSlotSize);
 			string name = neutral.Template?.Name ?? "Unknown";
 			slot.Setup(neutral.GetIcon(), () => UIText.UnitTooltip(name, neutral.GetEffectiveStats(), neutral.GetAttributes()) + "\n" + UIText.Threat(neutral.Level));
 			NeutralUnitsRow.AddChild(slot);
@@ -151,14 +168,14 @@ public partial class FieldInfoPanel : PanelContainer
 		UIText.ClearChildren(PlayerUnitsRow);
 		var units = _field.presentPlayerUnits;
 		bool hasUnits = units != null && units.Count > 0;
-		PlayerUnitsRow.Visible = hasUnits;
-		PlayerUnitsEmptyLabel.Visible = !hasUnits;
+		PlayerHeader.Text = hasUnits ? $"Your units: {units.Count}" : "Your units: none";
 		if (!hasUnits)
 			return;
 
 		foreach (var playerUnit in units)
 		{
 			var slot = IconSlotScene.Instantiate<IconSlot>();
+			slot.CustomMinimumSize = new Vector2(UnitSlotSize, UnitSlotSize);
 			string name = playerUnit.Template?.Name ?? playerUnit.Name;
 			slot.Setup(playerUnit.GetIcon(), () => UIText.UnitTooltip(name, playerUnit.battleStats, playerUnit.Attributes) + "\nClick to select");
 			slot.Pressed += () => UnitClicked?.Invoke(playerUnit);

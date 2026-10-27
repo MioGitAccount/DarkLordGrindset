@@ -14,6 +14,9 @@ public partial class UnitTemplate : Resource
 	[Export] public SpriteFrames MapSprite;
 	// Painted cutout for the battle screen, animated in code; units without one use MapSprite there
 	[Export] public Texture2D BattleSprite;
+	// The same cutout in its attack pose, at the same scale (tools/sprites "attack_source"); shown
+	// at the moment of the strike. Optional
+	[Export] public Texture2D BattleAttackSprite;
 	// Tilt the battle sprite when it attacks; off where bending looks wrong (four-legged creatures)
 	[Export] public bool BattleAttackLean = true;
 	// Colour of the bolt a ranged unit shoots with its normal attack

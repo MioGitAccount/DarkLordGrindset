@@ -53,7 +53,8 @@ tooltip_text = "Fight the enemies on the selected field with your units there"
 focus_mode = 0
 text = "Battle"
 
-[node name="FieldInfo" type="PanelContainer" parent="HUD" node_paths=PackedStringArray("TitleLabel", "FieldImage", "ResourcesRow", "NeutralSection", "NeutralUnitsRow", "PlayerUnitsEmptyLabel", "PlayerUnitsRow")]
+[node name="FieldInfo" type="PanelContainer" parent="HUD" node_paths=PackedStringArray("TitleLabel", "FieldImage", "ResourcesRow", "NeutralSection", "NeutralUnitsRow", "PlayerHeader", "PlayerUnitsRow")]
+custom_minimum_size = Vector2(290, 0)
 layout_mode = 1
 anchors_preset = 1
 anchor_left = 1.0
@@ -70,34 +71,37 @@ TitleLabel = NodePath("VBox/TitleLabel")
 FieldImage = NodePath("VBox/FieldImage")
 ResourcesRow = NodePath("VBox/ResourcesRow")
 NeutralSection = NodePath("VBox/NeutralSection")
-NeutralUnitsRow = NodePath("VBox/NeutralSection/NeutralUnitsRow")
-PlayerUnitsEmptyLabel = NodePath("VBox/PlayerSection/PlayerUnitsEmptyLabel")
-PlayerUnitsRow = NodePath("VBox/PlayerSection/PlayerUnitsRow")
+NeutralUnitsRow = NodePath("VBox/NeutralSection/NeutralScroll/NeutralUnitsRow")
+PlayerHeader = NodePath("VBox/PlayerSection/PlayerHeader")
+PlayerUnitsRow = NodePath("VBox/PlayerSection/PlayerScroll/PlayerUnitsRow")
 
 [node name="VBox" type="VBoxContainer" parent="HUD/FieldInfo"]
 layout_mode = 2
-theme_override_constants/separation = 8
+theme_override_constants/separation = 6
 
 [node name="TitleLabel" type="Label" parent="HUD/FieldInfo/VBox"]
 layout_mode = 2
 theme_type_variation = &"HeaderLabel"
 text = "Field"
 horizontal_alignment = 1
+clip_text = true
 
 [node name="FieldImage" type="TextureRect" parent="HUD/FieldInfo/VBox"]
-custom_minimum_size = Vector2(0, 200)
+custom_minimum_size = Vector2(0, 150)
 layout_mode = 2
 mouse_filter = 2
 expand_mode = 1
 stretch_mode = 6
 
 [node name="ResourcesRow" type="HBoxContainer" parent="HUD/FieldInfo/VBox"]
+custom_minimum_size = Vector2(0, 26)
 layout_mode = 2
 theme_override_constants/separation = 20
 alignment = 1
 
 [node name="NeutralSection" type="VBoxContainer" parent="HUD/FieldInfo/VBox"]
 layout_mode = 2
+theme_override_constants/separation = 2
 
 [node name="HSeparator" type="HSeparator" parent="HUD/FieldInfo/VBox/NeutralSection"]
 layout_mode = 2
@@ -107,11 +111,21 @@ layout_mode = 2
 theme_type_variation = &"MutedLabel"
 text = "Hostiles"
 
-[node name="NeutralUnitsRow" type="HFlowContainer" parent="HUD/FieldInfo/VBox/NeutralSection"]
+[node name="NeutralScroll" type="ScrollContainer" parent="HUD/FieldInfo/VBox/NeutralSection"]
+custom_minimum_size = Vector2(0, 36)
 layout_mode = 2
+horizontal_scroll_mode = 0
+vertical_scroll_mode = 3
+
+[node name="NeutralUnitsRow" type="HFlowContainer" parent="HUD/FieldInfo/VBox/NeutralSection/NeutralScroll"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/h_separation = 4
+theme_override_constants/v_separation = 4
 
 [node name="PlayerSection" type="VBoxContainer" parent="HUD/FieldInfo/VBox"]
 layout_mode = 2
+theme_override_constants/separation = 2
 
 [node name="HSeparator" type="HSeparator" parent="HUD/FieldInfo/VBox/PlayerSection"]
 layout_mode = 2
@@ -121,45 +135,51 @@ layout_mode = 2
 theme_type_variation = &"MutedLabel"
 text = "Your units"
 
-[node name="PlayerUnitsEmptyLabel" type="Label" parent="HUD/FieldInfo/VBox/PlayerSection"]
+[node name="PlayerScroll" type="ScrollContainer" parent="HUD/FieldInfo/VBox/PlayerSection"]
+custom_minimum_size = Vector2(0, 76)
 layout_mode = 2
-text = "None here"
+horizontal_scroll_mode = 0
+vertical_scroll_mode = 3
 
-[node name="PlayerUnitsRow" type="HFlowContainer" parent="HUD/FieldInfo/VBox/PlayerSection"]
+[node name="PlayerUnitsRow" type="HFlowContainer" parent="HUD/FieldInfo/VBox/PlayerSection/PlayerScroll"]
 layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/h_separation = 4
+theme_override_constants/v_separation = 4
 
 [node name="SelectedUnit" type="PanelContainer" parent="HUD" node_paths=PackedStringArray("Portrait", "NameLabel", "StatsLabel", "LocationLabel", "AttributesChart", "AbilitiesSection", "AbilitiesRow")]
-custom_minimum_size = Vector2(300, 0)
+custom_minimum_size = Vector2(380, 0)
 layout_mode = 1
 anchors_preset = 2
 anchor_top = 1.0
 anchor_bottom = 1.0
 offset_left = 8.0
 offset_top = -48.0
-offset_right = 308.0
+offset_right = 388.0
 offset_bottom = -8.0
 grow_vertical = 0
 script = ExtResource("6_unit")
 IconSlotScene = ExtResource("4_slot")
 Portrait = NodePath("VBox/Summary/Portrait")
 NameLabel = NodePath("VBox/Summary/Details/NameLabel")
-StatsLabel = NodePath("VBox/Summary/Details/StatsLabel")
+StatsLabel = NodePath("VBox/StatsLabel")
 LocationLabel = NodePath("VBox/Summary/Details/LocationLabel")
-AttributesChart = NodePath("VBox/AttributesChart")
+AttributesChart = NodePath("VBox/Summary/AttributesChart")
 AbilitiesSection = NodePath("VBox/AbilitiesSection")
 AbilitiesRow = NodePath("VBox/AbilitiesSection/AbilitiesRow")
 
 [node name="VBox" type="VBoxContainer" parent="HUD/SelectedUnit"]
 layout_mode = 2
-theme_override_constants/separation = 8
+theme_override_constants/separation = 4
 
 [node name="Summary" type="HBoxContainer" parent="HUD/SelectedUnit/VBox"]
 layout_mode = 2
-theme_override_constants/separation = 10
+theme_override_constants/separation = 8
 
 [node name="Portrait" type="TextureRect" parent="HUD/SelectedUnit/VBox/Summary"]
-custom_minimum_size = Vector2(96, 96)
+custom_minimum_size = Vector2(64, 64)
 layout_mode = 2
+size_flags_vertical = 0
 mouse_filter = 2
 expand_mode = 1
 stretch_mode = 5
@@ -167,36 +187,35 @@ stretch_mode = 5
 [node name="Details" type="VBoxContainer" parent="HUD/SelectedUnit/VBox/Summary"]
 layout_mode = 2
 size_flags_horizontal = 3
-alignment = 1
+theme_override_constants/separation = 2
 
 [node name="NameLabel" type="Label" parent="HUD/SelectedUnit/VBox/Summary/Details"]
 layout_mode = 2
 theme_type_variation = &"HeaderLabel"
 text = "Unit"
-
-[node name="StatsLabel" type="Label" parent="HUD/SelectedUnit/VBox/Summary/Details"]
-layout_mode = 2
-autowrap_mode = 3
+clip_text = true
 
 [node name="LocationLabel" type="Label" parent="HUD/SelectedUnit/VBox/Summary/Details"]
 layout_mode = 2
 theme_type_variation = &"MutedLabel"
+clip_text = true
 
-[node name="AttributesChart" type="Control" parent="HUD/SelectedUnit/VBox"]
-custom_minimum_size = Vector2(0, 140)
+[node name="AttributesChart" type="Control" parent="HUD/SelectedUnit/VBox/Summary"]
+custom_minimum_size = Vector2(112, 100)
 layout_mode = 2
 script = ExtResource("8_pentagon")
+FontSize = 9
+
+[node name="StatsLabel" type="Label" parent="HUD/SelectedUnit/VBox"]
+layout_mode = 2
+mouse_filter = 1
+theme_override_font_sizes/font_size = 13
+clip_text = true
 
 [node name="AbilitiesSection" type="VBoxContainer" parent="HUD/SelectedUnit/VBox"]
 layout_mode = 2
 
-[node name="HSeparator" type="HSeparator" parent="HUD/SelectedUnit/VBox/AbilitiesSection"]
+[node name="AbilitiesRow" type="HBoxContainer" parent="HUD/SelectedUnit/VBox/AbilitiesSection"]
+custom_minimum_size = Vector2(0, 34)
 layout_mode = 2
-
-[node name="AbilitiesHeader" type="Label" parent="HUD/SelectedUnit/VBox/AbilitiesSection"]
-layout_mode = 2
-theme_type_variation = &"MutedLabel"
-text = "Abilities"
-
-[node name="AbilitiesRow" type="HFlowContainer" parent="HUD/SelectedUnit/VBox/AbilitiesSection"]
-layout_mode = 2
+theme_override_constants/separation = 4

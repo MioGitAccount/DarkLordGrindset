@@ -18,6 +18,8 @@ public partial class SelectedUnitPanel : PanelContainer
 	[Export] private Control AbilitiesSection;
 	[Export] private Container AbilitiesRow;
 
+	private const int AbilitySlotSize = 34;
+
 	private unit _unit;
 	private double _refreshTimer;
 	private int _shownRevision = -1;
@@ -107,6 +109,7 @@ public partial class SelectedUnitPanel : PanelContainer
 		}
 
 		StatsLabel.Text = UIText.Stats(_unit.battleStats);
+		StatsLabel.TooltipText = StatsLabel.Text; // the label clips instead of wrapping
 		RefreshAbilityStates();
 		if (_unit.Revision != _shownRevision)
 		{
@@ -137,16 +140,25 @@ public partial class SelectedUnitPanel : PanelContainer
 
 	private void RefreshAbilities()
 	{
+		// The row keeps a fixed height even when empty, so learning abilities never resizes the panel
 		UIText.ClearChildren(AbilitiesRow);
 		var abilities = _unit.Abilities;
-		AbilitiesSection.Visible = abilities != null && abilities.Count > 0;
-		if (!AbilitiesSection.Visible)
+		if (abilities == null || abilities.Count == 0)
+		{
+			AbilitiesRow.AddChild(new Label
+			{
+				Text = "No abilities",
+				ThemeTypeVariation = "MutedLabel",
+				SizeFlagsVertical = SizeFlags.ShrinkCenter,
+			});
 			return;
+		}
 
 		var owner = _unit;
 		foreach (var ability in abilities)
 		{
 			var slot = IconSlotScene.Instantiate<IconSlot>();
+			slot.CustomMinimumSize = new Vector2(AbilitySlotSize, AbilitySlotSize);
 			slot.ToggleMode = true; // shows pressed while the ability runs
 			slot.Setup(ability.Icon, () => UIText.AbilityTooltip(ability, owner.IsUsingAbility(ability)));
 			slot.Pressed += () =>

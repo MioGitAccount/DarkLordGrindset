@@ -55,6 +55,8 @@ public partial class BattleScreen : Control
 	private bool _paused;
 	// Bumped on every open/close, so a battle loop from an earlier battle stops
 	private int _battleId;
+	// Player units use their abilities on their own when not given orders (see BattleSimulation)
+	public bool AutoCastPlayerAbilities;
 
 	private Control _fighters;
 	private Control _topBar;
@@ -232,7 +234,7 @@ public partial class BattleScreen : Control
 			if ((neutral.GetEffectiveStats()?.health ?? 0) > 0)
 				_allEnemies.Add(Combatant.FromNeutral(neutral));
 
-		_sim = new BattleSimulation(_allEnemies);
+		_sim = new BattleSimulation(_allEnemies) { AutoCastPlayerAbilities = AutoCastPlayerAbilities };
 		BattleFormation.AutoPlace(_sim.PlayerSlots, _playerUnits.Take(BattleFormation.SlotCount));
 		foreach (var combatant in _sim.All)
 			AddView(combatant);

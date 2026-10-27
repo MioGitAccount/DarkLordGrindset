@@ -47,6 +47,10 @@ public class Castle
 
 	public float GoldPerTick => _built.Sum(b => b.GoldPerTick);
 
+	// What this castle adds to PlayerAgents' caps
+	public int AgentCap => _built.Sum(b => b.AgentCap);
+	public int UnitCap(UnitTemplate type) => _built.Where(b => b.UnitCapFor == type).Sum(b => b.UnitCap);
+
 	// Called by the castle's field every tick
 	public void CollectIncome() => PlayerResources.Add(ResourceType.Gold, GoldPerTick);
 
@@ -84,7 +88,8 @@ public class Castle
 	}
 
 	public bool CanRecruit(BuildingDefinition building) =>
-		IsBuilt(building) && building.RecruitsUnit != null && ResourceCost.CanAfford(building.RecruitCost);
+		IsBuilt(building) && building.RecruitsUnit != null && ResourceCost.CanAfford(building.RecruitCost)
+		&& PlayerAgents.RecruitBlockedReason(building.RecruitsUnit) == null;
 
 	public bool TryRecruit(BuildingDefinition building)
 	{

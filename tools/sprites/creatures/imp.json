@@ -1,21 +1,68 @@
 {
-	"source": "res://tools/sprites/source/imp_concept.webp",
+	"source": "res://tools/sprites/source/imp_concept.png",
+	"attack_source": "res://tools/sprites/source/imp_attack_concept.png",
 	"output_dir": "res://images/Units/sprites",
 	"size": 64,
 	"bg_tolerance": 0.11,
 	"palette_size": 24,
-	"outline": [20, 24, 28],
+	"outline": [
+		20,
+		24,
+		28
+	],
 	"ground_y": 54,
+	"ground_chroma": 0.09,
 	"min_island": 16,
-	"enhance": { "saturation": 1.25, "value_offset": 0.04, "value_gain": 1.45 },
-	"eyes": [[408, 243], [492, 243]],
-	"eye_colour": [255, 220, 70],
-	"eye_rim": [230, 60, 40],
+	"enhance": {
+		"saturation": 1.25,
+		"value_offset": 0.04,
+		"value_gain": 1.45
+	},
+	"eyes": [
+		[
+			562,
+			368
+		],
+		[
+			690,
+			368
+		]
+	],
+	"eye_colour": [
+		255,
+		220,
+		70
+	],
+	"eye_rim": [
+		230,
+		60,
+		40
+	],
 	"parts": {
-		"hand": [44, 18, 20, 16],
-		"left_leg": [19, 47, 11, 15],
-		"right_leg": [30, 47, 13, 15],
-		"tail": [43, 42, 10, 14]
+		"hand": [
+			44,
+			18,
+			20,
+			16
+		],
+		"left_leg": [
+			19,
+			47,
+			11,
+			15
+		],
+		"right_leg": [
+			30,
+			47,
+			13,
+			15
+		],
+		"tail": [
+			43,
+			42,
+			10,
+			14
+		]
 	},
 	"animations": [
 		{
@@ -23,17 +70,54 @@
 			"speed": 2.5,
 			"frames": [
 				{},
-				{ "body": [0, 1], "tail": [1, 1] }
+				{
+					"body": [
+						0,
+						1
+					],
+					"tail": [
+						1,
+						1
+					]
+				}
 			]
 		},
 		{
 			"name": "walk",
 			"speed": 7.0,
 			"frames": [
-				{ "left_leg": [0, -2] },
-				{ "body": [0, 1], "tail": [1, 1] },
-				{ "right_leg": [0, -2] },
-				{ "body": [0, 1], "tail": [1, 1] }
+				{
+					"left_leg": [
+						0,
+						-2
+					]
+				},
+				{
+					"body": [
+						0,
+						1
+					],
+					"tail": [
+						1,
+						1
+					]
+				},
+				{
+					"right_leg": [
+						0,
+						-2
+					]
+				},
+				{
+					"body": [
+						0,
+						1
+					],
+					"tail": [
+						1,
+						1
+					]
+				}
 			]
 		},
 		{
@@ -41,9 +125,48 @@
 			"speed": 8.0,
 			"loop": false,
 			"frames": [
-				{ "hand": [-2, -1], "body": [-1, 0], "tail": [-1, 0] },
-				{ "hand": [3, 0], "body": [2, 0], "tail": [2, 0] },
-				{ "hand": [1, 0], "body": [1, 0], "tail": [1, 0] }
+				{
+					"hand": [
+						-2,
+						-1
+					],
+					"body": [
+						-1,
+						0
+					],
+					"tail": [
+						-1,
+						0
+					]
+				},
+				{
+					"hand": [
+						3,
+						0
+					],
+					"body": [
+						2,
+						0
+					],
+					"tail": [
+						2,
+						0
+					]
+				},
+				{
+					"hand": [
+						1,
+						0
+					],
+					"body": [
+						1,
+						0
+					],
+					"tail": [
+						1,
+						0
+					]
+				}
 			]
 		}
 	]

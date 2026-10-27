@@ -1,5 +1,6 @@
 using Godot;
 using System;
+using System.Linq;
 
 // Root of the in-game HUD. The rest of the game talks to the UI only through this class.
 public partial class UIManager : CanvasLayer
@@ -17,6 +18,8 @@ public partial class UIManager : CanvasLayer
 	private FieldHoverCard FieldHoverCard;
 	// Top bar counter for every ResourceType; the player always sees all of them
 	private readonly System.Collections.Generic.Dictionary<ResourceType, ResourceCounter> _playerCounters = new();
+	// "Agents 4/6" after the resource counters; the tooltip lists each unit type
+	private Label _agentsLabel;
 	private UnitInspectWindow UnitInspect;
 	private SkillTreeWindow SkillTree;
 	private BuildWindow Build;
@@ -27,6 +30,7 @@ public partial class UIManager : CanvasLayer
 	public override void _Ready()
 	{
 		CreatePlayerResourceCounters();
+		CreateAgentsCounter();
 		FieldHoverCard = new FieldHoverCard { Name = "FieldHoverCard" };
 		FieldInfo.GetParent().AddChild(FieldHoverCard);
 		FieldInfo.UnitClicked += selected => UnitSelected?.Invoke(selected);
@@ -67,6 +71,7 @@ public partial class UIManager : CanvasLayer
 
 	public override void _ExitTree()
 	{
+		PlayerAgents.Changed -= UpdateAgentsCounter;
 		if (_shownField != null)
 			_shownField.ContentsChanged -= UpdateBattleButton;
 	}
@@ -128,6 +133,27 @@ public partial class UIManager : CanvasLayer
 			bar.MoveChild(counter, insertAt++);
 			_playerCounters[type] = counter;
 		}
+	}
+
+	private void CreateAgentsCounter()
+	{
+		_agentsLabel = new Label { Name = "PlayerAgents", MouseFilter = Control.MouseFilterEnum.Stop };
+		var bar = PlayerGold.GetParent();
+		bar.AddChild(_agentsLabel);
+		bar.MoveChild(_agentsLabel, _playerCounters.Values.Max(c => c.GetIndex()) + 1);
+		PlayerAgents.Changed += UpdateAgentsCounter;
+		UpdateAgentsCounter();
+	}
+
+	private void UpdateAgentsCounter()
+	{
+		int count = PlayerAgents.Count, cap = PlayerAgents.Cap;
+		_agentsLabel.Text = $"Agents {count}/{cap}";
+		_agentsLabel.Modulate = count >= cap ? new Color(1f, 0.55f, 0.45f) : Colors.White;
+		var lines = new System.Collections.Generic.List<string> { $"Agents: {count} of {cap} (raise the cap by upgrading the Tower)" };
+		foreach (var type in PlayerAgents.Types.OrderBy(t => t.Name))
+			lines.Add($"{type.Name}: {PlayerAgents.CountOf(type)}/{PlayerAgents.CapFor(type)}");
+		_agentsLabel.TooltipText = string.Join("\n", lines);
 	}
 
 	public void SetPlayerResource(ResourceType type, float amount)

@@ -10,6 +10,9 @@
 # <output_dir>/<name>_frames.tres (SpriteFrames; an existing file keeps its uid) and
 # <output_dir>/<name>_battle.png (the same cutout at "battle_size", default 256, painted:
 # no palette reduction or outline; the battle screen animates it in code).
+# With "attack_source" (the same creature in its attack pose), also <output_dir>/<name>_attack_battle.png:
+# cut at the same source-pixels-per-texel as the battle image, so the game can swap the two
+# at one scale. Its size follows the pose's bounding box; "attack_ground_y" defaults to 64 (off).
 # With preview_dir it also writes <name>_preview.png (sheet at 5x) and
 # <name>_grid.png (first frame at 10x with a grid every 4px, red every 8px).
 extends SceneTree
@@ -19,6 +22,7 @@ var size: int
 var work_size: int              # masking happens at 4x, then box-filtered down
 var bg_tolerance: float
 var mask_polygons: Array[PackedVector2Array] = []   # source-pixel outlines, if given
+var last_side: int   # source pixels covered by the last cutout's square crop
 
 
 func _initialize() -> void:
@@ -83,30 +87,36 @@ func _initialize() -> void:
 	var battle_path := out_dir.path_join(creature + "_battle.png")
 	_cutout(src, bg, false).save_png(battle_path)
 	print("Saved ", battle_path)
+
+	if cfg.has("attack_source"):
+		var idle_side := last_side
+		var attack_src := Image.load_from_file(cfg.attack_source)
+		attack_src.convert(Image.FORMAT_RGBA8)
+		var attack_bg := _background_colour(attack_src)
+		mask_polygons.clear() # polygons trace the idle art only
+		var side := _square_crop(attack_src, attack_bg).size.x
+		size = int(round(int(cfg.get("battle_size", 256)) * float(side) / idle_side))
+		work_size = size * 4
+		var attack_path := out_dir.path_join(creature + "_attack_battle.png")
+		_cutout(attack_src, attack_bg, false, cfg.get("attack_ground_y", 64)).save_png(attack_path)
+		print("Saved ", attack_path, " (", size, "px)")
 	quit()
 
 
 # Cuts the creature out of the art at `size` px. Settings in sprite pixels (ground_y,
 # min_island) are given for 64px and scaled. `pixel` adds the palette reduction and eyes.
-func _cutout(src: Image, bg: Color, pixel: bool) -> Image:
+func _cutout(src: Image, bg: Color, pixel: bool, ground_y = null) -> Image:
 	var scale := size / 64.0
-	# Find the character's bounding box on a coarse copy
-	var coarse := src.duplicate() as Image
-	coarse.resize(work_size, work_size * src.get_height() / src.get_width(), Image.INTERPOLATE_BILINEAR)
-	var k := float(src.get_width()) / coarse.get_width()
-	var box := _bbox(_background_mask(coarse, bg, Vector2.ZERO, k))
-	box = Rect2i(Vector2i(Vector2(box.position) * k), Vector2i(Vector2(box.size) * k))
-
-	# Square crop, bottom aligned, with a small margin for the outline
-	var side := int(max(box.size.x, box.size.y) * 1.04)
-	var crop := Rect2i(box.get_center().x - side / 2, box.end.y - side + side / 40, side, side)
+	var crop := _square_crop(src, bg)
+	var side := crop.size.x
+	last_side = side
 	var work := Image.create(side, side, false, Image.FORMAT_RGBA8)
 	work.fill(bg)
 	work.blit_rect(src, crop, Vector2i.ZERO)
 	work.resize(work_size, work_size, Image.INTERPOLATE_LANCZOS)
 
 	var base := _downsample(work, _background_mask(work, bg, Vector2(crop.position), float(side) / work_size))
-	_remove_ground(base, int(cfg.get("ground_y", 64) * scale))
+	_remove_ground(base, int((ground_y if ground_y != null else cfg.get("ground_y", 64)) * scale))
 	_remove_islands(base, int(cfg.get("min_island", 16) * scale * scale))
 	_enhance(base, cfg.get("enhance", {}))
 	if not pixel:
@@ -119,6 +129,18 @@ func _cutout(src: Image, bg: Color, pixel: bool) -> Image:
 		base.set_pixelv(p, eye_colour)
 		base.set_pixelv(p + Vector2i(0, 1), eye_rim)
 	return base
+
+
+# Square crop around the character (found on a coarse copy), bottom aligned, with a small
+# margin for the outline
+func _square_crop(src: Image, bg: Color) -> Rect2i:
+	var coarse := src.duplicate() as Image
+	coarse.resize(work_size, work_size * src.get_height() / src.get_width(), Image.INTERPOLATE_BILINEAR)
+	var k := float(src.get_width()) / coarse.get_width()
+	var box := _bbox(_background_mask(coarse, bg, Vector2.ZERO, k))
+	box = Rect2i(Vector2i(Vector2(box.position) * k), Vector2i(Vector2(box.size) * k))
+	var side := int(max(box.size.x, box.size.y) * 1.04)
+	return Rect2i(box.get_center().x - side / 2, box.end.y - side + side / 40, side, side)
 
 
 # --- Animation -------------------------------------------------------------
@@ -280,12 +302,14 @@ func _downsample(img: Image, mask: PackedByteArray) -> Image:
 	return out
 
 
-# Drops neutral-grey pixels (stones, ground shadow) from ground_y down
+# Drops neutral-grey pixels (stones, ground shadow) from ground_y down; "ground_chroma" is how
+# colourful a pixel may be and still count as grey (raise it for slightly tinted stones)
 func _remove_ground(img: Image, ground_y: int) -> void:
+	var chroma: float = cfg.get("ground_chroma", 0.06)
 	for y in range(ground_y, size):
 		for x in size:
 			var c := img.get_pixel(x, y)
-			if c.a > 0 and max(c.r, c.g, c.b) - min(c.r, c.g, c.b) < 0.06:
+			if c.a > 0 and max(c.r, c.g, c.b) - min(c.r, c.g, c.b) < chroma:
 				img.set_pixel(x, y, Color(0, 0, 0, 0))
 
 

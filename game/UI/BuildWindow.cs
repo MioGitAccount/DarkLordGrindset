@@ -110,6 +110,7 @@ public partial class BuildWindow : PanelContainer
 			_castle = castle;
 			_castle.Changed += Refresh;
 			PlayerResources.Changed += OnResourcesChanged;
+			PlayerAgents.Changed += Refresh;
 		}
 		_title.Text = $"{_castle.Tree.Name} - buildings";
 		BuildTree();
@@ -132,6 +133,7 @@ public partial class BuildWindow : PanelContainer
 		if (_castle != null)
 			_castle.Changed -= Refresh;
 		PlayerResources.Changed -= OnResourcesChanged;
+		PlayerAgents.Changed -= Refresh;
 	}
 
 	// What the player can afford decides which cards light up
@@ -222,6 +224,10 @@ public partial class BuildWindow : PanelContainer
 			parts.Add($"+{building.BonusVision:0} vision");
 		if (building.BonusRecruitLevel != 0)
 			parts.Add($"{building.BonusLevelFor?.Name ?? "All"} +{building.BonusRecruitLevel} lv");
+		if (building.AgentCap != 0)
+			parts.Add($"+{building.AgentCap} agents");
+		if (building.UnitCap != 0 && building.UnitCapFor != null && building.RecruitsUnit == null)
+			parts.Add($"+{building.UnitCap} {building.UnitCapFor.Name}");
 		return string.Join(", ", parts);
 	}
 
@@ -341,9 +347,13 @@ public partial class BuildWindow : PanelContainer
 			int level = _castle.RecruitLevel(building.RecruitsUnit);
 			_recruitButton.Text = $"Recruit (lv {level})";
 			_recruitButton.Disabled = !_castle.CanRecruit(building);
-			_recruitButton.TooltipText = status == BuildingStatus.Built
-				? $"Recruit a level {level} {building.RecruitsUnit.Name} for {ResourceCost.Text(building.RecruitCost)}"
-				: "Build it first";
+			var type = building.RecruitsUnit;
+			string blocked = PlayerAgents.RecruitBlockedReason(type);
+			_recruitButton.TooltipText = status != BuildingStatus.Built ? "Build it first"
+				: blocked ?? $"Recruit a level {level} {type.Name} for {ResourceCost.Text(building.RecruitCost)}"
+					+ $" ({type.Name} {PlayerAgents.CountOf(type)}/{PlayerAgents.CapFor(type)}, agents {PlayerAgents.Count}/{PlayerAgents.Cap})";
+			if (status == BuildingStatus.Built && blocked != null)
+				_detailStatus.Text += $"  {blocked}.";
 		}
 	}
 

@@ -159,6 +159,7 @@ BuiltAtStart = true
 TowerLevel = 1
 BonusVision = 50.0
 GoldPerTick = 0.25
+AgentCap = 8
 
 [sub_resource type="Resource" id="Building_imp_den"]
 script = ExtResource("2_building")
@@ -170,6 +171,8 @@ Cost = [SubResource("Cost_1"), SubResource("Cost_2")]
 Requires = []
 RecruitsUnit = ExtResource("4_imp")
 RecruitCost = [SubResource("Cost_3")]
+UnitCapFor = ExtResource("4_imp")
+UnitCap = 4
 
 [sub_resource type="Resource" id="Building_orc_pit"]
 script = ExtResource("2_building")
@@ -181,6 +184,8 @@ Cost = [SubResource("Cost_4"), SubResource("Cost_5")]
 Requires = []
 RecruitsUnit = ExtResource("5_orc")
 RecruitCost = [SubResource("Cost_6"), SubResource("Cost_7")]
+UnitCapFor = ExtResource("5_orc")
+UnitCap = 4
 
 [sub_resource type="Resource" id="Building_tower2"]
 script = ExtResource("2_building")
@@ -192,6 +197,7 @@ Cost = [SubResource("Cost_8"), SubResource("Cost_9"), SubResource("Cost_10")]
 Requires = [SubResource("Building_tower1")]
 TowerLevel = 2
 BonusVision = 150.0
+AgentCap = 4
 
 [sub_resource type="Resource" id="Building_imp_academy"]
 script = ExtResource("2_building")
@@ -203,6 +209,8 @@ Cost = [SubResource("Cost_11"), SubResource("Cost_12"), SubResource("Cost_13")]
 Requires = [SubResource("Building_imp_den")]
 BonusLevelFor = ExtResource("4_imp")
 BonusRecruitLevel = 2
+UnitCapFor = ExtResource("4_imp")
+UnitCap = 1
 
 [sub_resource type="Resource" id="Building_orc_war_camp"]
 script = ExtResource("2_building")
@@ -214,6 +222,8 @@ Cost = [SubResource("Cost_14"), SubResource("Cost_15"), SubResource("Cost_16")]
 Requires = [SubResource("Building_orc_pit")]
 BonusLevelFor = ExtResource("5_orc")
 BonusRecruitLevel = 2
+UnitCapFor = ExtResource("5_orc")
+UnitCap = 1
 
 [sub_resource type="Resource" id="Building_tower3"]
 script = ExtResource("2_building")
@@ -225,6 +235,7 @@ Cost = [SubResource("Cost_17"), SubResource("Cost_18"), SubResource("Cost_19")]
 Requires = [SubResource("Building_tower2")]
 TowerLevel = 3
 BonusVision = 250.0
+AgentCap = 4
 
 [sub_resource type="Resource" id="Building_infernal_library"]
 script = ExtResource("2_building")
@@ -236,6 +247,8 @@ Cost = [SubResource("Cost_20"), SubResource("Cost_21"), SubResource("Cost_22")]
 Requires = [SubResource("Building_imp_academy")]
 BonusLevelFor = ExtResource("4_imp")
 BonusRecruitLevel = 2
+UnitCapFor = ExtResource("4_imp")
+UnitCap = 2
 
 [sub_resource type="Resource" id="Building_warlords_hall"]
 script = ExtResource("2_building")
@@ -247,6 +260,8 @@ Cost = [SubResource("Cost_23"), SubResource("Cost_24"), SubResource("Cost_25")]
 Requires = [SubResource("Building_orc_war_camp")]
 BonusLevelFor = ExtResource("5_orc")
 BonusRecruitLevel = 2
+UnitCapFor = ExtResource("5_orc")
+UnitCap = 2
 
 [sub_resource type="Resource" id="Building_dark_throne"]
 script = ExtResource("2_building")
@@ -257,6 +272,7 @@ Column = 3
 Cost = [SubResource("Cost_26"), SubResource("Cost_27"), SubResource("Cost_28")]
 Requires = []
 BonusRecruitLevel = 1
+AgentCap = 2
 
 [sub_resource type="Resource" id="Cost_witch_1"]
 script = ExtResource("3_cost")
@@ -288,6 +304,8 @@ Cost = [SubResource("Cost_witch_1"), SubResource("Cost_witch_2")]
 Requires = []
 RecruitsUnit = ExtResource("6_witch")
 RecruitCost = [SubResource("Cost_witch_3"), SubResource("Cost_witch_4")]
+UnitCapFor = ExtResource("6_witch")
+UnitCap = 2
 
 [resource]
 script = ExtResource("1_tree")

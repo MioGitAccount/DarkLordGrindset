@@ -35,6 +35,11 @@ public partial class BuildingDefinition : Resource
 	// Units of this type recruited at the castle start this many levels higher (all types when empty)
 	[Export] public UnitTemplate BonusLevelFor;
 	[Export(PropertyHint.Range, "0,10,1")] public int BonusRecruitLevel;
+	// Added to how many units (agents) the player may have in total
+	[Export(PropertyHint.Range, "0,20,1")] public int AgentCap;
+	// Added to how many units of UnitCapFor the player may have
+	[Export] public UnitTemplate UnitCapFor;
+	[Export(PropertyHint.Range, "0,10,1")] public int UnitCap;
 
 	// A tower is unlocked by the tower below it, every other building by the tower of its own level
 	public int RequiredTowerLevel => TowerLevel >= Level ? Level - 1 : Level;
@@ -51,6 +56,10 @@ public partial class BuildingDefinition : Resource
 			lines.Add($"Recruit {RecruitsUnit.Name} ({ResourceCost.Text(RecruitCost)})");
 		if (BonusRecruitLevel != 0)
 			lines.Add($"{BonusLevelFor?.Name ?? "Units"} recruited at +{BonusRecruitLevel} level{(BonusRecruitLevel == 1 ? "" : "s")}");
+		if (AgentCap != 0)
+			lines.Add($"+{AgentCap} agent cap");
+		if (UnitCap != 0 && UnitCapFor != null)
+			lines.Add($"+{UnitCap} {UnitCapFor.Name} cap");
 		return lines;
 	}
 }

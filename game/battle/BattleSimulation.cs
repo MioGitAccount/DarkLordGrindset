@@ -78,6 +78,8 @@ public class BattleSimulation
 	// Neutrals that didn't fit; they come as the next wave once the current one is beaten
 	public readonly List<List<Combatant>> EnemyWaves = new();
 	public int Round { get; private set; }
+	// Player units without an order pick abilities on their own, like the enemies (trailer recording)
+	public bool AutoCastPlayerAbilities;
 	public int Wave { get; private set; } = 1;
 
 	private readonly Random _rng = new();
@@ -277,7 +279,7 @@ public class BattleSimulation
 			actor.QueuedAbility = null;
 			actor.QueuedAbilityTarget = null;
 		}
-		else
+		if (ability == null && (!actor.IsPlayer || AutoCastPlayerAbilities))
 		{
 			ability = actor.Abilities.FirstOrDefault(a => CanUse(actor, a) && WorthUsing(actor, a));
 		}

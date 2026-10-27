@@ -38,6 +38,7 @@ public partial class BattleFighterView : Control
 	private AnimatedSprite2D _sprite;
 	// Painted sprite: a feet-anchored node animated with tweens (breathing, swings, knockback, falling)
 	private Node2D _rig;
+	private Sprite2D _painted; // the painted cutout inside _rig
 	private Tween _motion;
 	private float _speed = 1;
 	private bool _breathing; // idle breathing keeps its own pace, whatever the battle speed
@@ -66,20 +67,19 @@ public partial class BattleFighterView : Control
 		AddChild(_body);
 		if (Combatant.BattleSprite != null)
 		{
-			var texture = Combatant.BattleSprite;
-			float scale = PaintedHeight / texture.GetHeight();
+			// The attack pose shares this scale, so it may be a different size
+			float scale = PaintedHeight / Combatant.BattleSprite.GetHeight();
 			_rig = new Node2D { Position = Feet };
-			_rig.AddChild(new Sprite2D
+			_painted = new Sprite2D
 			{
-				Texture = texture,
 				Centered = false,
-				// The cutout's bottom edge has a small margin under the feet
-				Offset = new Vector2(-texture.GetWidth() / 2f, -texture.GetHeight() * 0.976f),
 				Scale = new Vector2(scale, scale),
 				TextureFilter = TextureFilterEnum.LinearWithMipmaps,
 				// Art faces right; enemies stand on the right and face left
 				FlipH = !Combatant.IsPlayer,
-			});
+			};
+			ShowPose(Combatant.BattleSprite);
+			_rig.AddChild(_painted);
 			_body.AddChild(_rig);
 			PlayIdle();
 		}
@@ -179,8 +179,18 @@ public partial class BattleFighterView : Control
 		return _motion;
 	}
 
+	private void ShowPose(Texture2D texture)
+	{
+		if (_painted.Texture == texture)
+			return;
+		_painted.Texture = texture;
+		// The cutout's bottom edge has a small margin under the feet
+		_painted.Offset = new Vector2(-texture.GetWidth() / 2f, -texture.GetHeight() * 0.976f);
+	}
+
 	private void ResetRig()
 	{
+		ShowPose(Combatant.BattleSprite);
 		_rig.Position = Feet;
 		_rig.Rotation = 0;
 		_rig.Scale = Vector2.One;
@@ -202,26 +212,32 @@ public partial class BattleFighterView : Control
 	}
 
 	// Wind-up (lean back, crouch), strike (lunge forward, squash), recover. The blow lands at about half.
+	// With an attack pose the strike snaps to it (it already leans, so the tilt is smaller) and holds it
 	private float Swing()
 	{
 		ResetRig();
 		float f = Facing;
+		var pose = Combatant.BattleAttackSprite;
 		float lean = Combatant.AttackLean ? f : 0;
 		var tween = NewMotion();
 		tween.SetTrans(Tween.TransitionType.Quad).SetEase(Tween.EaseType.Out);
 		tween.TweenProperty(_rig, "rotation", Mathf.DegToRad(-7) * lean, 0.24);
 		tween.Parallel().TweenProperty(_rig, "scale", new Vector2(0.96f, 1.04f), 0.24);
 		tween.Parallel().TweenProperty(_rig, "position", Feet + new Vector2(-8 * f, 0), 0.24);
+		if (pose != null)
+			tween.TweenCallback(Callable.From(() => ShowPose(pose)));
 		tween.SetTrans(Tween.TransitionType.Back);
-		tween.TweenProperty(_rig, "rotation", Mathf.DegToRad(9) * lean, 0.12);
+		tween.TweenProperty(_rig, "rotation", Mathf.DegToRad(pose != null ? 3 : 9) * lean, 0.12);
 		tween.Parallel().TweenProperty(_rig, "scale", new Vector2(1.08f, 0.93f), 0.12);
 		tween.Parallel().TweenProperty(_rig, "position", Feet + new Vector2(16 * f, 0), 0.12);
-		tween.TweenInterval(0.12);
+		tween.TweenInterval(pose != null ? 0.22 : 0.12);
+		if (pose != null)
+			tween.TweenCallback(Callable.From(() => ShowPose(Combatant.BattleSprite)));
 		tween.SetTrans(Tween.TransitionType.Sine).SetEase(Tween.EaseType.InOut);
 		tween.TweenProperty(_rig, "rotation", 0f, 0.26);
 		tween.Parallel().TweenProperty(_rig, "scale", Vector2.One, 0.26);
 		tween.Parallel().TweenProperty(_rig, "position", Feet, 0.26);
-		return 0.74f;
+		return pose != null ? 0.84f : 0.74f;
 	}
 
 	// Knocked back by a hit, then settles

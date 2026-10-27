@@ -30,6 +30,8 @@ public class Combatant
 	public SpriteFrames Sprite;
 	// Painted cutout, animated in code; preferred over Sprite
 	public Texture2D BattleSprite;
+	// Attack pose of BattleSprite, swapped in for the strike; may be null
+	public Texture2D BattleAttackSprite;
 	public bool AttackLean = true;
 	// Bolt of a ranged unit's normal attack
 	public Color ProjectileColor = new Color(1f, 0.7f, 0.3f);
@@ -102,6 +104,7 @@ public class Combatant
 			Icon = playerUnit.GetIcon(),
 			Sprite = playerUnit.Template?.MapSprite,
 			BattleSprite = playerUnit.Template?.BattleSprite,
+			BattleAttackSprite = playerUnit.Template?.BattleAttackSprite,
 			AttackLean = playerUnit.Template?.BattleAttackLean ?? true,
 			ProjectileColor = playerUnit.Template?.AttackProjectileColor ?? new Color(1f, 0.7f, 0.3f),
 			Side = BattleSide.Player,
@@ -124,6 +127,7 @@ public class Combatant
 			Icon = neutral.GetIcon(),
 			Sprite = template?.MapSprite,
 			BattleSprite = template?.BattleSprite,
+			BattleAttackSprite = template?.BattleAttackSprite,
 			AttackLean = template?.BattleAttackLean ?? true,
 			ProjectileColor = template?.AttackProjectileColor ?? new Color(1f, 0.7f, 0.3f),
 			Side = BattleSide.Enemy,
