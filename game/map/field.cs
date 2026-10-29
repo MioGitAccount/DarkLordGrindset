@@ -19,6 +19,8 @@ public partial class field : Node2D
 	[Export] public Godot.Collections.Array<FieldPerk> ExtraPerks = new();
 	// Perks that wear off: perk -> ticks left (e.g. "Raided")
 	private readonly Dictionary<FieldPerk, int> _timedPerks = new();
+	// Perks taken away (e.g. by a quest), even ones the field type gives
+	private readonly HashSet<FieldPerk> _removedPerks = new();
 	// Ticks since the healers standing here (e.g. a Witch with Herbalist) last healed the units here
 	private int _ticksSinceHeal;
 	public Godot.Collections.Array<unit> presentPlayerUnits = new();
@@ -79,9 +81,10 @@ public partial class field : Node2D
 		{
 			if (type != null)
 				foreach (var perk in type.Perks)
-					yield return perk;
+					if (!_removedPerks.Contains(perk))
+						yield return perk;
 			foreach (var perk in ExtraPerks)
-				if (perk != null)
+				if (perk != null && !_removedPerks.Contains(perk))
 					yield return perk;
 			foreach (var perk in _timedPerks.Keys)
 				yield return perk;
@@ -104,6 +107,26 @@ public partial class field : Node2D
 			UpdateGeneration();
 			ContentsChanged?.Invoke();
 		}
+	}
+
+	// Gives the field a perk for good (e.g. a quest reward)
+	public void AddPerk(FieldPerk perk)
+	{
+		_removedPerks.Remove(perk);
+		if (!ExtraPerks.Contains(perk))
+			ExtraPerks.Add(perk);
+		resourcesHolder.ApplyPerks(Perks);
+		UpdateGeneration();
+		ContentsChanged?.Invoke();
+	}
+
+	// Takes a perk away, timed or not, including perks of the field type
+	public void RemovePerk(FieldPerk perk)
+	{
+		_timedPerks.Remove(perk);
+		_removedPerks.Add(perk);
+		UpdateGeneration();
+		ContentsChanged?.Invoke();
 	}
 
 	private void TickTimedPerks()
@@ -236,6 +259,18 @@ public partial class field : Node2D
 		if (Fog == FogState.Visible)
 			LastSeenNeutrals = presentNeutralUnits.Duplicate();
 		ContentsChanged?.Invoke();
+	}
+
+	// One neutral of this type leaves the field (e.g. an assassinated guard); false when there is none
+	public bool RemoveNeutralOfType(UnitTemplate template)
+	{
+		foreach (var neutral in presentNeutralUnits)
+			if (neutral.Template == template)
+			{
+				RemoveNeutralUnits(new[] { neutral });
+				return true;
+			}
+		return false;
 	}
 
 	// Lets the UI know something about the field's units changed (e.g. damage taken in battle)

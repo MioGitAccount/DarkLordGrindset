@@ -72,6 +72,7 @@ public partial class UnitManager : Node
 	public bool MoveSelectedUnitTo(field targetNode)
 	{
 		if (selectedUnit == null || selectedUnit.currentField == null || selectedUnit.isMoving) return false;
+		if (selectedUnit.OnQuest) return false; // stuck on its field until the quest ends
 
 		List<field> path = PathFindingUtil.FindPath(selectedUnit.currentField, targetNode);
 		GD.Print("Path size: " + path.Count);

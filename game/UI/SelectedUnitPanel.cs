@@ -122,6 +122,8 @@ public partial class SelectedUnitPanel : PanelContainer
 		}
 		if (_unit.isMoving)
 			LocationLabel.Text = "Moving...";
+		else if (_unit.OnQuest)
+			LocationLabel.Text = $"{_unit.currentField?.type?.Name}: on {_unit.ActiveQuest.Title}";
 		else
 			LocationLabel.Text = _unit.currentField?.type?.Name ?? "";
 	}

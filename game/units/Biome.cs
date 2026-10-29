@@ -6,6 +6,8 @@ public enum Biome
 	Forest,   // spring and autumn forests
 	Mountain, // ore mines and caves
 	Plains,   // grass plains, roads, crossroads and bridges
+	Castle,   // the player's castle (quests only, no neutrals live there)
+	City,     // big cities; no field type uses it yet (arena quests already list it)
 }
 
 public static class Biomes
@@ -16,6 +18,7 @@ public static class Biomes
 		FieldTypeEnum.SpringForest or FieldTypeEnum.AutumnForest => Biome.Forest,
 		FieldTypeEnum.OreMine or FieldTypeEnum.Cave => Biome.Mountain,
 		FieldTypeEnum.GrassPlains or FieldTypeEnum.GrassRoad or FieldTypeEnum.GrassCrossRoads or FieldTypeEnum.Bridge => Biome.Plains,
+		FieldTypeEnum.Castle => Biome.Castle,
 		_ => Biome.None,
 	};
 

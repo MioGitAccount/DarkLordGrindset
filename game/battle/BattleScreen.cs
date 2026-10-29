@@ -55,6 +55,8 @@ public partial class BattleScreen : Control
 	private bool _paused;
 	// Bumped on every open/close, so a battle loop from an earlier battle stops
 	private int _battleId;
+	// Set for a quest's battle (see OpenQuestBattle): told whether the player won
+	private Action<bool> _onFinished;
 	// Player units use their abilities on their own when not given orders (see BattleSimulation)
 	public bool AutoCastPlayerAbilities;
 
@@ -222,15 +224,31 @@ public partial class BattleScreen : Control
 	{
 		if (!CanFightOn(battleField, out _))
 			return;
+		Open(battleField, battleField.presentPlayerUnits, battleField.presentNeutralUnits, null);
+	}
+
+	// A quest's battle stage: only its agents fight, against the quest's enemies (not the field's
+	// neutrals). onFinished gets whether they won; Cancel closes without calling it.
+	public void OpenQuestBattle(Quest quest, Action<bool> onFinished)
+	{
+		if (quest?.Field == null || quest.Agents.Count == 0 || quest.Enemies.Count == 0)
+			return;
+		Open(quest.Field, quest.Agents, quest.Enemies, onFinished);
+		_title.Text = $"{quest.Title} - {quest.CurrentStage?.Name}";
+	}
+
+	private void Open(field battleField, IEnumerable<unit> players, IEnumerable<NeutralUnit> enemies, Action<bool> onFinished)
+	{
 		_battleId++;
 		_field = battleField;
+		_onFinished = onFinished;
 		_background = Battlegrounds.For(battleField);
 		ClearBattle();
 
-		foreach (var playerUnit in battleField.presentPlayerUnits)
+		foreach (var playerUnit in players)
 			if (IsInstanceValid(playerUnit) && playerUnit.battleStats != null && playerUnit.battleStats.health > 0)
 				_playerUnits.Add(Combatant.FromUnit(playerUnit));
-		foreach (var neutral in battleField.presentNeutralUnits)
+		foreach (var neutral in enemies)
 			if ((neutral.GetEffectiveStats()?.health ?? 0) > 0)
 				_allEnemies.Add(Combatant.FromNeutral(neutral));
 
@@ -254,6 +272,7 @@ public partial class BattleScreen : Control
 	public void Close()
 	{
 		_battleId++;
+		_onFinished = null;
 		ClearBattle();
 		Visible = false;
 		_resultPanel.Visible = false;
@@ -1160,6 +1179,9 @@ public partial class BattleScreen : Control
 		}
 		_field.RemoveNeutralUnits(killed.Select(c => c.Neutral));
 		_field.NotifyContentsChanged();
+		var onFinished = _onFinished;
+		bool won = Won;
 		Close();
+		onFinished?.Invoke(won);
 	}
 }

@@ -222,6 +222,8 @@ public class FieldData
 	// Extra perks on top of the type's (files in resources/field_perks without .tres)
 	public List<string> Perks { get; set; }
 	public List<NeutralData> Neutrals { get; set; }
+	// Story quests on this field, no timer (files in resources/quests without .tres)
+	public List<string> Quests { get; set; }
 }
 
 public class NeutralData

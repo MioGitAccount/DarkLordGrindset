@@ -25,6 +25,12 @@ public partial class map : Node2D
 	public event Action<field> FieldSelected;
 	public event Action<unit> UnitSelected;
 	public event Action<field> FieldHovered;
+	// A quest marker on the map was clicked
+	public event Action<Quest> QuestClicked;
+	// Every quest on this map (random and story quests)
+	public QuestManager Quests { get; private set; }
+	private QuestMarkers _questMarkers;
+	public IEnumerable<field> Fields => fields.Values;
 	// Set by game.cs; hover is ignored while the mouse is over a UI panel
 	public Func<bool> IsPointerOverUI = () => false;
 	private field hoveredField;
@@ -80,8 +86,36 @@ public partial class map : Node2D
 			foreach (var f in fields.Values)
 				f.UpdateFog(fog.GetState(f.GlobalPosition));
 		};
+		CreateQuests();
 
 	}
+	private void CreateQuests()
+	{
+		Quests = new QuestManager { Name = "Quests" };
+		AddChild(Quests);
+		Quests.SetFields(fields.Values);
+		Quests.SpawnUnit = SpawnUnit;
+		Quests.PlayerUnits = () => units;
+		Quests.Home = StartField;
+		foreach (var data in Data.Fields)
+		{
+			if (data.Quests == null || data.Id == null || !fields.TryGetValue(data.Id, out var place))
+				continue;
+			foreach (var name in data.Quests)
+			{
+				var definition = MapCatalog.LoadQuest(name);
+				if (definition != null)
+					Quests.AddStoryQuest(definition, place);
+				else
+					GD.PushWarning($"Field {data.Id}: unknown quest {name}");
+			}
+		}
+		// Above the fog, so quests on grey fields stay visible
+		_questMarkers = new QuestMarkers { Name = "QuestMarkers" };
+		AddChild(_questMarkers);
+		_questMarkers.Setup(Quests);
+	}
+
 	public override void _Process(double delta)
 	{
 		field underMouse = null;
@@ -127,6 +161,13 @@ public partial class map : Node2D
 			Vector2 mousePosition = GetGlobalMousePosition();
 			bool found = false;
 
+			var quest = mouseEvent.ButtonIndex == MouseButton.Left ? _questMarkers?.QuestAt(mousePosition) : null;
+			if (quest != null)
+			{
+				OnNodeClicked(quest.Field);
+				QuestClicked?.Invoke(quest);
+				return;
+			}
 			foreach (var node in fields.Values)
 			{
 				if (node.IsPointInside(mousePosition))

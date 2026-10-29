@@ -106,7 +106,8 @@ terrain texture (one tile covers 512 world px). Run new textures through
 ```json
 { "id": "Field6", "type": "Village", "pos": [1001, 988],
   "perks": ["ore_vein"],
-  "neutrals": [{ "template": "wolf", "count": 2 }] }
+  "neutrals": [{ "template": "wolf", "count": 2 }],
+  "quests": ["the_buried_relic"] }
 ```
 
 - `id`: unique, used by `connections`.
@@ -116,6 +117,8 @@ terrain texture (one tile covers 512 world px). Run new textures through
 - `perks` (optional): extra perks, files in `resources/field_perks/` without `.tres`.
 - `neutrals` (optional): neutral units guarding the field; `template` is a file in
   `unit_templates/neutral_unit_templates/` or `unit_templates/` without `.tres`.
+- `quests` (optional): story quests waiting on the field from the start, with no timer; files in
+  `resources/quests/` without `.tres`. Random quests appear on their own during play.
 - The player's starting units begin on the **first `Castle` field** in the list.
 
 `connections` are undirected pairs of field ids. Units walk only along connections, so every

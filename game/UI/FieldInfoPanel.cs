@@ -1,5 +1,6 @@
 using Godot;
 using System;
+using System.Linq;
 
 // Right-side panel describing the selected field: biome, resources, neutral and player units.
 // Refreshes itself while units enter or leave the shown field and when its fog changes.
@@ -10,6 +11,23 @@ public partial class FieldInfoPanel : PanelContainer
 	public event Action<unit> UnitClicked;
 	// The "Enter castle" button of a castle field
 	public event Action<Castle> CastleRequested;
+	// A quest button of the field was clicked
+	public event Action<Quest> QuestRequested;
+
+	// Set by UIManager; the panel lists the shown field's quests
+	public QuestManager Quests
+	{
+		get => _quests;
+		set
+		{
+			if (_quests != null)
+				_quests.QuestAdded -= OnQuestsChanged;
+			_quests = value;
+			if (_quests != null)
+				_quests.QuestAdded += OnQuestsChanged;
+		}
+	}
+	private QuestManager _quests;
 
 	[Export] public PackedScene IconSlotScene;
 	[Export] public PackedScene ResourceCounterScene;
@@ -28,6 +46,9 @@ public partial class FieldInfoPanel : PanelContainer
 	private Label _neutralHeader;
 	private Label _perksLabel;
 	private Button _castleButton;
+	private HBoxContainer _questsRow;
+	// The quests the row's buttons show, so the timers update without rebuilding the buttons
+	private readonly System.Collections.Generic.List<(Quest, Button)> _questButtons = new();
 
 	public override void _Ready()
 	{
@@ -52,6 +73,11 @@ public partial class FieldInfoPanel : PanelContainer
 		perksRow.AddChild(_castleButton);
 		ResourcesRow.GetParent().AddChild(perksRow);
 		ResourcesRow.GetParent().MoveChild(perksRow, ResourcesRow.GetIndex() + 1);
+		// Quests of the field, one fixed-height row under the perks; each button opens its quest
+		_questsRow = new HBoxContainer { Name = "QuestsRow", CustomMinimumSize = new Vector2(0, 30), ClipContents = true };
+		_questsRow.AddThemeConstantOverride("separation", 6);
+		ResourcesRow.GetParent().AddChild(_questsRow);
+		ResourcesRow.GetParent().MoveChild(_questsRow, perksRow.GetIndex() + 1);
 		ShowField(null);
 	}
 
@@ -59,6 +85,13 @@ public partial class FieldInfoPanel : PanelContainer
 	{
 		if (_field != null)
 			_field.ContentsChanged -= Refresh;
+		Quests = null;
+	}
+
+	private void OnQuestsChanged(Quest quest)
+	{
+		if (_field != null && quest.Field == _field)
+			RefreshQuests();
 	}
 
 	public override void _Process(double delta)
@@ -69,6 +102,7 @@ public partial class FieldInfoPanel : PanelContainer
 			return;
 		_perksRefreshTimer = 0.5;
 		RefreshPerks();
+		RefreshQuestTimers();
 	}
 	private double _perksRefreshTimer;
 
@@ -100,6 +134,7 @@ public partial class FieldInfoPanel : PanelContainer
 		}
 		RefreshResources();
 		RefreshPerks();
+		RefreshQuests();
 		RefreshNeutralUnits();
 		RefreshPlayerUnits();
 	}
@@ -142,6 +177,38 @@ public partial class FieldInfoPanel : PanelContainer
 		}
 		_perksLabel.Text = "Perks: " + string.Join(", ", names);
 		_perksLabel.TooltipText = string.Join("\n", details);
+	}
+
+	private void RefreshQuests()
+	{
+		UIText.ClearChildren(_questsRow);
+		_questButtons.Clear();
+		var quests = _quests?.QuestsOn(_field).ToList() ?? new System.Collections.Generic.List<Quest>();
+		if (quests.Count == 0)
+		{
+			_questsRow.AddChild(new Label { Text = "No quests", ThemeTypeVariation = "MutedLabel", SizeFlagsVertical = SizeFlags.ShrinkCenter });
+			return;
+		}
+		foreach (var quest in quests)
+		{
+			var button = new Button { FocusMode = FocusModeEnum.None, SizeFlagsVertical = SizeFlags.ShrinkCenter, TooltipText = "Open the quest" };
+			var shown = quest;
+			button.Pressed += () => QuestRequested?.Invoke(shown);
+			_questsRow.AddChild(button);
+			_questButtons.Add((quest, button));
+		}
+		RefreshQuestTimers();
+	}
+
+	private void RefreshQuestTimers()
+	{
+		foreach (var (quest, button) in _questButtons)
+		{
+			string time = quest.HasDeadline ? $" {quest.TimeLeftText}" : "";
+			string mark = quest.State == QuestState.WaitingForBattle ? "Fight! " : quest.IsStarted ? "... " : "! ";
+			button.Text = $"{mark}{quest.Title} (Lv {quest.Definition.Level}){time}";
+			button.Modulate = quest.IsExpiringSoon ? new Color(1f, 0.6f, 0.55f) : Colors.White;
+		}
 	}
 
 	private void RefreshNeutralUnits()

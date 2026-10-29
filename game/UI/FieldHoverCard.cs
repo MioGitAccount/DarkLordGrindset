@@ -14,7 +14,10 @@ public partial class FieldHoverCard : PanelContainer
 	private Label _title;
 	private Label _emptyLabel;
 	private HBoxContainer _icons;
+	private Label _questsLabel;
 	private field _field;
+	// Set by UIManager; quests on the field are listed with their timers
+	public QuestManager Quests;
 
 	public override void _Ready()
 	{
@@ -28,6 +31,9 @@ public partial class FieldHoverCard : PanelContainer
 		box.AddChild(_title);
 		box.AddChild(_icons);
 		box.AddChild(_emptyLabel);
+		_questsLabel = new Label { HorizontalAlignment = HorizontalAlignment.Center, MouseFilter = MouseFilterEnum.Ignore };
+		_questsLabel.AddThemeColorOverride("font_color", new Color(1f, 0.82f, 0.4f));
+		box.AddChild(_questsLabel);
 		AddChild(box);
 		Visible = false;
 	}
@@ -66,6 +72,21 @@ public partial class FieldHoverCard : PanelContainer
 		pos.X = Mathf.Clamp(pos.X, 4, screen.X - Size.X - 4);
 		pos.Y = Mathf.Clamp(pos.Y, 4, screen.Y - Size.Y - 4);
 		Position = pos;
+		RefreshQuests();
+	}
+
+	private void RefreshQuests()
+	{
+		var lines = new System.Collections.Generic.List<string>();
+		if (Quests != null)
+			foreach (var quest in Quests.QuestsOn(_field))
+				lines.Add($"! {quest.Title} (Lv {quest.Definition.Level})" + (quest.HasDeadline ? $"  {quest.TimeLeftText}" : "") + (quest.IsStarted ? "  (in progress)" : ""));
+		string text = string.Join("\n", lines);
+		if (text == _questsLabel.Text)
+			return;
+		_questsLabel.Text = text;
+		_questsLabel.Visible = lines.Count > 0;
+		ResetSize();
 	}
 
 	private void Rebuild()
@@ -84,6 +105,8 @@ public partial class FieldHoverCard : PanelContainer
 		bool empty = _icons.GetChildCount() == 0;
 		_icons.Visible = !empty;
 		_emptyLabel.Visible = empty;
+		_questsLabel.Text = "";
+		RefreshQuests();
 		ResetSize(); // shrink back to fit after showing a busier field
 	}
 

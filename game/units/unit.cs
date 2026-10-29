@@ -34,6 +34,9 @@ public partial class unit : Node2D
 	public int FieldHealInterval { get; private set; }
 	// Experience multiplier per ability from skills like Greed (missing = 1)
 	private Dictionary<Ability, float> _experienceMultipliers = new();
+	// The quest this unit works on; it can't move or use abilities until the quest ends
+	public Quest ActiveQuest { get; set; }
+	public bool OnQuest => ActiveQuest != null;
 	// Raised when the unit dies (in battle), right before it is removed from the game
 	public event Action<unit> Died;
 
@@ -186,6 +189,16 @@ public partial class unit : Node2D
 		battleStats.health = Math.Clamp(health, 0, battleStats.maxHealth);
 		battleStats.mana = Math.Clamp(mana, 0, battleStats.maxMana);
 		Revision++;
+	}
+
+	// Damage outside battle (e.g. a failed quest stage); leaves at least 1 health
+	public void Injure(int amount)
+	{
+		if (amount <= 0)
+			return;
+		battleStats.health = Math.Max(1, battleStats.health - amount);
+		Revision++;
+		currentField?.NotifyContentsChanged();
 	}
 
 	// Gives back up to `amount` health; false when the unit was already at full health
@@ -362,6 +375,8 @@ public partial class unit : Node2D
 	// Starts the ability, or stops it when it is already running
 	public void UseAbility(Ability ability)
 	{
+		if (OnQuest)
+			return;
 		if (IsUsingAbility(ability))
 		{
 			abilityRunner.StopAbility();

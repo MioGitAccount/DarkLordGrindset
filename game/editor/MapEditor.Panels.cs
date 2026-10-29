@@ -522,6 +522,25 @@ public partial class MapEditor
 		}
 
 		_rightBox.AddChild(new HSeparator());
+		_rightBox.AddChild(new Label { Text = "Story quests (no timer)" });
+		foreach (var quest in MapCatalog.QuestNames)
+		{
+			var check = new CheckBox { Text = MapCatalog.LoadQuest(quest)?.Title ?? quest, ButtonPressed = field.Quests?.Contains(quest) == true };
+			check.Toggled += on =>
+			{
+				PushUndo();
+				field.Quests ??= new List<string>();
+				if (on)
+					field.Quests.Add(quest);
+				else
+					field.Quests.Remove(quest);
+				if (field.Quests.Count == 0)
+					field.Quests = null;
+			};
+			_rightBox.AddChild(check);
+		}
+
+		_rightBox.AddChild(new HSeparator());
 		_rightBox.AddChild(new Label { Text = "Neutral units" });
 		var biome = Biomes.Of(field.Type);
 		var fitting = MapCatalog.UnitTemplatesFor(biome);

@@ -1,0 +1,96 @@
+[gd_resource type="Resource" script_class="QuestDefinition" load_steps=14 format=3]
+
+[ext_resource type="Script" path="res://game/quests/QuestDefinition.cs" id="def"]
+[ext_resource type="Script" path="res://game/quests/QuestStage.cs" id="stage"]
+[ext_resource type="Script" path="res://game/quests/QuestReward.cs" id="reward"]
+[ext_resource type="Script" path="res://game/castle/ResourceCost.cs" id="cost"]
+[ext_resource type="Script" path="res://game/units/SpecialAttributes.cs" id="attr"]
+[ext_resource type="Resource" path="res://unit_templates/neutral_unit_templates/villager_militia.tres" id="r5"]
+[ext_resource type="Resource" path="res://unit_templates/neutral_unit_templates/villager_archer.tres" id="r6"]
+
+[sub_resource type="Resource" id="S0"]
+script = ExtResource("stage")
+Name = "Lie in wait"
+Description = "Hide by the road and keep still."
+Kind = 0
+Duration = 30
+WeightDeadliness = 0.0
+WeightStrength = 0.0
+WeightDurability = 0.0
+WeightCleverness = 0.5
+WeightQuickness = 0.5
+Difficulty = 4.0
+Enemies = []
+OnFail = 0
+RetryDelay = 20
+FailDamage = 0
+DeathChance = 0.0
+
+[sub_resource type="Resource" id="S1"]
+script = ExtResource("stage")
+Name = "Ambush!"
+Description = "The escort draws their weapons."
+Kind = 1
+Duration = 0
+WeightDeadliness = 0.0
+WeightStrength = 0.0
+WeightDurability = 0.0
+WeightCleverness = 0.0
+WeightQuickness = 0.0
+Difficulty = 5.0
+Enemies = [ExtResource("r5"), ExtResource("r5"), ExtResource("r6")]
+OnFail = 0
+RetryDelay = 20
+FailDamage = 0
+DeathChance = 0.0
+
+[sub_resource type="Resource" id="S2"]
+script = ExtResource("stage")
+Name = "Loot the wagons"
+Description = "Take what you can carry."
+Kind = 0
+Duration = 20
+WeightDeadliness = 0.0
+WeightStrength = 1.0
+WeightDurability = 0.0
+WeightCleverness = 0.0
+WeightQuickness = 0.0
+Difficulty = 3.0
+Enemies = []
+OnFail = 2
+RetryDelay = 20
+FailDamage = 0
+DeathChance = 0.0
+
+[sub_resource type="Resource" id="S3"]
+script = ExtResource("cost")
+Type = 0
+Amount = 50.0
+
+[sub_resource type="Resource" id="S4"]
+script = ExtResource("cost")
+Type = 2
+Amount = 25.0
+
+[sub_resource type="Resource" id="S5"]
+script = ExtResource("reward")
+Resources = [SubResource("S3"), SubResource("S4")]
+Experience = 25
+AddPerks = []
+AddPerksSeconds = 0
+RemovePerks = []
+RemoveNeutrals = []
+
+[resource]
+script = ExtResource("def")
+Title = "Ambush the Caravan"
+Story = "A merchant caravan with a militia escort will pass here soon, heavy with coin and ore."
+Level = 3
+Biomes = [4]
+Deadline = 300
+SpawnWeight = 1.0
+MinLevel = 1
+MinAgents = 2
+MaxAgents = 3
+Stages = [SubResource("S0"), SubResource("S1"), SubResource("S2")]
+Reward = SubResource("S5")

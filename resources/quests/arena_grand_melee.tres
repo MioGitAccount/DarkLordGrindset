@@ -1,0 +1,95 @@
+[gd_resource type="Resource" script_class="QuestDefinition" load_steps=17 format=3]
+
+[ext_resource type="Script" path="res://game/quests/QuestDefinition.cs" id="def"]
+[ext_resource type="Script" path="res://game/quests/QuestStage.cs" id="stage"]
+[ext_resource type="Script" path="res://game/quests/QuestReward.cs" id="reward"]
+[ext_resource type="Script" path="res://game/castle/ResourceCost.cs" id="cost"]
+[ext_resource type="Script" path="res://game/units/SpecialAttributes.cs" id="attr"]
+[ext_resource type="Resource" path="res://unit_templates/neutral_unit_templates/night_watchman.tres" id="r5"]
+[ext_resource type="Resource" path="res://unit_templates/neutral_unit_templates/villager_archer.tres" id="r6"]
+[ext_resource type="Resource" path="res://unit_templates/neutral_unit_templates/elf_blade_dancer.tres" id="r7"]
+[ext_resource type="Resource" path="res://unit_templates/neutral_unit_templates/elf_archer.tres" id="r8"]
+[ext_resource type="Resource" path="res://unit_templates/neutral_unit_templates/village_sergeant.tres" id="r9"]
+[ext_resource type="Resource" path="res://unit_templates/neutral_unit_templates/dwarf_axeman.tres" id="r10"]
+
+[sub_resource type="Resource" id="S0"]
+script = ExtResource("stage")
+Name = "Round 1"
+Description = "A night watchman and an archer."
+Kind = 1
+Duration = 0
+WeightDeadliness = 0.0
+WeightStrength = 0.0
+WeightDurability = 0.0
+WeightCleverness = 0.0
+WeightQuickness = 0.0
+Difficulty = 5.0
+Enemies = [ExtResource("r5"), ExtResource("r6")]
+OnFail = 0
+RetryDelay = 20
+FailDamage = 0
+DeathChance = 0.0
+
+[sub_resource type="Resource" id="S1"]
+script = ExtResource("stage")
+Name = "Round 2"
+Description = "A blade dancer and an elf archer."
+Kind = 1
+Duration = 0
+WeightDeadliness = 0.0
+WeightStrength = 0.0
+WeightDurability = 0.0
+WeightCleverness = 0.0
+WeightQuickness = 0.0
+Difficulty = 5.0
+Enemies = [ExtResource("r7"), ExtResource("r8")]
+OnFail = 0
+RetryDelay = 20
+FailDamage = 0
+DeathChance = 0.0
+
+[sub_resource type="Resource" id="S2"]
+script = ExtResource("stage")
+Name = "Round 3"
+Description = "The champions: a sergeant and a dwarf axeman."
+Kind = 1
+Duration = 0
+WeightDeadliness = 0.0
+WeightStrength = 0.0
+WeightDurability = 0.0
+WeightCleverness = 0.0
+WeightQuickness = 0.0
+Difficulty = 5.0
+Enemies = [ExtResource("r9"), ExtResource("r10")]
+OnFail = 0
+RetryDelay = 20
+FailDamage = 0
+DeathChance = 0.0
+
+[sub_resource type="Resource" id="S3"]
+script = ExtResource("cost")
+Type = 0
+Amount = 45.0
+
+[sub_resource type="Resource" id="S4"]
+script = ExtResource("reward")
+Resources = [SubResource("S3")]
+Experience = 50
+AddPerks = []
+AddPerksSeconds = 0
+RemovePerks = []
+RemoveNeutrals = []
+
+[resource]
+script = ExtResource("def")
+Title = "Arena: Grand Melee"
+Story = "The finest pairs of the realm, three rounds of two on two. The prize purse is enormous."
+Level = 4
+Biomes = [1, 6, 5]
+Deadline = 360
+SpawnWeight = 0.3
+MinLevel = 1
+MinAgents = 2
+MaxAgents = 2
+Stages = [SubResource("S0"), SubResource("S1"), SubResource("S2")]
+Reward = SubResource("S4")

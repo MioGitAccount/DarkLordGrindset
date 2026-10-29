@@ -13,6 +13,8 @@ public partial class game : Node2D
 		ui.UnitSelected += map.SelectUnit;
 		map.FieldHovered += ui.ShowFieldHover;
 		map.IsPointerOverUI = ui.IsMouseOverPanel;
+		ui.SetQuests(map.Quests);
+		map.QuestClicked += ui.ShowQuest;
 
 		PlayerResources.Changed += ui.SetPlayerResource;
 		PlayerResources.Reset();

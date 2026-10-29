@@ -1,0 +1,68 @@
+[gd_resource type="Resource" script_class="QuestDefinition" load_steps=10 format=3]
+
+[ext_resource type="Script" path="res://game/quests/QuestDefinition.cs" id="def"]
+[ext_resource type="Script" path="res://game/quests/QuestStage.cs" id="stage"]
+[ext_resource type="Script" path="res://game/quests/QuestReward.cs" id="reward"]
+[ext_resource type="Script" path="res://game/castle/ResourceCost.cs" id="cost"]
+[ext_resource type="Script" path="res://game/units/SpecialAttributes.cs" id="attr"]
+[ext_resource type="Resource" path="res://unit_templates/neutral_unit_templates/wolf.tres" id="r5"]
+
+[sub_resource type="Resource" id="S0"]
+script = ExtResource("stage")
+Name = "Find it"
+Description = "Follow the whimpering."
+Kind = 0
+Duration = 30
+WeightDeadliness = 0.0
+WeightStrength = 0.0
+WeightDurability = 0.0
+WeightCleverness = 1.0
+WeightQuickness = 0.0
+Difficulty = 4.0
+Enemies = []
+OnFail = 1
+RetryDelay = 15
+FailDamage = 0
+DeathChance = 0.0
+
+[sub_resource type="Resource" id="S1"]
+script = ExtResource("stage")
+Name = "Calm it"
+Description = "It bites. Be patient."
+Kind = 0
+Duration = 30
+WeightDeadliness = 0.0
+WeightStrength = 0.0
+WeightDurability = 0.4
+WeightCleverness = 0.6
+WeightQuickness = 0.0
+Difficulty = 4.0
+Enemies = []
+OnFail = 1
+RetryDelay = 20
+FailDamage = 3
+DeathChance = 0.0
+
+[sub_resource type="Resource" id="S2"]
+script = ExtResource("reward")
+Resources = []
+Experience = 15
+JoiningUnit = ExtResource("r5")
+AddPerks = []
+AddPerksSeconds = 0
+RemovePerks = []
+RemoveNeutrals = []
+
+[resource]
+script = ExtResource("def")
+Title = "The Lost Wolf Pup"
+Story = "A wolf pup whimpers somewhere in the undergrowth, lost from its pack. Raised by you, it would grow into a loyal hunter."
+Level = 2
+Biomes = [2]
+Deadline = 300
+SpawnWeight = 0.7
+MinLevel = 1
+MinAgents = 1
+MaxAgents = 1
+Stages = [SubResource("S0"), SubResource("S1")]
+Reward = SubResource("S2")

@@ -1,0 +1,71 @@
+[gd_resource type="Resource" script_class="QuestDefinition" load_steps=10 format=3]
+
+[ext_resource type="Script" path="res://game/quests/QuestDefinition.cs" id="def"]
+[ext_resource type="Script" path="res://game/quests/QuestStage.cs" id="stage"]
+[ext_resource type="Script" path="res://game/quests/QuestReward.cs" id="reward"]
+[ext_resource type="Script" path="res://game/castle/ResourceCost.cs" id="cost"]
+[ext_resource type="Script" path="res://game/units/SpecialAttributes.cs" id="attr"]
+
+[sub_resource type="Resource" id="S0"]
+script = ExtResource("stage")
+Name = "Blend into the crowd"
+Description = "Look like just another face at the market."
+Kind = 0
+Duration = 25
+WeightDeadliness = 0.0
+WeightStrength = 0.0
+WeightDurability = 0.0
+WeightCleverness = 0.7
+WeightQuickness = 0.3
+Difficulty = 4.0
+Enemies = []
+OnFail = 1
+RetryDelay = 15
+FailDamage = 0
+DeathChance = 0.0
+
+[sub_resource type="Resource" id="S1"]
+script = ExtResource("stage")
+Name = "Lift the ring"
+Description = "One quick touch while he haggles."
+Kind = 0
+Duration = 20
+WeightDeadliness = 0.0
+WeightStrength = 0.0
+WeightDurability = 0.0
+WeightCleverness = 0.0
+WeightQuickness = 1.0
+Difficulty = 4.0
+Enemies = []
+OnFail = 0
+RetryDelay = 20
+FailDamage = 3
+DeathChance = 0.0
+
+[sub_resource type="Resource" id="S2"]
+script = ExtResource("cost")
+Type = 0
+Amount = 50.0
+
+[sub_resource type="Resource" id="S3"]
+script = ExtResource("reward")
+Resources = [SubResource("S2")]
+Experience = 30
+AddPerks = []
+AddPerksSeconds = 0
+RemovePerks = []
+RemoveNeutrals = []
+
+[resource]
+script = ExtResource("def")
+Title = "Steal the Ring"
+Story = "A merchant passing through town wears a ruby ring worth more than the whole market. He leaves when his business is done."
+Level = 2
+Biomes = [1]
+Deadline = 240
+SpawnWeight = 1.0
+MinLevel = 1
+MinAgents = 1
+MaxAgents = 1
+Stages = [SubResource("S0"), SubResource("S1")]
+Reward = SubResource("S3")

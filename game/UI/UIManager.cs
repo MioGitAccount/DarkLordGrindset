@@ -23,6 +23,8 @@ public partial class UIManager : CanvasLayer
 	private UnitInspectWindow UnitInspect;
 	private SkillTreeWindow SkillTree;
 	private BuildWindow Build;
+	private QuestWindow QuestView;
+	private QuestToasts Toasts;
 	private BattleScreen Battle;
 	// The field shown in the field panel; the Battle button fights there
 	private field _shownField;
@@ -44,10 +46,21 @@ public partial class UIManager : CanvasLayer
 		SelectedUnit.InspectRequested += selected => { CloseWindows(); UnitInspect.Open(selected); };
 		SelectedUnit.SkillsRequested += selected => { CloseWindows(); SkillTree.Open(selected); };
 		FieldInfo.CastleRequested += castle => { CloseWindows(); Build.Open(castle); };
+		QuestView = new QuestWindow { Name = "Quest" };
+		FieldInfo.GetParent().AddChild(QuestView);
+		FieldInfo.QuestRequested += ShowQuest;
+		Toasts = new QuestToasts { Name = "QuestToasts" };
+		FieldInfo.GetParent().AddChild(Toasts);
+		Toasts.QuestClicked += ShowQuest;
 		// Last child, so the full-screen battle covers the rest of the HUD
 		Battle = new BattleScreen { Name = "Battle" };
 		FieldInfo.GetParent().AddChild(Battle);
 		BattleButton.Pressed += () => { CloseWindows(); Battle.Open(_shownField); };
+		QuestView.FightRequested += quest =>
+		{
+			CloseWindows();
+			Battle.OpenQuestBattle(quest, won => quest.BattleFinished(won));
+		};
 		UpdateBattleButton();
 	}
 
@@ -56,6 +69,21 @@ public partial class UIManager : CanvasLayer
 		UnitInspect.Close();
 		SkillTree.Close();
 		Build.Close();
+		QuestView.Close();
+	}
+
+	// Called once by game.cs with the map's quests
+	public void SetQuests(QuestManager quests)
+	{
+		FieldInfo.Quests = quests;
+		FieldHoverCard.Quests = quests;
+		quests.Notified += Toasts.AddToast;
+	}
+
+	public void ShowQuest(Quest quest)
+	{
+		CloseWindows();
+		QuestView.Open(quest);
 	}
 
 	public void ShowField(field selectedField)

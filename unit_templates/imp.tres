@@ -8,7 +8,7 @@
 [ext_resource type="Script" path="res://game/units/SpecialAttributes.cs" id="9_attrs"]
 [ext_resource type="Resource" uid="uid://dqn2enw377rth" path="res://resources/skill_trees/imp_skill_tree.tres" id="10_skills"]
 [ext_resource type="Texture2D" uid="uid://c7oxkwre2vv1w" path="res://images/Units/sprites/imp_battle.png" id="11_battle"]
-[ext_resource type="Texture2D" path="res://images/Units/sprites/imp_attack_battle.png" id="12_attack"]
+[ext_resource type="Texture2D" uid="uid://cnju3fqkpl6wa" path="res://images/Units/sprites/imp_attack_battle.png" id="12_attack"]
 [ext_resource type="Resource" path="res://resources/combat/critical.tres" id="c_critical"]
 
 [sub_resource type="Resource" id="Resource_attrs"]

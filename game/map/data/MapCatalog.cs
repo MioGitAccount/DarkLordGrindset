@@ -90,6 +90,13 @@ public static class MapCatalog
 	// Files in res://resources/field_perks without .tres
 	public static List<string> PerkNames => _perkNames ??= ListResources("res://resources/field_perks");
 
+	private static List<string> _questNames;
+	// Files in res://resources/quests without .tres
+	public static List<string> QuestNames => _questNames ??= ListResources("res://resources/quests");
+
+	public static QuestDefinition LoadQuest(string name) =>
+		ResourceLoader.Exists($"res://resources/quests/{name}.tres") ? GD.Load<QuestDefinition>($"res://resources/quests/{name}.tres") : null;
+
 	private static List<string> _unitTemplates;
 	// Templates usable as neutral units: neutral templates first, then the player unit templates
 	public static List<string> UnitTemplateNames => _unitTemplates ??=
