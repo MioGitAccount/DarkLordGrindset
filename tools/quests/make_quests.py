@@ -155,6 +155,26 @@ QUESTS = {
                 battle("Break the shelter", "His protectors stand in the doorway.", ["villager_militia", "villager_militia", "villager_archer"]),
                 roll("Drag him back", "He fights every step of the way.", {"STR": 0.7, "DUR": 0.3}, 4, 30, "InjureContinue", dmg=3)],
         reward=dict(res={"gold": 40, "mana": 15}, xp=40)),
+    # --- Torture Chamber (Chaos castle building, levels 1-3): interrogations in the castle dungeon.
+    # Only the Torture Chamber hands these out (see its QuestPool); they never appear at random.
+    "torture_loosen_a_tongue": dict(
+        title="Loosen a Tongue", level=1, biomes=["Castle"], deadline=240, weight=1,
+        story="A village scout hangs in chains in the Torture Chamber. He knows where the town hides its coin.",
+        stages=[roll("Make him talk", "Patience, a hot iron, and more patience.", {"CLE": 0.6, "DEA": 0.4}, 3, 30, "Retry", 15)],
+        reward=dict(res={"gold": 25}, xp=20)),
+    "torture_the_silent_ranger": dict(
+        title="The Silent Ranger", level=2, biomes=["Castle"], deadline=300, weight=1,
+        story="An elf ranger caught in your woods has not said a word in three days. Her people's paths and wards are worth the effort.",
+        stages=[roll("Break her will", "She stares back, unblinking.", {"DUR": 0.5, "CLE": 0.5}, 4, 30, "Retry", 20),
+                roll("Read her maps", "Elven marks, half of them lies.", {"CLE": 1}, 4, 25, "EndQuest")],
+        reward=dict(res={"crystal": 15, "mana": 15}, xp=25)),
+    "torture_the_spy_in_chains": dict(
+        title="The Spy in Chains", level=3, biomes=["Castle"], deadline=360, weight=1, maxagents=2,
+        story="A spy from the town was caught inside your walls. His friends will not leave him here for long.",
+        stages=[roll("Question the spy", "Who sent him, and who else is inside?", {"CLE": 1}, 5, 30, "Retry", 20),
+                battle("The rescue", "His friends storm the dungeon stairs.", ["night_watchman", "villager_militia"]),
+                roll("Make an example", "The whole castle should hear it.", {"DEA": 0.6, "STR": 0.4}, 4, 20, "InjureContinue", dmg=2)],
+        reward=dict(res={"gold": 40, "mana": 20}, xp=35)),
     # --- Level 3 -------------------------------------------------------------------------------
     "hunt_the_wolf_pack": dict(
         title="Hunt the Wolf Pack", level=3, biomes=["Forest"], deadline=0, weight=1, maxagents=3,

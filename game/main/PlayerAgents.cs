@@ -4,8 +4,8 @@ using System.Collections.Generic;
 using System.Linq;
 
 // The player's units (agents) and how many of them the player may have. Every unit is one agent.
-// Castle buildings raise the total cap (towers) and the cap of each unit type (its dwelling and
-// upgrades); recruiting stops at either. The top bar shows it through Changed.
+// Castle buildings raise the total cap (towers) and the cap of each unit type (its faction base,
+// its levels and slot buildings); recruiting stops at either. The top bar shows it through Changed.
 public static class PlayerAgents
 {
 	private static readonly List<unit> _units = new();
@@ -32,7 +32,7 @@ public static class PlayerAgents
 		if (Count >= Cap)
 			return $"Agent cap reached ({Count}/{Cap}) - upgrade the Tower";
 		if (CountOf(type) >= CapFor(type))
-			return $"{type.Name} cap reached ({CountOf(type)}/{CapFor(type)}) - upgrade its dwelling";
+			return $"{type.Name} cap reached ({CountOf(type)}/{CapFor(type)}) - upgrade its faction base";
 		return null;
 	}
 

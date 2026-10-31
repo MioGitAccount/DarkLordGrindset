@@ -153,9 +153,10 @@ public partial class field : Node2D
 	}
 
 	// Player units standing here get 1 health every FieldHealInterval ticks of the fastest healer here
+	// (a castle's healing building counts as a healer too)
 	private void TickHealing()
 	{
-		int interval = 0;
+		int interval = Castle?.HealInterval ?? 0;
 		foreach (var playerUnit in presentPlayerUnits)
 			if (IsInstanceValid(playerUnit) && playerUnit.FieldHealInterval > 0 && (interval == 0 || playerUnit.FieldHealInterval < interval))
 				interval = playerUnit.FieldHealInterval;

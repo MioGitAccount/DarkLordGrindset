@@ -1,0 +1,53 @@
+[gd_resource type="Resource" script_class="QuestDefinition" load_steps=9 format=3]
+
+[ext_resource type="Script" path="res://game/quests/QuestDefinition.cs" id="def"]
+[ext_resource type="Script" path="res://game/quests/QuestStage.cs" id="stage"]
+[ext_resource type="Script" path="res://game/quests/QuestReward.cs" id="reward"]
+[ext_resource type="Script" path="res://game/castle/ResourceCost.cs" id="cost"]
+[ext_resource type="Script" path="res://game/units/SpecialAttributes.cs" id="attr"]
+
+[sub_resource type="Resource" id="S0"]
+script = ExtResource("stage")
+Name = "Make him talk"
+Description = "Patience, a hot iron, and more patience."
+Kind = 0
+Duration = 30
+WeightDeadliness = 0.4
+WeightStrength = 0.0
+WeightDurability = 0.0
+WeightCleverness = 0.6
+WeightQuickness = 0.0
+Difficulty = 3.0
+Enemies = []
+OnFail = 1
+RetryDelay = 15
+FailDamage = 0
+DeathChance = 0.0
+
+[sub_resource type="Resource" id="S1"]
+script = ExtResource("cost")
+Type = 0
+Amount = 25.0
+
+[sub_resource type="Resource" id="S2"]
+script = ExtResource("reward")
+Resources = [SubResource("S1")]
+Experience = 20
+AddPerks = []
+AddPerksSeconds = 0
+RemovePerks = []
+RemoveNeutrals = []
+
+[resource]
+script = ExtResource("def")
+Title = "Loosen a Tongue"
+Story = "A village scout hangs in chains in the Torture Chamber. He knows where the town hides its coin."
+Level = 1
+Biomes = [5]
+Deadline = 240
+SpawnWeight = 1.0
+MinLevel = 1
+MinAgents = 1
+MaxAgents = 1
+Stages = [SubResource("S0")]
+Reward = SubResource("S2")

@@ -19296,8 +19296,16 @@
     {
       "id": "Field8",
       "type": "SpringForest",
-      "pos": [1190.9,1004.5],
+      "pos": [1190.4,1003.5],
       "neutrals": [
+        {
+          "template": "elf_blade_dancer",
+          "count": 1
+        },
+        {
+          "template": "wolf",
+          "count": 1
+        },
         {
           "template": "elf_archer",
           "count": 1
@@ -19511,7 +19519,17 @@
     {
       "id": "F30",
       "type": "AutumnForest",
-      "pos": [576,1177.3]
+      "pos": [576,1177.3],
+      "neutrals": [
+        {
+          "template": "wolf",
+          "count": 1
+        },
+        {
+          "template": "elf_blade_dancer",
+          "count": 1
+        }
+      ]
     },
     {
       "id": "F31",
@@ -19531,7 +19549,17 @@
     {
       "id": "F35",
       "type": "AutumnForest",
-      "pos": [570.1,1352.1]
+      "pos": [570.1,1352.1],
+      "neutrals": [
+        {
+          "template": "druid",
+          "count": 1
+        },
+        {
+          "template": "elf_archer",
+          "count": 2
+        }
+      ]
     },
     {
       "id": "F36",

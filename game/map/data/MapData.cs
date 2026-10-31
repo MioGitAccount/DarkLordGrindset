@@ -224,6 +224,9 @@ public class FieldData
 	public List<NeutralData> Neutrals { get; set; }
 	// Story quests on this field, no timer (files in resources/quests without .tres)
 	public List<string> Quests { get; set; }
+	// Castle fields only: which faction bases stand at the start ("Chaos", "Stronghold",
+	// "DarkHumans", "Undead"); null = all of them
+	public List<string> Factions { get; set; }
 }
 
 public class NeutralData

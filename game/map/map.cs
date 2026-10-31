@@ -73,6 +73,11 @@ public partial class map : Node2D
 			var castleField = f;
 			if (castleField.Castle == null)
 				continue;
+			var castleData = Data.Fields.FirstOrDefault(d => d.Id == castleField.Name.ToString());
+			if (castleData?.Factions != null)
+				castleField.Castle.SetStartingBases(castleData.Factions
+					.Select(name => Enum.TryParse<Faction>(name, true, out var faction) ? faction : Faction.None)
+					.Where(faction => faction != Faction.None));
 			castleField.Castle.UnitRecruited += (template, level) => SpawnUnit(template, castleField, level);
 			PlayerAgents.AddCastle(castleField.Castle);
 		}
