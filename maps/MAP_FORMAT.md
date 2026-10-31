@@ -50,6 +50,7 @@ Terrain types (`type`):
 | `dirt`   | land    | brown patches, often around mountains                              |
 | `desert` | land    | sand                                                               |
 | `snow`   | land    | snowfields, e.g. around snowy mountains                            |
+| `swamp`  | land    | boggy ground with reeds and puddles, around `Swamp` fields         |
 | `road`   | land    | stroke, width 8–12                                                 |
 | `blight` | overlay | dark Dark-Lord corruption, drawn as a soft stain over what's below |
 
@@ -112,7 +113,7 @@ terrain texture (one tile covers 512 world px). Run new textures through
 
 - `id`: unique, used by `connections`.
 - `type`: a field type from `game/map/FieldTypeManager.cs`: `Castle`, `SpringForest`,
-  `AutumnForest`, `Cave`, `OreMine`, `Bridge`, `GrassPlains`, `Village`, `GrassCrossRoads`, `GrassRoad`.
+  `AutumnForest`, `Cave`, `OreMine`, `Bridge`, `GrassPlains`, `Village`, `GrassCrossRoads`, `GrassRoad`, `Swamp`.
   The type decides what the field produces. Put it next to a matching object (a `Castle` field by a castle, an `OreMine` field by a mine, a forest field among trees).
 - `perks` (optional): extra perks, files in `resources/field_perks/` without `.tres`.
 - `neutrals` (optional): neutral units guarding the field; `template` is a file in

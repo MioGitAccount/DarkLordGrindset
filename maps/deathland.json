@@ -4690,6 +4690,727 @@
       "points": [[748.2,1733],[752.1,1739.2]],
       "width": 18,
       "rough": false
+    },
+    {
+      "type": "swamp",
+      "shape": "stroke",
+      "points": [[538.4,1369.4]],
+      "width": 70,
+      "rough": false
+    },
+    {
+      "type": "swamp",
+      "shape": "stroke",
+      "points": [[572.8,1350.9]],
+      "width": 70,
+      "rough": false
+    },
+    {
+      "type": "swamp",
+      "shape": "stroke",
+      "points": [[555.8,1361.2]],
+      "width": 70,
+      "rough": false
+    },
+    {
+      "type": "swamp",
+      "shape": "stroke",
+      "points": [[546.6,1355]],
+      "width": 70,
+      "rough": false
+    },
+    {
+      "type": "swamp",
+      "shape": "stroke",
+      "points": [[517.3,1360.7],[510.1,1361.7]],
+      "width": 70,
+      "rough": false
+    },
+    {
+      "type": "swamp",
+      "shape": "stroke",
+      "points": [[304.2,1155.7],[301.1,1155.7]],
+      "width": 70,
+      "rough": false
+    },
+    {
+      "type": "swamp",
+      "shape": "stroke",
+      "points": [[264.7,1150.5],[263.6,1148.5]],
+      "width": 70,
+      "rough": false
+    },
+    {
+      "type": "swamp",
+      "shape": "stroke",
+      "points": [[275.4,1135.1]],
+      "width": 70,
+      "rough": false
+    },
+    {
+      "type": "swamp",
+      "shape": "stroke",
+      "points": [[981.9,1696.9],[966,1701.6],[959.3,1709.8],[958.8,1719.5],[960.9,1730.3]],
+      "width": 70,
+      "rough": false
+    },
+    {
+      "type": "swamp",
+      "shape": "stroke",
+      "points": [[957.3,1690.8],[943.9,1692.3],[942.9,1696.9],[944.4,1701.6]],
+      "width": 70,
+      "rough": false
+    },
+    {
+      "type": "swamp",
+      "shape": "stroke",
+      "points": [[967.6,1678.4],[960.9,1640.9]],
+      "width": 70,
+      "rough": false
+    },
+    {
+      "type": "swamp",
+      "shape": "stroke",
+      "points": [[962.4,1633.2],[969.6,1620.9],[981.4,1611.1]],
+      "width": 70,
+      "rough": false
+    },
+    {
+      "type": "swamp",
+      "shape": "stroke",
+      "points": [[1029.7,1635.1],[1026.2,1667.3]],
+      "width": 70,
+      "rough": false
+    },
+    {
+      "type": "swamp",
+      "shape": "stroke",
+      "points": [[497.7,1302.6]],
+      "width": 70,
+      "rough": false
+    },
+    {
+      "type": "swamp",
+      "shape": "stroke",
+      "points": [[532.5,1296.4],[537,1295]],
+      "width": 70,
+      "rough": false
+    },
+    {
+      "type": "water",
+      "shape": "stroke",
+      "points": [[508.5,1294.5]],
+      "width": 18,
+      "rough": false
+    },
+    {
+      "type": "water",
+      "shape": "stroke",
+      "points": [[511.2,1301.3]],
+      "width": 18,
+      "rough": false
+    },
+    {
+      "type": "water",
+      "shape": "stroke",
+      "points": [[500.1,1296.2]],
+      "width": 18,
+      "rough": false
+    },
+    {
+      "type": "water",
+      "shape": "stroke",
+      "points": [[548.1,1287.9]],
+      "width": 18,
+      "rough": false
+    },
+    {
+      "type": "water",
+      "shape": "stroke",
+      "points": [[349,1166.7]],
+      "width": 18,
+      "rough": false
+    },
+    {
+      "type": "water",
+      "shape": "stroke",
+      "points": [[338.8,1168.4]],
+      "width": 18,
+      "rough": false
+    },
+    {
+      "type": "water",
+      "shape": "stroke",
+      "points": [[989.1,1706.9]],
+      "width": 18,
+      "rough": false
+    },
+    {
+      "type": "water",
+      "shape": "stroke",
+      "points": [[977.9,1708.3],[982.4,1701.6]],
+      "width": 18,
+      "rough": false
+    },
+    {
+      "type": "water",
+      "shape": "stroke",
+      "points": [[986.4,1706.9]],
+      "width": 18,
+      "rough": false
+    },
+    {
+      "type": "water",
+      "shape": "stroke",
+      "points": [[1027.9,1646.2],[1021.2,1636.8]],
+      "width": 18,
+      "rough": false
+    },
+    {
+      "type": "water",
+      "shape": "stroke",
+      "points": [[1032.9,1648.4],[1036.4,1648]],
+      "width": 18,
+      "rough": false
+    },
+    {
+      "type": "water",
+      "shape": "stroke",
+      "points": [[1047.1,1650.2],[1033.3,1640.8]],
+      "width": 18,
+      "rough": false
+    },
+    {
+      "type": "water",
+      "shape": "stroke",
+      "points": [[1036,1639.5],[1039.6,1637.2]],
+      "width": 18,
+      "rough": false
+    },
+    {
+      "type": "swamp",
+      "shape": "stroke",
+      "points": [[639,1495.4],[651.3,1513.4],[673.9,1517.5],[699.6,1516]],
+      "width": 70,
+      "rough": false
+    },
+    {
+      "type": "swamp",
+      "shape": "stroke",
+      "points": [[717.1,1487.7],[683.2,1486.2]],
+      "width": 70,
+      "rough": false
+    },
+    {
+      "type": "swamp",
+      "shape": "stroke",
+      "points": [[714,1502.6],[713.5,1525.7]],
+      "width": 70,
+      "rough": false
+    },
+    {
+      "type": "swamp",
+      "shape": "stroke",
+      "points": [[710.4,1571.5],[722.7,1579.2]],
+      "width": 70,
+      "rough": false
+    },
+    {
+      "type": "swamp",
+      "shape": "stroke",
+      "points": [[734.5,1585.3],[727.3,1583.8],[700.1,1571.5],[688.3,1554]],
+      "width": 70,
+      "rough": false
+    },
+    {
+      "type": "swamp",
+      "shape": "stroke",
+      "points": [[645.7,1500.6],[640.6,1486.7]],
+      "width": 70,
+      "rough": false
+    },
+    {
+      "type": "swamp",
+      "shape": "stroke",
+      "points": [[711.4,1464.1],[736.1,1472.8]],
+      "width": 70,
+      "rough": false
+    },
+    {
+      "type": "swamp",
+      "shape": "stroke",
+      "points": [[759,1479.9],[789.3,1477.4]],
+      "width": 70,
+      "rough": false
+    },
+    {
+      "type": "swamp",
+      "shape": "stroke",
+      "points": [[785.2,1468.1],[785.2,1473.8],[792.9,1486.1]],
+      "width": 70,
+      "rough": false
+    },
+    {
+      "type": "swamp",
+      "shape": "stroke",
+      "points": [[949.5,1624.6]],
+      "width": 70,
+      "rough": false
+    },
+    {
+      "type": "swamp",
+      "shape": "stroke",
+      "points": [[988,1585.6]],
+      "width": 70,
+      "rough": false
+    },
+    {
+      "type": "swamp",
+      "shape": "stroke",
+      "points": [[980.3,1578.9]],
+      "width": 70,
+      "rough": false
+    },
+    {
+      "type": "swamp",
+      "shape": "stroke",
+      "points": [[937.2,1670.7]],
+      "width": 70,
+      "rough": false
+    },
+    {
+      "type": "swamp",
+      "shape": "stroke",
+      "points": [[897.2,1711.8],[890.5,1711.8]],
+      "width": 70,
+      "rough": false
+    },
+    {
+      "type": "swamp",
+      "shape": "stroke",
+      "points": [[856.1,1713.3]],
+      "width": 70,
+      "rough": false
+    },
+    {
+      "type": "swamp",
+      "shape": "stroke",
+      "points": [[839.1,1720.5]],
+      "width": 70,
+      "rough": false
+    },
+    {
+      "type": "swamp",
+      "shape": "stroke",
+      "points": [[890,1739.5],[892,1740.1]],
+      "width": 70,
+      "rough": false
+    },
+    {
+      "type": "swamp",
+      "shape": "stroke",
+      "points": [[955.7,1744.7],[960.8,1745.7]],
+      "width": 70,
+      "rough": false
+    },
+    {
+      "type": "swamp",
+      "shape": "stroke",
+      "points": [[1014.2,1750.9],[1020.4,1746.2]],
+      "width": 70,
+      "rough": false
+    },
+    {
+      "type": "swamp",
+      "shape": "stroke",
+      "points": [[1044,1712.8],[1049.7,1706.7]],
+      "width": 70,
+      "rough": false
+    },
+    {
+      "type": "swamp",
+      "shape": "stroke",
+      "points": [[1051.7,1704.1],[1057.4,1702]],
+      "width": 70,
+      "rough": false
+    },
+    {
+      "type": "swamp",
+      "shape": "stroke",
+      "points": [[1085.1,1687.1]],
+      "width": 70,
+      "rough": false
+    },
+    {
+      "type": "swamp",
+      "shape": "stroke",
+      "points": [[1008,1608]],
+      "width": 70,
+      "rough": false
+    },
+    {
+      "type": "swamp",
+      "shape": "stroke",
+      "points": [[1070.6,1668.6],[1093.7,1686.6]],
+      "width": 70,
+      "rough": false
+    },
+    {
+      "type": "swamp",
+      "shape": "stroke",
+      "points": [[1100.9,1693.8],[1109.6,1706.7]],
+      "width": 70,
+      "rough": false
+    },
+    {
+      "type": "swamp",
+      "shape": "stroke",
+      "points": [[1141.5,1669.1]],
+      "width": 70,
+      "rough": false
+    },
+    {
+      "type": "swamp",
+      "shape": "stroke",
+      "points": [[1061.9,1721],[1058.8,1731.8]],
+      "width": 70,
+      "rough": false
+    },
+    {
+      "type": "swamp",
+      "shape": "stroke",
+      "points": [[1011,1733.9],[1009.5,1738]],
+      "width": 70,
+      "rough": false
+    },
+    {
+      "type": "swamp",
+      "shape": "stroke",
+      "points": [[989.5,1755]],
+      "width": 70,
+      "rough": false
+    },
+    {
+      "type": "swamp",
+      "shape": "stroke",
+      "points": [[827.3,1568.2]],
+      "width": 70,
+      "rough": false
+    },
+    {
+      "type": "swamp",
+      "shape": "stroke",
+      "points": [[772.4,1598.5]],
+      "width": 70,
+      "rough": false
+    },
+    {
+      "type": "swamp",
+      "shape": "stroke",
+      "points": [[726.7,1628.3],[725.7,1626.8]],
+      "width": 70,
+      "rough": false
+    },
+    {
+      "type": "swamp",
+      "shape": "stroke",
+      "points": [[671.2,1603.1]],
+      "width": 70,
+      "rough": false
+    },
+    {
+      "type": "swamp",
+      "shape": "stroke",
+      "points": [[810.1,1493.4]],
+      "width": 70,
+      "rough": false
+    },
+    {
+      "type": "swamp",
+      "shape": "stroke",
+      "points": [[803.9,1463.6]],
+      "width": 70,
+      "rough": false
+    },
+    {
+      "type": "swamp",
+      "shape": "stroke",
+      "points": [[631.9,1503.7]],
+      "width": 70,
+      "rough": false
+    },
+    {
+      "type": "swamp",
+      "shape": "stroke",
+      "points": [[607.8,1498]],
+      "width": 70,
+      "rough": false
+    },
+    {
+      "type": "swamp",
+      "shape": "stroke",
+      "points": [[554.9,1777.9],[577.5,1770.1]],
+      "width": 70,
+      "rough": false
+    },
+    {
+      "type": "swamp",
+      "shape": "stroke",
+      "points": [[603.3,1765.4],[579.1,1754.4],[571.3,1748.2]],
+      "width": 70,
+      "rough": false
+    },
+    {
+      "type": "swamp",
+      "shape": "stroke",
+      "points": [[598.6,1748.9],[613.5,1755.2]],
+      "width": 70,
+      "rough": false
+    },
+    {
+      "type": "swamp",
+      "shape": "stroke",
+      "points": [[555.7,1787.2],[532.2,1784.9],[448.7,1784.1]],
+      "width": 70,
+      "rough": false
+    },
+    {
+      "type": "swamp",
+      "shape": "stroke",
+      "points": [[439.3,1777.1],[432.3,1769.3],[429.9,1760.7],[430.7,1751.3]],
+      "width": 70,
+      "rough": false
+    },
+    {
+      "type": "swamp",
+      "shape": "stroke",
+      "points": [[431.5,1748.2],[404.2,1759.9],[394,1768.5],[387,1779.4],[384.7,1799.8]],
+      "width": 70,
+      "rough": false
+    },
+    {
+      "type": "swamp",
+      "shape": "stroke",
+      "points": [[383.9,1820.9]],
+      "width": 70,
+      "rough": false
+    },
+    {
+      "type": "swamp",
+      "shape": "stroke",
+      "points": [[390.9,1826.3],[365.9,1833.4]],
+      "width": 70,
+      "rough": false
+    },
+    {
+      "type": "swamp",
+      "shape": "stroke",
+      "points": [[572.9,1797.4],[597.8,1795.8],[618.1,1799]],
+      "width": 70,
+      "rough": false
+    },
+    {
+      "type": "swamp",
+      "shape": "stroke",
+      "points": [[652.5,1801.3]],
+      "width": 70,
+      "rough": false
+    },
+    {
+      "type": "swamp",
+      "shape": "stroke",
+      "points": [[615.5,1799.2],[623.7,1806.4],[639.7,1813.5]],
+      "width": 70,
+      "rough": false
+    },
+    {
+      "type": "swamp",
+      "shape": "stroke",
+      "points": [[687.4,1825.9],[700.8,1834.1]],
+      "width": 70,
+      "rough": false
+    },
+    {
+      "type": "swamp",
+      "shape": "stroke",
+      "points": [[709,1844.9],[715.1,1846.4]],
+      "width": 70,
+      "rough": false
+    },
+    {
+      "type": "swamp",
+      "shape": "stroke",
+      "points": [[633.5,1831.5],[628.4,1830],[584.2,1830],[556,1832.6]],
+      "width": 70,
+      "rough": false
+    },
+    {
+      "type": "swamp",
+      "shape": "stroke",
+      "points": [[496.4,1844.4],[489.2,1846.4]],
+      "width": 70,
+      "rough": false
+    },
+    {
+      "type": "swamp",
+      "shape": "stroke",
+      "points": [[447.6,1842.3]],
+      "width": 70,
+      "rough": false
+    },
+    {
+      "type": "swamp",
+      "shape": "stroke",
+      "points": [[453.3,1818.2],[438.9,1818.2],[429.6,1822.3]],
+      "width": 70,
+      "rough": false
+    },
+    {
+      "type": "swamp",
+      "shape": "stroke",
+      "points": [[411.2,1845.9],[409.6,1851.1],[401.4,1857.2]],
+      "width": 70,
+      "rough": false
+    },
+    {
+      "type": "swamp",
+      "shape": "stroke",
+      "points": [[541.1,1783.2],[547.2,1781.7],[558.5,1782.7]],
+      "width": 70,
+      "rough": false
+    },
+    {
+      "type": "swamp",
+      "shape": "stroke",
+      "points": [[626.3,1793.5],[634,1795]],
+      "width": 70,
+      "rough": false
+    },
+    {
+      "type": "swamp",
+      "shape": "stroke",
+      "points": [[559.5,1765.2],[580.1,1757.5],[596.5,1744.2]],
+      "width": 70,
+      "rough": false
+    },
+    {
+      "type": "swamp",
+      "shape": "stroke",
+      "points": [[595,1736.5]],
+      "width": 70,
+      "rough": false
+    },
+    {
+      "type": "swamp",
+      "shape": "stroke",
+      "points": [[402.4,1825.9],[388.1,1846.4],[377.8,1853.1]],
+      "width": 70,
+      "rough": false
+    },
+    {
+      "type": "swamp",
+      "shape": "stroke",
+      "points": [[368.5,1860.8],[356.7,1865.5]],
+      "width": 70,
+      "rough": false
+    },
+    {
+      "type": "swamp",
+      "shape": "stroke",
+      "points": [[914.9,1772.8],[914.9,1775.3]],
+      "width": 70,
+      "rough": false
+    },
+    {
+      "type": "swamp",
+      "shape": "stroke",
+      "points": [[881.5,1795.9]],
+      "width": 70,
+      "rough": false
+    },
+    {
+      "type": "swamp",
+      "shape": "stroke",
+      "points": [[920.5,1814.4],[932.8,1811.8]],
+      "width": 70,
+      "rough": false
+    },
+    {
+      "type": "swamp",
+      "shape": "stroke",
+      "points": [[1203.4,1566.8]],
+      "width": 70,
+      "rough": false
+    },
+    {
+      "type": "swamp",
+      "shape": "stroke",
+      "points": [[1224.7,1578.6],[1208.1,1609.3],[1183.3,1621.8],[1170.4,1625.9]],
+      "width": 70,
+      "rough": false
+    },
+    {
+      "type": "swamp",
+      "shape": "stroke",
+      "points": [[1234.1,1597.5],[1248.9,1585.1],[1256,1573.9],[1261.9,1560.3],[1266,1542.6]],
+      "width": 70,
+      "rough": false
+    },
+    {
+      "type": "swamp",
+      "shape": "stroke",
+      "points": [[1269.6,1510.7],[1269.6,1508.3]],
+      "width": 70,
+      "rough": false
+    },
+    {
+      "type": "water",
+      "shape": "stroke",
+      "points": [[677.6,1452.9]],
+      "width": 18,
+      "rough": false
+    },
+    {
+      "type": "water",
+      "shape": "stroke",
+      "points": [[757.7,1439.5]],
+      "width": 18,
+      "rough": false
+    },
+    {
+      "type": "water",
+      "shape": "stroke",
+      "points": [[755.1,1450.8],[751,1450.3]],
+      "width": 18,
+      "rough": false
+    },
+    {
+      "type": "water",
+      "shape": "stroke",
+      "points": [[755.1,1443.6],[750,1443.6]],
+      "width": 18,
+      "rough": false
+    },
+    {
+      "type": "water",
+      "shape": "stroke",
+      "points": [[667.3,1441.1],[668.4,1442.6]],
+      "width": 18,
+      "rough": false
+    },
+    {
+      "type": "water",
+      "shape": "stroke",
+      "points": [[669.4,1453.4],[668.4,1456]],
+      "width": 18,
+      "rough": false
+    },
+    {
+      "type": "water",
+      "shape": "stroke",
+      "points": [[720.2,1467.3]],
+      "width": 18,
+      "rough": false
     }
   ],
   "objects": [
@@ -4772,7 +5493,7 @@
     },
     {
       "type": "village",
-      "pos": [703.3,1510.8],
+      "pos": [696.9,1578.1],
       "scale": 1,
       "variant": 4
     },
@@ -7441,7 +8162,7 @@
     },
     {
       "type": "oak",
-      "pos": [706.6,1555.4],
+      "pos": [615.4,1517.3],
       "scale": 0.99,
       "variant": 83
     },
@@ -18321,6 +19042,198 @@
       "scale": 1.13,
       "variant": 65,
       "flip": true
+    },
+    {
+      "type": "dead_tree",
+      "pos": [652.5,1471.2],
+      "scale": 1.03,
+      "variant": 42
+    },
+    {
+      "type": "dead_tree",
+      "pos": [757,1473.5],
+      "scale": 1.13,
+      "variant": 44
+    },
+    {
+      "type": "dead_tree",
+      "pos": [318.7,1135.7],
+      "scale": 1.13,
+      "variant": 97
+    },
+    {
+      "type": "dead_tree",
+      "pos": [395.2,1246.5],
+      "scale": 0.97,
+      "variant": 89,
+      "flip": true
+    },
+    {
+      "type": "dead_tree",
+      "pos": [421.2,1253.9],
+      "scale": 1.02,
+      "variant": 27
+    },
+    {
+      "type": "dead_tree",
+      "pos": [396,1270.6],
+      "scale": 1.11,
+      "variant": 62
+    },
+    {
+      "type": "dead_tree",
+      "pos": [366.1,1251.9],
+      "scale": 1.07,
+      "variant": 37
+    },
+    {
+      "type": "dead_tree",
+      "pos": [411.9,1274.1],
+      "scale": 1.03,
+      "variant": 74,
+      "flip": true
+    },
+    {
+      "type": "dead_tree",
+      "pos": [424.7,1292],
+      "scale": 0.89,
+      "variant": 13,
+      "flip": true
+    },
+    {
+      "type": "dead_tree",
+      "pos": [478.7,1235.6],
+      "scale": 1.14,
+      "variant": 94
+    },
+    {
+      "type": "dead_tree",
+      "pos": [395.6,1188.6],
+      "scale": 1.15,
+      "variant": 39
+    },
+    {
+      "type": "dead_tree",
+      "pos": [336.2,1201],
+      "scale": 1.08,
+      "variant": 10,
+      "flip": true
+    },
+    {
+      "type": "dead_tree",
+      "pos": [250.3,1079.1],
+      "scale": 0.87,
+      "variant": 22
+    },
+    {
+      "type": "dead_tree",
+      "pos": [193.3,1074.5],
+      "scale": 1.04,
+      "variant": 89
+    },
+    {
+      "type": "dead_tree",
+      "pos": [199.5,1089.9],
+      "scale": 1,
+      "variant": 99
+    },
+    {
+      "type": "dead_tree",
+      "pos": [140.4,1209.4],
+      "scale": 1,
+      "variant": 34,
+      "flip": true
+    },
+    {
+      "type": "oak",
+      "pos": [624.6,1332.6],
+      "scale": 1.03,
+      "variant": 47,
+      "flip": true
+    },
+    {
+      "type": "oak",
+      "pos": [550.9,1385.4],
+      "scale": 0.88,
+      "variant": 13
+    },
+    {
+      "type": "oak",
+      "pos": [577.3,1393],
+      "scale": 1.11,
+      "variant": 23
+    },
+    {
+      "type": "oak",
+      "pos": [527.7,1386.3],
+      "scale": 1,
+      "variant": 24
+    },
+    {
+      "type": "oak",
+      "pos": [722.3,1377.2],
+      "scale": 0.97,
+      "variant": 40
+    },
+    {
+      "type": "oak",
+      "pos": [669.2,1404],
+      "scale": 0.95,
+      "variant": 9
+    },
+    {
+      "type": "oak",
+      "pos": [718.3,1400.4],
+      "scale": 1.12,
+      "variant": 7,
+      "flip": true
+    },
+    {
+      "type": "oak",
+      "pos": [653.5,1387.9],
+      "scale": 1.06,
+      "variant": 25,
+      "flip": true
+    },
+    {
+      "type": "oak",
+      "pos": [598.6,1331.2],
+      "scale": 1.07,
+      "variant": 83
+    },
+    {
+      "type": "oak",
+      "pos": [587.9,1410.2],
+      "scale": 1.1,
+      "variant": 55,
+      "flip": true
+    },
+    {
+      "type": "oak",
+      "pos": [555.3,1403.1],
+      "scale": 0.94,
+      "variant": 31,
+      "flip": true
+    },
+    {
+      "type": "oak",
+      "pos": [573.2,1412.5],
+      "scale": 0.94,
+      "variant": 87
+    },
+    {
+      "type": "oak",
+      "pos": [620.9,1421],
+      "scale": 1.13,
+      "variant": 54,
+      "flip": true
+    },
+    {
+      "type": "oak",
+      "pos": [647.3,1565.8],
+      "scale": 0.96,
+      "variant": 20,
+      "flip": true
     }
   ],
   "fields": [
@@ -18432,11 +19345,15 @@
       "pos": [865.6,904.4],
       "neutrals": [
         {
-          "template": "wolf",
-          "count": 3
+          "template": "dwarf_crossbowman",
+          "count": 1
         },
         {
-          "template": "imp",
+          "template": "dwarf_axeman",
+          "count": 1
+        },
+        {
+          "template": "dwarf_miner",
           "count": 1
         }
       ]
@@ -18598,20 +19515,45 @@
     },
     {
       "id": "F31",
-      "type": "SpringForest",
+      "type": "Swamp",
       "pos": [503.3,1257.6]
     },
     {
       "id": "F33",
-      "type": "AutumnForest",
+      "type": "Swamp",
       "pos": [414.5,1220.9]
     },
     {
       "id": "F34",
       "type": "GrassPlains",
       "pos": [285.1,1132.4]
+    },
+    {
+      "id": "F35",
+      "type": "AutumnForest",
+      "pos": [570.1,1352.1]
+    },
+    {
+      "id": "F36",
+      "type": "AutumnForest",
+      "pos": [691.1,1352.6]
+    },
+    {
+      "id": "F37",
+      "type": "Cave",
+      "pos": [779.6,1308]
+    },
+    {
+      "id": "F38",
+      "type": "Swamp",
+      "pos": [709.1,1429.8]
+    },
+    {
+      "id": "F39",
+      "type": "Village",
+      "pos": [710.5,1526.8]
     }
   ],
-  "connections": [["Field","Field2"],["Field4","Field5"],["Field4","Field10"],["Field5","Field6"],["Field8","Field9"],["Field10","Field11"],["Field11","Field12"],["Field2","Field13"],["Field13","Field14"],["Field17","Field18"],["Field18","Field19"],["Field19","Field20"],["Field20","Field21"],["Field18","Field24"],["Field24","Field25"],["Field25","Field26"],["Field25","Field29"],["Field29","Field30"],["Field","Field31"],["F32","Field10"],["Field2","Field4"],["Field5","Field8"],["Field5","Field15"],["Field15","Field17"],["Field15","Field20"],["Field15","Field23"],["Field26","Field28"],["F28","F32"],["F30","F31"],["F31","F33"],["F29","Field31"],["Field31","F30"],["F34","F33"],["F34","F29"],["F29","F33"]],
+  "connections": [["Field","Field2"],["Field4","Field5"],["Field4","Field10"],["Field5","Field6"],["Field8","Field9"],["Field10","Field11"],["Field11","Field12"],["Field2","Field13"],["Field13","Field14"],["Field17","Field18"],["Field18","Field19"],["Field19","Field20"],["Field20","Field21"],["Field18","Field24"],["Field24","Field25"],["Field25","Field26"],["Field25","Field29"],["Field29","Field30"],["Field","Field31"],["F32","Field10"],["Field2","Field4"],["Field5","Field8"],["Field5","Field15"],["Field15","Field17"],["Field15","Field20"],["Field15","Field23"],["Field26","Field28"],["F28","F32"],["F30","F31"],["F31","F33"],["F29","Field31"],["Field31","F30"],["F34","F33"],["F34","F29"],["F35","F31"],["F35","F36"],["F36","F37"],["F38","F36"],["F38","F39"]],
   "size": {}
 }

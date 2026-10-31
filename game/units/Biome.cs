@@ -8,6 +8,7 @@ public enum Biome
 	Plains,   // grass plains, roads, crossroads and bridges
 	Castle,   // the player's castle (quests only, no neutrals live there)
 	City,     // big cities; no field type uses it yet (arena quests already list it)
+	Swamp,    // swamps (add new biomes at the end: they are saved by number)
 }
 
 public static class Biomes
@@ -19,6 +20,7 @@ public static class Biomes
 		FieldTypeEnum.OreMine or FieldTypeEnum.Cave => Biome.Mountain,
 		FieldTypeEnum.GrassPlains or FieldTypeEnum.GrassRoad or FieldTypeEnum.GrassCrossRoads or FieldTypeEnum.Bridge => Biome.Plains,
 		FieldTypeEnum.Castle => Biome.Castle,
+		FieldTypeEnum.Swamp => Biome.Swamp,
 		_ => Biome.None,
 	};
 

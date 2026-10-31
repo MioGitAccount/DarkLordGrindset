@@ -1,0 +1,22 @@
+[gd_resource type="Resource" script_class="FieldPerk" load_steps=5 format=3]
+
+[ext_resource type="Script" path="res://game/map/resources/FieldPerk.cs" id="1_perk"]
+[ext_resource type="Script" path="res://game/map/resources/ResourceYield.cs" id="2_yield"]
+
+[sub_resource type="Resource" id="Yield_0"]
+script = ExtResource("2_yield")
+Type = 1
+PerTick = 0.1667
+Capacity = 150.0
+
+[sub_resource type="Resource" id="Yield_1"]
+script = ExtResource("2_yield")
+Type = 4
+PerTick = 0.0833
+Capacity = 40.0
+
+[resource]
+script = ExtResource("1_perk")
+Name = "Bog"
+Description = "Rotting peat and marsh gas, thick with old magic. Generates some wood and mana."
+Yields = [SubResource("Yield_0"), SubResource("Yield_1")]

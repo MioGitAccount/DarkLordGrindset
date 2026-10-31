@@ -1,4 +1,4 @@
-[gd_scene load_steps=14 format=3 uid="uid://bmw3037w1kmrt"]
+[gd_scene load_steps=11 format=3 uid="uid://bmw3037w1kmrt"]
 
 [ext_resource type="Script" path="res://game/main/game.cs" id="1_64kao"]
 [ext_resource type="PackedScene" uid="uid://var6frhqr00x" path="res://game/map/map.tscn" id="1_h6xol"]
@@ -9,30 +9,7 @@
 [ext_resource type="PackedScene" uid="uid://d2oqmhsdb8fn3" path="res://game/UI/UI.tscn" id="5_n8336"]
 [ext_resource type="Resource" uid="uid://bewribr222x3c" path="res://unit_templates/orc.tres" id="6_5s4c6"]
 [ext_resource type="Resource" uid="uid://nabuwucekvmd" path="res://unit_templates/witch.tres" id="7_witch"]
-[ext_resource type="Script" path="res://game/units/BattleStats.cs" id="8_1outy"]
 [ext_resource type="Script" path="res://game/map/FogOfWar.cs" id="14_ho7uh"]
-
-[sub_resource type="Resource" id="Resource_grcv5"]
-script = ExtResource("8_1outy")
-attack = 6
-defence = 2
-health = 10
-maxHealth = 10
-mana = 0
-maxMana = 0
-initiative = 0
-rangeUnit = false
-
-[sub_resource type="Resource" id="Resource_i543h"]
-script = ExtResource("8_1outy")
-attack = 5
-defence = 3
-health = 10
-maxHealth = 10
-mana = 0
-maxMana = 0
-initiative = 0
-rangeUnit = false
 
 [node name="Game" type="Node2D"]
 script = ExtResource("1_64kao")
@@ -46,34 +23,13 @@ script = ExtResource("2_r28mm")
 [node name="UnitList" type="Node" parent="Map"]
 
 [node name="Imp" parent="Map/UnitList" instance=ExtResource("4_63g25")]
-position = Vector2(383, 327)
 Template = ExtResource("5_buf6p")
-battleStats = SubResource("Resource_grcv5")
 
 [node name="Orc" parent="Map/UnitList" instance=ExtResource("4_63g25")]
-position = Vector2(406, 303)
 Template = ExtResource("6_5s4c6")
-battleStats = SubResource("Resource_i543h")
 
-[node name="TestImp" parent="Map/UnitList" instance=ExtResource("4_63g25")]
-position = Vector2(743.9, 881.6)
-Template = ExtResource("5_buf6p")
-StartFieldId = "Field14"
-
-[node name="TestOrc" parent="Map/UnitList" instance=ExtResource("4_63g25")]
-position = Vector2(743.9, 881.6)
-Template = ExtResource("6_5s4c6")
-StartFieldId = "Field14"
-
-[node name="TestOrc2" parent="Map/UnitList" instance=ExtResource("4_63g25")]
-position = Vector2(743.9, 881.6)
-Template = ExtResource("6_5s4c6")
-StartFieldId = "Field14"
-
-[node name="TestWitch" parent="Map/UnitList" instance=ExtResource("4_63g25")]
-position = Vector2(743.9, 881.6)
+[node name="Witch" parent="Map/UnitList" instance=ExtResource("4_63g25")]
 Template = ExtResource("7_witch")
-StartFieldId = "Field14"
 
 [node name="UnitManager" type="Node" parent="Map"]
 script = ExtResource("4_lus3e")

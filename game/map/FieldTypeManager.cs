@@ -22,6 +22,7 @@ public class FieldTypeManager
 		FieldTypes["GrassCrossRoads"] = new fieldType("GrassCrossRoads", "res://images/Bioms/GrassCrossRoads.png", FieldTypeEnum.GrassCrossRoads, "ley_line");
 		FieldTypes["GrassRoad"] = new fieldType("GrassRoad", "res://images/Bioms/GrassRoad.png", FieldTypeEnum.GrassCrossRoads);
 		FieldTypes["Castle"] = new fieldType("Castle", "res://images/Bioms/Castle.png", FieldTypeEnum.Castle, "castle");
+		FieldTypes["Swamp"] = new fieldType("Swamp", "res://images/Bioms/Swamp.webp", FieldTypeEnum.Swamp, "bog");
 	}
 
 	public static fieldType GetFieldType(string typeName)
