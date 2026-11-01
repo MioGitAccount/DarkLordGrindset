@@ -96,6 +96,7 @@ public partial class unit : Node2D
 		if (Template?.MapSprite != null)
 		{
 			animatedSprite.SpriteFrames = Template.MapSprite;
+			animatedSprite.Scale *= Template.SpriteScale;
 			animatedSprite.Visible = true;
 			sprite.Visible = false;
 			animatedSprite.Play("idle");

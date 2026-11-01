@@ -10,6 +10,10 @@ public partial class field : Node2D
 	private bool isHovered = false;
 	private bool hasMarker = false;
 	private const float MarkerScale = 0.5f; // 64px biome marker drawn at 32px
+	// Player units standing here are hidden, so the field shows one dot per unit under its marker
+	private const int MaxUnitDots = 6;
+	private static readonly Color UnitDotColor = new Color(1f, 0.82f, 0.35f);
+	private static readonly Color UnitDotRim = new Color(0.1f, 0.08f, 0.06f, 0.9f);
 	private float radius = 20f; // Set a radius for detection
 	[Export] public string TypeName = "Default"; // Set in Inspector
 	public fieldType type { get; private set; }
@@ -46,6 +50,7 @@ public partial class field : Node2D
 			hasMarker = true;
 		}
 		UpdateMarker();
+		ContentsChanged += QueueRedraw;
 		resourcesHolder = GetNode<ResourcesHolder>("ResourcesHolder");
 		resourcesHolder.ApplyPerks(Perks);
 		foreach (var perk in Perks)
@@ -218,15 +223,41 @@ public partial class field : Node2D
 
 	public override void _Draw()
 	{
-		if (!isSelected && !isHovered)
-			return;
-
 		DrawSetTransform(Vector2.Zero, 0, new Vector2(1 / Scale.X, 1 / Scale.Y));
 		float r = FieldMarkers.Size / 2f * MarkerScale * Grow + 2.5f;
 		if (isSelected)
 			DrawArc(Vector2.Zero, r, 0, Mathf.Tau, 48, new Color(1f, 0.82f, 0.35f, 0.95f), 2.5f, true);
-		else
+		else if (isHovered)
 			DrawArc(Vector2.Zero, r, 0, Mathf.Tau, 48, new Color(1f, 1f, 1f, 0.6f), 1.5f, true);
+		DrawUnitDots(r);
+	}
+
+	// Dots in an arc along the bottom of the marker, centred under it; "+N" past MaxUnitDots
+	private void DrawUnitDots(float markerRadius)
+	{
+		int count = presentPlayerUnits.Count;
+		if (count == 0)
+			return;
+		int dots = Mathf.Min(count, MaxUnitDots);
+		const float dotRadius = 3.2f;
+		const float step = 0.42f; // radians between dots
+		float ring = markerRadius + 4f;
+		float first = Mathf.Pi / 2 + step * (dots - 1) / 2f; // straight down is Pi/2
+		for (int i = 0; i < dots; i++)
+		{
+			float angle = first - step * i;
+			var at = new Vector2(Mathf.Cos(angle), Mathf.Sin(angle)) * ring;
+			DrawCircle(at, dotRadius + 1.2f, UnitDotRim);
+			DrawCircle(at, dotRadius, UnitDotColor);
+		}
+		if (count > dots)
+		{
+			float last = first - step * (dots - 1) - step;
+			var at = new Vector2(Mathf.Cos(last), Mathf.Sin(last)) * ring + new Vector2(-2, 4);
+			var font = ThemeDB.FallbackFont;
+			DrawStringOutline(font, at, $"+{count - dots}", HorizontalAlignment.Left, -1, 10, 3, UnitDotRim);
+			DrawString(font, at, $"+{count - dots}", HorizontalAlignment.Left, -1, 10, UnitDotColor);
+		}
 	}
 
 	public bool IsPointInside(Vector2 point)

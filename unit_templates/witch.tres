@@ -1,4 +1,4 @@
-[gd_resource type="Resource" script_class="UnitTemplate" load_steps=10 format=3 uid="uid://nabuwucekvmd"]
+[gd_resource type="Resource" script_class="UnitTemplate" load_steps=12 format=3 uid="uid://nabuwucekvmd"]
 
 [ext_resource type="Script" path="res://game/units/BattleStats.cs" id="1_stats"]
 [ext_resource type="Script" path="res://game/units/UnitTemplate.cs" id="2_template"]
@@ -7,6 +7,8 @@
 [ext_resource type="AudioStream" uid="uid://djn8mnlxgewb" path="res://sound/unitSound/click2.ogg" id="5_sound"]
 [ext_resource type="Script" path="res://game/units/SpecialAttributes.cs" id="6_attrs"]
 [ext_resource type="Resource" uid="uid://b103d78iqvnhe" path="res://resources/skill_trees/witch_skill_tree.tres" id="7_skills"]
+[ext_resource type="Texture2D" uid="uid://b2u6m7g4i83nq" path="res://images/Units/sprites/witch_attack_battle.png" id="8_attack"]
+[ext_resource type="Texture2D" uid="uid://c7y4fktaiw34i" path="res://images/Units/witchIcon.png" id="9_icon"]
 
 [sub_resource type="Resource" id="Resource_attrs"]
 script = ExtResource("6_attrs")
@@ -32,9 +34,11 @@ script = ExtResource("2_template")
 Name = "Witch"
 Level = 1
 Biome = 0
-Icon = ExtResource("3_battle")
+Icon = ExtResource("9_icon")
 MapSprite = ExtResource("4_frames")
 BattleSprite = ExtResource("3_battle")
+BattleAttackSprite = ExtResource("8_attack")
+SpriteScale = 1.0
 BattleAttackLean = true
 AttackProjectileColor = Color(0.45, 1, 0.35, 1)
 SelectSound = ExtResource("5_sound")

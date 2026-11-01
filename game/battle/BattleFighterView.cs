@@ -54,21 +54,22 @@ public partial class BattleFighterView : Control
 
 	public BattleFighterView() { }
 
-	public Vector2 Chest => Position + Feet + new Vector2(0, _rig != null ? -60 : -45);
+	public Vector2 Chest => Position + Feet + new Vector2(0, _rig != null ? -60 * Combatant.SpriteScale : -45);
 
 	public override void _Ready()
 	{
 		Size = ViewSize;
 		CustomMinimumSize = ViewSize;
 		PivotOffset = Feet;
-		MouseFilter = MouseFilterEnum.Stop;
+		// Views overlap when the rows are close, so the screen picks the clicked unit (see HitDistance)
+		MouseFilter = MouseFilterEnum.Ignore;
 		// The body is a plain Control so flashing/fading never tints the bars
 		_body = new Control { MouseFilter = MouseFilterEnum.Ignore, Size = ViewSize };
 		AddChild(_body);
 		if (Combatant.BattleSprite != null)
 		{
 			// The attack pose shares this scale, so it may be a different size
-			float scale = PaintedHeight / Combatant.BattleSprite.GetHeight();
+			float scale = PaintedHeight * Combatant.SpriteScale / Combatant.BattleSprite.GetHeight();
 			_rig = new Node2D { Position = Feet };
 			_painted = new Sprite2D
 			{
@@ -115,15 +116,23 @@ public partial class BattleFighterView : Control
 		AddChild(_overlay);
 	}
 
-	public override void _GuiInput(InputEvent @event)
+	// Height of the drawn unit above its feet
+	private float BodyHeight => _rig != null ? PaintedHeight * Combatant.SpriteScale : _sprite != null ? 32 * SpriteScale * 2 : IconSize;
+
+	// How far `point` (in the parent's coordinates) is from the middle of this unit's body, or
+	// null when it misses the body and its bars. The screen gives the click to the nearest unit.
+	public float? HitDistance(Vector2 point)
 	{
-		if (@event is InputEventMouseButton { Pressed: true } mouse
-				&& (mouse.ButtonIndex == MouseButton.Left || mouse.ButtonIndex == MouseButton.Right))
-		{
-			Clicked?.Invoke(this, mouse.ButtonIndex);
-			AcceptEvent();
-		}
+		if (!Visible)
+			return null;
+		var local = point - Position;
+		float top = Mathf.Min(Feet.Y - BodyHeight, 10);
+		if (Mathf.Abs(local.X - Feet.X) > 50 || local.Y < top || local.Y > Feet.Y + 8)
+			return null;
+		return local.DistanceTo(Feet - new Vector2(0, BodyHeight / 2));
 	}
+
+	public void Click(MouseButton button) => Clicked?.Invoke(this, button);
 
 	public void SetAnimationSpeed(float speed)
 	{

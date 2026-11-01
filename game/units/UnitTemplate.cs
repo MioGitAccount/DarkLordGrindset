@@ -17,6 +17,8 @@ public partial class UnitTemplate : Resource
 	// The same cutout in its attack pose, at the same scale (tools/sprites "attack_source"); shown
 	// at the moment of the strike. Optional
 	[Export] public Texture2D BattleAttackSprite;
+	// Size of the map sprite and battle image compared with other units (1 = normal)
+	[Export(PropertyHint.Range, "0.5,2,0.05")] public float SpriteScale = 1f;
 	// Tilt the battle sprite when it attacks; off where bending looks wrong (four-legged creatures)
 	[Export] public bool BattleAttackLean = true;
 	// Colour of the bolt a ranged unit shoots with its normal attack

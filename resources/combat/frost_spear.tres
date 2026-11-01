@@ -1,0 +1,13 @@
+[gd_resource type="Resource" script_class="CombatAbility" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://game/battle/CombatAbility.cs" id="1_script"]
+
+[resource]
+script = ExtResource("1_script")
+Name = "Frost Spear"
+Description = "An icy spear thrust at an enemy it can reach: attack +1, and unless the hit is blocked or dodged the target is frozen and skips its next turn. Ready again 3 turns later."
+Kind = 15
+ManaCost = 0
+Cooldown = 3
+Amount = 1
+Duration = 1

@@ -1,4 +1,4 @@
-[gd_resource type="Resource" script_class="SkillTree" load_steps=33 format=3 uid="uid://dqn2enw377rth"]
+[gd_resource type="Resource" script_class="SkillTree" load_steps=34 format=3 uid="uid://dqn2enw377rth"]
 
 [ext_resource type="Script" path="res://game/units/skills/SkillTree.cs" id="1_tree"]
 [ext_resource type="Script" path="res://game/units/skills/SkillDefinition.cs" id="2_skill"]
@@ -70,6 +70,24 @@ FieldHealInterval = 0
 ExperienceBonus = 0.0
 ExperienceBonusAbilities = []
 
+[sub_resource type="Resource" id="Skill_tunnelrat"]
+script = ExtResource("2_skill")
+Name = "Tunnel Rat"
+Description = "Squashed, scraped and buried alive - and still squirming."
+Tier = 1
+Column = 4
+Cost = 1
+Requires = []
+BonusDeadliness = 0
+BonusStrength = 0
+BonusDurability = 1
+BonusCleverness = 0
+BonusQuickness = 0
+BonusVision = 0.0
+FieldHealInterval = 0
+ExperienceBonus = 0.0
+ExperienceBonusAbilities = []
+
 [sub_resource type="Resource" id="Skill_int1"]
 script = ExtResource("2_skill")
 Name = "Intelligence +1"
@@ -92,7 +110,7 @@ ExperienceBonusAbilities = []
 script = ExtResource("2_skill")
 Name = "Silent Killer"
 Description = "Strikes before the victim hears a thing."
-Tier = 2
+Tier = 3
 Column = 0
 Cost = 1
 Requires = [SubResource("Skill_quick")]
@@ -132,7 +150,7 @@ Description = "Small claws, deep tunnels. Unlocks Mine: dig ore out of a field."
 Tier = 2
 Column = 4
 Cost = 1
-Requires = []
+Requires = [SubResource("Skill_tunnelrat")]
 BonusDeadliness = 0
 BonusStrength = 0
 BonusDurability = 0
@@ -189,7 +207,7 @@ Description = "Long arms, longer claws. No attack penalty from the back row (mel
 Tier = 3
 Column = 1
 Cost = 1
-Requires = []
+Requires = [SubResource("Skill_scout")]
 BonusDeadliness = 0
 BonusStrength = 0
 BonusDurability = 0
@@ -354,4 +372,4 @@ ExperienceBonusAbilities = []
 [resource]
 script = ExtResource("1_tree")
 Name = "Imp"
-Skills = [SubResource("Skill_quick"), SubResource("Skill_scout"), SubResource("Skill_raider1"), SubResource("Skill_int1"), SubResource("Skill_silent"), SubResource("Skill_contempt1"), SubResource("Skill_mining1"), SubResource("Skill_firebolt1"), SubResource("Skill_manadrain"), SubResource("Skill_longreach"), SubResource("Skill_raider2"), SubResource("Skill_greed"), SubResource("Skill_wicked"), SubResource("Skill_manasteal"), SubResource("Skill_contempt2"), SubResource("Skill_firebolt2"), SubResource("Skill_lord"), SubResource("Skill_fireball")]
+Skills = [SubResource("Skill_quick"), SubResource("Skill_scout"), SubResource("Skill_raider1"), SubResource("Skill_tunnelrat"), SubResource("Skill_int1"), SubResource("Skill_silent"), SubResource("Skill_contempt1"), SubResource("Skill_mining1"), SubResource("Skill_firebolt1"), SubResource("Skill_manadrain"), SubResource("Skill_longreach"), SubResource("Skill_raider2"), SubResource("Skill_greed"), SubResource("Skill_wicked"), SubResource("Skill_manasteal"), SubResource("Skill_contempt2"), SubResource("Skill_firebolt2"), SubResource("Skill_lord"), SubResource("Skill_fireball")]

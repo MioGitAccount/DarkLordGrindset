@@ -117,6 +117,7 @@ func _cutout(src: Image, bg: Color, pixel: bool, ground_y = null) -> Image:
 
 	var base := _downsample(work, _background_mask(work, bg, Vector2(crop.position), float(side) / work_size))
 	_remove_ground(base, int((ground_y if ground_y != null else cfg.get("ground_y", 64)) * scale))
+	_drop_hues(base)
 	_remove_islands(base, int(cfg.get("min_island", 16) * scale * scale))
 	_enhance(base, cfg.get("enhance", {}))
 	if not pixel:
@@ -310,6 +311,19 @@ func _remove_ground(img: Image, ground_y: int) -> void:
 		for x in size:
 			var c := img.get_pixel(x, y)
 			if c.a > 0 and max(c.r, c.g, c.b) - min(c.r, c.g, c.b) < chroma:
+				img.set_pixel(x, y, Color(0, 0, 0, 0))
+
+
+# Drops pixels whose hue lies in "drop_hues": [from, to, min_saturation] (0-1), e.g. background
+# colour that bled into glows and mist. Only for creatures without that colour themselves
+func _drop_hues(img: Image) -> void:
+	var band: Array = cfg.get("drop_hues", [])
+	if band.is_empty():
+		return
+	for y in size:
+		for x in size:
+			var c := img.get_pixel(x, y)
+			if c.a > 0 and c.s >= band[2] and c.h >= band[0] and c.h <= band[1]:
 				img.set_pixel(x, y, Color(0, 0, 0, 0))
 
 

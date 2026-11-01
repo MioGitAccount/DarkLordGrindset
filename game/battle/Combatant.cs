@@ -33,6 +33,8 @@ public class Combatant
 	// Attack pose of BattleSprite, swapped in for the strike; may be null
 	public Texture2D BattleAttackSprite;
 	public bool AttackLean = true;
+	// Drawn size compared with other units (UnitTemplate.SpriteScale)
+	public float SpriteScale = 1f;
 	// Bolt of a ranged unit's normal attack
 	public Color ProjectileColor = new Color(1f, 0.7f, 0.3f);
 	public BattleSide Side;
@@ -106,6 +108,7 @@ public class Combatant
 			BattleSprite = playerUnit.Template?.BattleSprite,
 			BattleAttackSprite = playerUnit.Template?.BattleAttackSprite,
 			AttackLean = playerUnit.Template?.BattleAttackLean ?? true,
+			SpriteScale = playerUnit.Template?.SpriteScale ?? 1f,
 			ProjectileColor = playerUnit.Template?.AttackProjectileColor ?? new Color(1f, 0.7f, 0.3f),
 			Side = BattleSide.Player,
 			PlayerUnit = playerUnit,
@@ -129,6 +132,7 @@ public class Combatant
 			BattleSprite = template?.BattleSprite,
 			BattleAttackSprite = template?.BattleAttackSprite,
 			AttackLean = template?.BattleAttackLean ?? true,
+			SpriteScale = template?.SpriteScale ?? 1f,
 			ProjectileColor = template?.AttackProjectileColor ?? new Color(1f, 0.7f, 0.3f),
 			Side = BattleSide.Enemy,
 			Neutral = neutral,

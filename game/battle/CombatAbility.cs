@@ -18,6 +18,7 @@ public enum CombatAbilityKind
 	Rejuvenation, // Every living ally (the caster too) heals Amount at the end of each of its next Duration turns
 	Taunt,    // For their next Duration turns, enemies that can reach the caster must aim their normal attacks at it
 	Fortify,  // Every living unit on the caster's side gets +Amount defence for its next Duration turns
+	Freeze,   // Melee hit (+Amount attack) on an enemy the unit can reach; unless blocked, the target skips its next Duration turns
 }
 
 // An action a unit takes instead of its normal attack. Player units use it when ordered to
@@ -35,10 +36,10 @@ public partial class CombatAbility : Resource
 	[Export] public int Cooldown;
 	// Attack bonus (Roar), defence bonus (Fortify), spell base power (Firebolt, Fireball; see BattleSimulation.SpellAttack),
 	// mana taken (ManaSteal), base healing (Heal, HealAll), attack taken away (Curse, CurseAll)
-	// attack added to the hit (AimedShot, WhirlingBlades), taken off each arrow (Volley),
+	// attack added to the hit (AimedShot, WhirlingBlades, Freeze), taken off each arrow (Volley),
 	// damage per rooted turn (Roots) or healing per turn (Rejuvenation)
 	[Export] public int Amount = 2;
-	// Turns the effect lasts (Roar, Fortify, Curse, CurseAll, Roots, Rejuvenation, Taunt)
+	// Turns the effect lasts (Roar, Fortify, Freeze, Curse, CurseAll, Roots, Rejuvenation, Taunt)
 	[Export] public int Duration = 2;
 	// Damage dealt (no defence) when Mana Steal hits an enemy without mana
 	[Export] public int EmptyDamage = 3;
@@ -46,10 +47,12 @@ public partial class CombatAbility : Resource
 	[Export] public CombatAbility Replaces;
 
 	// True when the ability needs an enemy picked as its target
-	public bool TargetsEnemy => Kind == CombatAbilityKind.Firebolt || Kind == CombatAbilityKind.ManaSteal || Kind == CombatAbilityKind.Curse || Kind == CombatAbilityKind.AimedShot || Kind == CombatAbilityKind.Roots;
+	public bool TargetsEnemy => Kind == CombatAbilityKind.Firebolt || Kind == CombatAbilityKind.ManaSteal || Kind == CombatAbilityKind.Curse || Kind == CombatAbilityKind.AimedShot || Kind == CombatAbilityKind.Roots || Kind == CombatAbilityKind.Freeze;
 	// True when the ability needs an ally (or the caster) picked as its target
 	public bool TargetsAlly => Kind == CombatAbilityKind.Heal;
 	public bool NeedsTarget => TargetsEnemy || TargetsAlly;
 	public bool IsCurse => Kind == CombatAbilityKind.Curse || Kind == CombatAbilityKind.CurseAll;
+	// A weapon hit that has to reach its target like a normal melee attack (guards block it)
+	public bool IsMeleeHit => Kind == CombatAbilityKind.Freeze;
 	public bool IsSpell => Kind == CombatAbilityKind.Firebolt || Kind == CombatAbilityKind.Fireball;
 }

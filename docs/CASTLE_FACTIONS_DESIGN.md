@@ -16,7 +16,7 @@ faction base L2 needs Tower II, base L3 needs Tower III.
 | Chaos | Imp Den | Imp |
 | Stronghold (orcs, goblins) | Orc Pit | Orc |
 | Dark Humans | Witch's Hut | Witch |
-| Undead | Crypt *(default name)* | Skeleton (new unit, placeholder art) |
+| Undead | Crypt *(default name)* | Skeleton |
 
 - All 4 start built at level 1. A map file can override which bases start built.
 - Max level 3. **Base level = number of building slots** in that layer (L1 = 1, L2 = 2, L3 = 3).
@@ -61,8 +61,9 @@ one open at a time per building)*, separate from the random map quests.
   The first one comes 30 s after building it; the next one 3-4 min after the last one ends.
 - Torture Chamber quests (`torture_*`, levels 1-3) are in `tools/quests/make_quests.py`.
 - Map JSON: a castle field can list `"factions": ["Chaos", ...]` to start with only those bases.
-- Skeleton (`unit_templates/skeleton.tres`) uses a placeholder icon, also as its battle image; make real
-  art with the creature-sprite skill.
+- Skeleton (`unit_templates/skeleton.tres`) has real art (map sprite, battle image with a spear-thrust
+  attack pose, icon) and a skill tree (`resources/skill_trees/skeleton_skill_tree.tres`): Wood Cutter,
+  Grave Strength, Hardened Bones / Cold Fury, Defender, Shield Block / Frost Spear, Deathless.
 
 ## Build window
 

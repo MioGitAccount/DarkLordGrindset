@@ -18,6 +18,8 @@ public class HitEvent : BattleEvent
 	public int Damage;
 	public bool Critical;
 	public bool Stunned;
+	// Frost Spear: the target skips its next turns
+	public bool Frozen;
 	public bool Killed;
 	// The target's Shield Block or Evasion stopped the whole hit
 	public bool ShieldBlocked;
@@ -155,8 +157,8 @@ public class BattleSimulation
 
 	public static int HealAmount(Combatant caster, CombatAbility ability) => ability.Amount + caster.Cleverness / 2;
 
-	// Targeted spells (Firebolt, Mana Steal) fly over the guards
-	private static bool IgnoresGuards(CombatAbility ability) => ability.TargetsEnemy;
+	// Targeted spells (Firebolt, Mana Steal) fly over the guards; melee hits (Frost Spear) don't
+	private static bool IgnoresGuards(CombatAbility ability) => ability.TargetsEnemy && !ability.IsMeleeHit;
 
 	// Who `attacker` would hit with a normal attack on its turn right now
 	public Combatant PlannedTarget(Combatant attacker)
@@ -319,6 +321,7 @@ public class BattleSimulation
 	{
 		CombatAbilityKind.Volley => OpponentsOf(actor).Count(enemy => enemy != null && enemy.IsAlive) > 1,
 		CombatAbilityKind.WhirlingBlades => ReachableTargets(actor).Count > 1,
+		CombatAbilityKind.Freeze => ReachableTargets(actor).Any(enemy => enemy.StunnedTurns == 0),
 		CombatAbilityKind.Roots => OpponentsOf(actor).Any(enemy => enemy != null && enemy.IsAlive && enemy.RootedTurns == 0),
 		CombatAbilityKind.Taunt => OpponentsOf(actor).Any(enemy => enemy != null && enemy.IsAlive && (enemy.TauntTurns == 0 || enemy.TauntedBy?.IsAlive != true)),
 		CombatAbilityKind.Rejuvenation => AlliesOf(actor).Any(ally => ally != null && ally.IsAlive && ally.Health < ally.MaxHealth
@@ -359,6 +362,7 @@ public class BattleSimulation
 				break;
 			case CombatAbilityKind.Firebolt:
 			case CombatAbilityKind.AimedShot:
+			case CombatAbilityKind.Freeze:
 				events.Add(Hit(actor, target, ability));
 				break;
 			case CombatAbilityKind.Fireball:
@@ -451,6 +455,8 @@ public class BattleSimulation
 	{
 		int attack = EffectiveAttack(attacker);
 		int defence = target.Defence + target.BuffDefence + (target.GetPassive(CombatPassiveKind.BarkSkin)?.Amount ?? 0);
+		if (!BattleFormation.IsBack(target.Slot))
+			defence += target.GetPassive(CombatPassiveKind.Defender)?.Amount ?? 0;
 		bool contempt = false;
 		if (ability != null && ability.IsSpell)
 		{
@@ -464,7 +470,7 @@ public class BattleSimulation
 		}
 		else if (ability?.Kind == CombatAbilityKind.Volley)
 			attack = Math.Max(0, attack - ability.Amount);
-		else if (ability?.Kind == CombatAbilityKind.WhirlingBlades)
+		else if (ability?.Kind == CombatAbilityKind.WhirlingBlades || ability?.Kind == CombatAbilityKind.Freeze)
 			attack += ability.Amount;
 		else if (ability == null && IsWeak(target))
 		{
@@ -507,13 +513,18 @@ public class BattleSimulation
 			hit.Stunned = true;
 			target.StunnedTurns = Math.Max(target.StunnedTurns, stun.Amount);
 		}
+		if (ability?.Kind == CombatAbilityKind.Freeze && !hit.ShieldBlocked && !hit.Dodged && !hit.Killed)
+		{
+			hit.Frozen = true;
+			target.StunnedTurns = Math.Max(target.StunnedTurns, ability.Duration);
+		}
 
 		string how = ability == null ? "hits" : ability.IsSpell ? $"casts {ability.Name} at" : $"uses {ability.Name} on";
 		string damage = hit.ShieldBlocked ? "0 (shield block)"
 			: hit.Dodged ? "0 (dodged)"
 			: hit.Critical ? $"{BattleMath.Damage(attack, hit.DefenceRoll)}, critical x{critical.Multiplier:0.#} = {hit.Damage}"
 			: hit.Damage.ToString();
-		hit.Message = $"{Label(attacker)} {how} {Label(target)}{(contempt ? " (contempt for the weak)" : "")}: {attack} attack - {hit.DefenceRoll} defence = {damage}" + (hit.Stunned ? ", stunned" : "") + (hit.Killed ? ", killed" : "");
+		hit.Message = $"{Label(attacker)} {how} {Label(target)}{(contempt ? " (contempt for the weak)" : "")}: {attack} attack - {hit.DefenceRoll} defence = {damage}" + (hit.Stunned ? ", stunned" : "") + (hit.Frozen ? ", frozen" : "") + (hit.Killed ? ", killed" : "");
 		return hit;
 	}
 

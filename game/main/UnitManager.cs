@@ -65,6 +65,7 @@ public partial class UnitManager : Node
 	public void setUnitLocation(List<unit> listOfUnits, field place){
 		foreach(unit aUnit in listOfUnits)
 		{
+			aUnit.Position = place.Position;
 			aUnit.EnterField(place, fade: false);
 		}
 

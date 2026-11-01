@@ -39,6 +39,7 @@ Icon = ExtResource("2_vajrq")
 MapSprite = ExtResource("4_frames")
 BattleSprite = ExtResource("11_battle")
 BattleAttackSprite = ExtResource("12_attack")
+SpriteScale = 1.0
 BattleAttackLean = true
 AttackProjectileColor = Color(1, 0.7, 0.3, 1)
 SelectSound = ExtResource("3_h5yr5")

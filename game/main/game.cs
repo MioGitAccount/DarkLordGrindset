@@ -27,6 +27,20 @@ public partial class game : Node2D
 		camera.LimitBottom = (int)map.Data.Height;
 		if (map.StartField != null)
 			camera.Position = map.StartField.Position;
+
+		PlayWorldMapMusic();
+	}
+
+	// World map theme (rendered by tools/music/render_score.py); the track is built to loop seamlessly
+	private void PlayWorldMapMusic()
+	{
+		var stream = GD.Load<AudioStreamOggVorbis>("res://sound/music/beyond_the_ashen_crown.ogg");
+		if (stream == null)
+			return;
+		stream.Loop = true;
+		var music = new AudioStreamPlayer { Name = "Music", Stream = stream, VolumeDb = -8f };
+		AddChild(music);
+		music.Play();
 	}
 
 	// F10 opens the World Map Editor on the map being played

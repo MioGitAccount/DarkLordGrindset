@@ -1,0 +1,129 @@
+{
+	"source": "res://tools/sprites/source/skeleton_concept.png",
+	"attack_source": "res://tools/sprites/source/skeleton_attack_concept.png",
+	"output_dir": "res://images/Units/sprites",
+	"size": 64,
+	"bg_tolerance": 0.12,
+	"palette_size": 28,
+	"outline": [
+		20,
+		24,
+		28
+	],
+	"ground_y": 64,
+	"min_island": 16,
+	"enhance": {
+		"saturation": 1.1,
+		"value_offset": 0.02,
+		"value_gain": 1.2
+	},
+	"eyes": [
+		[
+			622,
+			395
+		],
+		[
+			668,
+			392
+		]
+	],
+	"eye_colour": [
+		110,
+		235,
+		255
+	],
+	"eye_rim": [
+		30,
+		110,
+		160
+	],
+	"parts": {
+		"left_leg": [
+			23,
+			52,
+			8,
+			12
+		],
+		"right_leg": [
+			38,
+			52,
+			11,
+			12
+		]
+	},
+	"animations": [
+		{
+			"name": "idle",
+			"speed": 2.5,
+			"frames": [
+				{},
+				{
+					"body": [
+						0,
+						1
+					]
+				}
+			]
+		},
+		{
+			"name": "walk",
+			"speed": 7.0,
+			"frames": [
+				{
+					"left_leg": [
+						0,
+						-2
+					]
+				},
+				{
+					"body": [
+						0,
+						1
+					]
+				},
+				{
+					"right_leg": [
+						0,
+						-2
+					]
+				},
+				{
+					"body": [
+						0,
+						1
+					]
+				}
+			]
+		},
+		{
+			"name": "attack",
+			"speed": 8.0,
+			"loop": false,
+			"frames": [
+				{
+					"body": [
+						-1,
+						0
+					]
+				},
+				{
+					"body": [
+						2,
+						0
+					]
+				},
+				{
+					"body": [
+						1,
+						0
+					]
+				}
+			]
+		}
+	],
+	"drop_hues": [
+		0.2,
+		0.5,
+		0.25
+	]
+}

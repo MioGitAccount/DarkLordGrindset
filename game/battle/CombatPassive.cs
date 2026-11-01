@@ -11,6 +11,7 @@ public enum CombatPassiveKind
 	ShieldBlock, // Chance to block all damage of a weapon hit (normal attacks and Aimed Shot, not spells)
 	Evasion,     // Chance to dodge all damage of a weapon hit, like ShieldBlock
 	BarkSkin,    // +Amount defence against every hit
+	Defender,    // +Amount defence against every hit while standing in the front row
 }
 
 // A combat trait that works on its own (no order needed). Units get them from their
@@ -25,7 +26,7 @@ public partial class CombatPassive : Resource
 	// 0-1, for Critical, Stun, ShieldBlock and Evasion
 	[Export(PropertyHint.Range, "0,1,0.05")] public float Chance = 0.2f;
 	// Attack bonus (PackHunter, ContemptForTheWeak), turns stunned (Stun), attribute bonus (Lord)
-	// or defence bonus (BarkSkin)
+	// or defence bonus (BarkSkin, Defender)
 	[Export] public int Amount = 1;
 	// Damage multiplier (Critical)
 	[Export] public float Multiplier = 2f;

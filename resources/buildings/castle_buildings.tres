@@ -1,4 +1,4 @@
-[gd_resource type="Resource" script_class="BuildingTree" load_steps=108 format=3]
+[gd_resource type="Resource" script_class="BuildingTree" load_steps=105 format=3]
 
 [ext_resource type="Script" path="res://game/castle/BuildingTree.cs" id="tree"]
 [ext_resource type="Script" path="res://game/castle/BuildingDefinition.cs" id="building"]
@@ -187,11 +187,6 @@ script = ExtResource("cost")
 Type = 0
 Amount = 50.0
 
-[sub_resource type="Resource" id="Cost_26"]
-script = ExtResource("cost")
-Type = 2
-Amount = 10.0
-
 [sub_resource type="Resource" id="Building_orc_pit"]
 script = ExtResource("building")
 Name = "Orc Pit"
@@ -206,7 +201,7 @@ UpgradeCostLevel2 = [SubResource("Cost_20"), SubResource("Cost_21")]
 UpgradeCostLevel3 = [SubResource("Cost_22"), SubResource("Cost_23"), SubResource("Cost_24")]
 UnitCapPerLevel = 2
 RecruitsUnit = ExtResource("r4")
-RecruitCost = [SubResource("Cost_25"), SubResource("Cost_26")]
+RecruitCost = [SubResource("Cost_25")]
 UnitCapFor = ExtResource("r4")
 UnitCap = 4
 
@@ -255,11 +250,6 @@ script = ExtResource("cost")
 Type = 0
 Amount = 60.0
 
-[sub_resource type="Resource" id="Cost_37"]
-script = ExtResource("cost")
-Type = 1
-Amount = 20.0
-
 [sub_resource type="Resource" id="Building_witch_hut"]
 script = ExtResource("building")
 Name = "Witch's Hut"
@@ -274,7 +264,7 @@ UpgradeCostLevel2 = [SubResource("Cost_30"), SubResource("Cost_31"), SubResource
 UpgradeCostLevel3 = [SubResource("Cost_33"), SubResource("Cost_34"), SubResource("Cost_35")]
 UnitCapPerLevel = 1
 RecruitsUnit = ExtResource("r5")
-RecruitCost = [SubResource("Cost_36"), SubResource("Cost_37")]
+RecruitCost = [SubResource("Cost_36")]
 UnitCapFor = ExtResource("r5")
 UnitCap = 2
 
@@ -318,11 +308,6 @@ script = ExtResource("cost")
 Type = 0
 Amount = 40.0
 
-[sub_resource type="Resource" id="Cost_47"]
-script = ExtResource("cost")
-Type = 2
-Amount = 10.0
-
 [sub_resource type="Resource" id="Building_crypt"]
 script = ExtResource("building")
 Name = "Crypt"
@@ -337,7 +322,7 @@ UpgradeCostLevel2 = [SubResource("Cost_41"), SubResource("Cost_42")]
 UpgradeCostLevel3 = [SubResource("Cost_43"), SubResource("Cost_44"), SubResource("Cost_45")]
 UnitCapPerLevel = 2
 RecruitsUnit = ExtResource("r6")
-RecruitCost = [SubResource("Cost_46"), SubResource("Cost_47")]
+RecruitCost = [SubResource("Cost_46")]
 UnitCapFor = ExtResource("r6")
 UnitCap = 4
 

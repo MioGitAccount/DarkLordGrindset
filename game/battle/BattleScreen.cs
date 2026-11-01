@@ -29,6 +29,7 @@ public partial class BattleScreen : Control
 	private static readonly Color SpellColor = new Color(0.45f, 1f, 0.4f);
 	private static readonly Color FireColor = new Color(1f, 0.45f, 0.15f);
 	private static readonly Color ManaColor = new Color(0.4f, 0.65f, 1f);
+	private static readonly Color FrostColor = new Color(0.55f, 0.85f, 1f);
 	private static readonly Color HealColor = new Color(0.55f, 1f, 0.55f);
 	private static readonly Color CurseColor = new Color(0.75f, 0.45f, 1f);
 	private static readonly Color RootColor = new Color(0.6f, 0.8f, 0.3f);
@@ -520,6 +521,13 @@ public partial class BattleScreen : Control
 	{
 		if (@event is not InputEventMouseButton { Pressed: true } mouse)
 			return;
+		var hit = FighterAt(mouse.Position);
+		if (hit != null && (mouse.ButtonIndex == MouseButton.Left || mouse.ButtonIndex == MouseButton.Right))
+		{
+			hit.Click(mouse.ButtonIndex);
+			AcceptEvent();
+			return;
+		}
 		if (mouse.ButtonIndex == MouseButton.Right)
 		{
 			Select(null);
@@ -541,6 +549,18 @@ public partial class BattleScreen : Control
 		}
 		Select(null);
 	}
+
+	// The unit whose body is nearest to `point`, so overlapping units can all be clicked
+	private BattleFighterView FighterAt(Vector2 point) =>
+		_views.Values
+			.Select(view => (view, distance: view.HitDistance(point)))
+			.Where(hit => hit.distance != null)
+			.OrderBy(hit => hit.distance)
+			.Select(hit => hit.view)
+			.FirstOrDefault();
+
+	// Fighter views ignore the mouse, so their tooltips are shown from here
+	public override string _GetTooltip(Vector2 atPosition) => FighterAt(atPosition)?.TooltipText ?? "";
 
 	public override void _UnhandledInput(InputEvent @event)
 	{
@@ -987,9 +1007,9 @@ public partial class BattleScreen : Control
 		if (!_views.TryGetValue(hit.Target, out var target))
 			return;
 		_fighters.MoveChild(attacker, -1); // draw the attacker on top while it acts
-		bool melee = hit.Ability == null && !hit.Actor.Ranged;
+		bool melee = (hit.Ability == null || hit.Ability.IsMeleeHit) && !hit.Actor.Ranged;
 		Vector2 home = attacker.Position;
-		if (hit.Ability?.Kind == CombatAbilityKind.AimedShot)
+		if (hit.Ability?.Kind == CombatAbilityKind.AimedShot || hit.Ability?.IsMeleeHit == true)
 			Popup(attacker, hit.Ability.Name.ToUpper() + "!", Gold, 22);
 		if (melee)
 		{
@@ -1088,6 +1108,11 @@ public partial class BattleScreen : Control
 		}
 		if (hit.Stunned)
 			Popup(target, "Stunned!", new Color(0.75f, 0.55f, 1f), 18, 0.3f);
+		if (hit.Frozen)
+		{
+			target.Flash(FrostColor);
+			Popup(target, "Frozen!", FrostColor, 18, 0.3f);
+		}
 		if (hit.Killed)
 			target.SetDead();
 		target.Refresh();
