@@ -6,7 +6,8 @@ using System.Linq;
 // Every quest in play. Random quests appear every 75-105 seconds on explored fields that fit them
 // (at most MaxRandomQuests waiting at once, one quest per field), up to one level above the
 // player's best agent, near the castle: a quest of level L appears at most L + 5 steps away, and
-// closer fields are picked more often. Castle buildings with a QuestPool (Arena, Prison...) hand
+// closer fields are picked more often. Quests come out of shuffle bags, so one doesn't repeat until
+// the others had their turn. Castle buildings with a QuestPool (Arena, Prison...) hand
 // out their own quests, one at a time each: on the castle, or near it for quests of other biomes;
 // those quests never appear at random. Story quests come from the map file. Ticks the quests and
 // hands out rewards. Created by the map; the UI listens to the events.
@@ -134,13 +135,46 @@ public partial class QuestManager : Node
 		return steps;
 	}
 
-	// Picks a fitting (quest, field) pair at random, weighted by the quest's SpawnWeight and
-	// by how close the field is to the castle
+	// Shuffle bags, so quests don't repeat: a quest leaves its bag when it appears, and only quests
+	// still in the bag can appear. When nothing left in a bag can appear, the bag is refilled.
+	private readonly HashSet<QuestDefinition> _randomBag = new();
+	private readonly Dictionary<BuildingDefinition, HashSet<QuestDefinition>> _buildingBags = new();
+
+	// Picks a fitting (quest, field) pair from the random bag, weighted by the quest's SpawnWeight
+	// and by how close the field is to the castle
 	public Quest TrySpawnRandom()
 	{
 		if (_quests.Count(q => !q.IsStory && q.State == QuestState.Available) >= MaxRandomQuests)
 			return null;
+		var options = RandomOptions(_randomBag);
+		if (options.Count == 0)
+		{
+			_randomBag.Clear();
+			_randomBag.UnionWith(_definitions);
+			options = RandomOptions(_randomBag);
+		}
+		if (options.Count == 0)
+			return null;
+		float pick = GD.Randf() * options.Sum(o => o.Item3);
+		foreach (var (definition, place, weight) in options)
+		{
+			pick -= weight;
+			if (pick <= 0)
+			{
+				_randomBag.Remove(definition);
+				var quest = Add(definition, place, isStory: false);
+				Notify(quest, $"New quest in {place.type?.Name ?? place.Name}: {quest.Title}");
+				return quest;
+			}
+		}
+		return null;
+	}
+
+	// Every (quest from the bag, field) pair that can appear now, with its weight
+	private List<(QuestDefinition, field, float)> RandomOptions(HashSet<QuestDefinition> bag)
+	{
 		var taken = _quests.Select(q => q.Field).ToHashSet();
+		var open = _quests.Select(q => q.Definition).ToHashSet();
 		int maxLevel = MaxSpawnLevel(PlayerUnits());
 		var stepsFromHome = StepsFromHome();
 		var pooled = PooledQuests();
@@ -151,25 +185,12 @@ public partial class QuestManager : Node
 				continue;
 			// Without a castle (or off its network) the distance rule doesn't apply
 			int steps = stepsFromHome.Count == 0 ? 0 : stepsFromHome.TryGetValue(place, out int s) ? s : int.MaxValue;
-			foreach (var definition in _definitions)
-				if (definition.SpawnWeight > 0 && !pooled.Contains(definition) && definition.Level <= maxLevel && steps <= definition.Level + ExtraStepsPerLevel
-					&& definition.FitsField(place))
+			foreach (var definition in bag)
+				if (definition.SpawnWeight > 0 && !pooled.Contains(definition) && !open.Contains(definition) && definition.Level <= maxLevel
+					&& steps <= definition.Level + ExtraStepsPerLevel && definition.FitsField(place))
 					options.Add((definition, place, definition.SpawnWeight / (1 + steps * DistanceFalloff)));
 		}
-		if (options.Count == 0)
-			return null;
-		float pick = GD.Randf() * options.Sum(o => o.Item3);
-		foreach (var (definition, place, weight) in options)
-		{
-			pick -= weight;
-			if (pick <= 0)
-			{
-				var quest = Add(definition, place, isStory: false);
-				Notify(quest, $"New quest in {place.type?.Name ?? place.Name}: {quest.Title}");
-				return quest;
-			}
-		}
-		return null;
+		return options;
 	}
 
 	// Quests that only castle buildings hand out (every QuestPool of the castle, built or not)
@@ -216,7 +237,15 @@ public partial class QuestManager : Node
 	public Quest SpawnFromBuilding(BuildingDefinition building)
 	{
 		int maxLevel = MaxSpawnLevel(PlayerUnits());
-		var pool = building.QuestPool.Where(q => q != null && q.Level <= maxLevel).ToList();
+		if (!_buildingBags.TryGetValue(building, out var bag))
+			_buildingBags[building] = bag = new HashSet<QuestDefinition>();
+		var pool = bag.Where(q => q.Level <= maxLevel).ToList();
+		if (pool.Count == 0)
+		{
+			bag.Clear();
+			bag.UnionWith(building.QuestPool.Where(q => q != null));
+			pool = bag.Where(q => q.Level <= maxLevel).ToList();
+		}
 		if (pool.Count == 0)
 			return null;
 		float pick = GD.Randf() * pool.Sum(q => Math.Max(q.SpawnWeight, 0.01f));
@@ -233,6 +262,7 @@ public partial class QuestManager : Node
 		var place = definition.FitsField(Home) ? Home : PickNearHome(definition);
 		if (place == null)
 			return null;
+		bag.Remove(definition);
 		var quest = Add(definition, place, isStory: false);
 		Notify(quest, $"{building.Name}: {quest.Title}");
 		return quest;

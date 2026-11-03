@@ -19244,11 +19244,11 @@
     },
     {
       "id": "Field",
-      "type": "AutumnForest",
+      "type": "DarkForest",
       "pos": [689,1065.7],
       "neutrals": [
         {
-          "template": "elf_archer",
+          "template": "skeleton",
           "count": 1
         }
       ]
@@ -19518,15 +19518,15 @@
     },
     {
       "id": "F30",
-      "type": "AutumnForest",
+      "type": "DarkForest",
       "pos": [576,1177.3],
       "neutrals": [
         {
-          "template": "wolf",
+          "template": "skeleton",
           "count": 1
         },
         {
-          "template": "elf_blade_dancer",
+          "template": "witch",
           "count": 1
         }
       ]

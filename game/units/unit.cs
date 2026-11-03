@@ -23,6 +23,7 @@ public partial class unit : Node2D
 	[Export] public Godot.Collections.Array<Ability> Abilities = new Godot.Collections.Array<Ability>();
 
 	// Level, experience, skill points and unlocked skills
+	private int _statsLevel; // level the stats were last calculated for (level ups add health)
 	public UnitProgression Progression { get; private set; }
 	public SkillTree SkillTree => Template?.SkillTree;
 	// Bumped whenever stats, attributes, abilities or progression change, so UI knows when to refresh
@@ -82,7 +83,7 @@ public partial class unit : Node2D
 		Progression = new UnitProgression();
 		Progression.Changed += skillsChanged =>
 		{
-			if (skillsChanged)
+			if (skillsChanged || Progression.Level != _statsLevel)
 				RecalculateStats();
 			else
 				Revision++;
@@ -152,6 +153,9 @@ public partial class unit : Node2D
 		RemoveReplaced(combatAbilities, a => a.Replaces);
 
 		var stats = attributes.ApplyTo(_baseStats);
+		int levelHealth = UnitProgression.HealthPerLevel * (Progression.Level - 1);
+		stats.maxHealth += levelHealth;
+		stats.health += levelHealth;
 		if (battleStats != null)
 		{
 			if (battleStats.maxHealth > 0)
@@ -167,6 +171,7 @@ public partial class unit : Node2D
 		CombatAbilities = combatAbilities;
 		_experienceMultipliers = experienceMultipliers;
 		FieldHealInterval = fieldHealInterval;
+		_statsLevel = Progression.Level;
 		Revision++;
 	}
 

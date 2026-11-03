@@ -23,7 +23,7 @@ public partial class QuestReward : Resource
 	public int ExperienceFor(float multiplier) => Mathf.RoundToInt(Experience * ExperienceBonus * multiplier);
 
 	// Quests pay much more XP than work; every quest's Experience is multiplied by this
-	public const float ExperienceBonus = 2f;
+	public const float ExperienceBonus = 3f;
 
 	public List<string> Lines(float multiplier)
 	{

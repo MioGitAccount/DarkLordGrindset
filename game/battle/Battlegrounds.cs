@@ -8,13 +8,19 @@ public static class Battlegrounds
 {
 	private const string Folder = "res://images/battlegrounds";
 	private static readonly string[] Extensions = { "webp", "png", "jpg" };
+	// Field types that fight on another type's backdrop
+	private static readonly System.Collections.Generic.Dictionary<string, string> Borrowed = new()
+	{
+		["DarkForest"] = "Swamp",
+	};
 
 	public static Texture2D For(field battleField)
 	{
 		if (battleField == null)
 			return null;
 		var biome = battleField.type != null ? Biomes.Of(battleField.type.FieldTypeEnum) : Biome.None;
-		foreach (var name in new[] { battleField.TypeName, biome == Biome.None ? null : biome.ToString().ToLower() })
+		string typeName = battleField.TypeName != null && Borrowed.TryGetValue(battleField.TypeName, out var other) ? other : battleField.TypeName;
+		foreach (var name in new[] { typeName, biome == Biome.None ? null : biome.ToString().ToLower() })
 		{
 			if (string.IsNullOrEmpty(name))
 				continue;

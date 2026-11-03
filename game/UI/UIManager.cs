@@ -7,6 +7,8 @@ public partial class UIManager : CanvasLayer
 {
 	// Raised when the player picks a unit from the UI (e.g. from the field panel)
 	public event Action<unit> UnitSelected;
+	// Raised when the battle screen opens (true) or closes (false); game.cs switches the music
+	public event Action<bool> BattleShownChanged;
 
 	[Export] private FieldInfoPanel FieldInfo;
 	[Export] private SelectedUnitPanel SelectedUnit;
@@ -55,6 +57,7 @@ public partial class UIManager : CanvasLayer
 		// Last child, so the full-screen battle covers the rest of the HUD
 		Battle = new BattleScreen { Name = "Battle" };
 		FieldInfo.GetParent().AddChild(Battle);
+		Battle.VisibilityChanged += () => BattleShownChanged?.Invoke(Battle.Visible);
 		BattleButton.Pressed += () => { CloseWindows(); Battle.Open(_shownField); };
 		QuestView.FightRequested += quest =>
 		{

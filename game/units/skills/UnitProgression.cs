@@ -17,6 +17,7 @@ public class UnitProgression
 	public const int MaxLevel = 20;
 	public const int SkillPointsPerLevel = 1;
 	public const int StartingSkillPoints = 1; // so a new unit can pick its first skill right away
+	public const int HealthPerLevel = 2; // max health gained on every level up
 
 	// Experience needed to go from `level` to level + 1
 	public static int ExperienceToNextLevel(int level) => 100 * level;

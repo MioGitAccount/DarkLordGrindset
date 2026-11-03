@@ -37,7 +37,7 @@ public static class UIText
 		{
 			0 => $"+{value * SpecialAttributes.AttackPerDeadliness} ATK",
 			1 => $"+{value * SpecialAttributes.HealthPerStrength} HP",
-			2 => $"+{value * SpecialAttributes.DefencePerDurability} DEF",
+			2 => $"+{SpecialAttributes.DefenceFrom(value)} DEF",
 			3 => $"+{value * SpecialAttributes.ManaPerCleverness} MP",
 			_ => $"+{Mathf.RoundToInt(value * SpecialAttributes.MoveSpeedPerQuickness * 100)}% speed",
 		};

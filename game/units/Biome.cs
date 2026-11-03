@@ -9,6 +9,8 @@ public enum Biome
 	Castle,   // the player's castle (quests only, no neutrals live there)
 	City,     // big cities; no field type uses it yet (arena quests already list it)
 	Swamp,    // swamps (add new biomes at the end: they are saved by number)
+	DarkForest,   // dark, blighted forests
+	WinterForest, // snowy forests
 }
 
 public static class Biomes
@@ -21,6 +23,8 @@ public static class Biomes
 		FieldTypeEnum.GrassPlains or FieldTypeEnum.GrassRoad or FieldTypeEnum.GrassCrossRoads or FieldTypeEnum.Bridge => Biome.Plains,
 		FieldTypeEnum.Castle => Biome.Castle,
 		FieldTypeEnum.Swamp => Biome.Swamp,
+		FieldTypeEnum.DarkForest => Biome.DarkForest,
+		FieldTypeEnum.WinterForest => Biome.WinterForest,
 		_ => Biome.None,
 	};
 

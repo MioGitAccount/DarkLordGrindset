@@ -16,13 +16,13 @@ script = ExtResource("9_attrs")
 Deadliness = 3
 Strength = 2
 Durability = 1
-Cleverness = 5
-Quickness = 6
+Cleverness = 4
+Quickness = 5
 
 [sub_resource type="Resource" id="Resource_geemo"]
 script = ExtResource("1_e1v2y")
-attack = 5
-defence = 2
+attack = 2
+defence = 1
 health = 15
 maxHealth = 15
 mana = 0

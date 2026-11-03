@@ -113,7 +113,7 @@ terrain texture (one tile covers 512 world px). Run new textures through
 
 - `id`: unique, used by `connections`.
 - `type`: a field type from `game/map/FieldTypeManager.cs`: `Castle`, `SpringForest`,
-  `AutumnForest`, `Cave`, `OreMine`, `Bridge`, `GrassPlains`, `Village`, `GrassCrossRoads`, `GrassRoad`, `Swamp`.
+  `AutumnForest`, `Cave`, `OreMine`, `Bridge`, `GrassPlains`, `Village`, `GrassCrossRoads`, `GrassRoad`, `Swamp`, `DarkForest`, `WinterForest`.
   The type decides what the field produces. Put it next to a matching object (a `Castle` field by a castle, an `OreMine` field by a mine, a forest field among trees).
 - `perks` (optional): extra perks, files in `resources/field_perks/` without `.tres`.
 - `neutrals` (optional): neutral units guarding the field; `template` is a file in

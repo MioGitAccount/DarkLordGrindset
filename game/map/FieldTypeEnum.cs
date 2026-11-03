@@ -13,5 +13,7 @@ public enum FieldTypeEnum
 	GrassCrossRoads,
 	GrassRoad,
 	Castle,
-	Swamp
+	Swamp,
+	DarkForest,
+	WinterForest
 }

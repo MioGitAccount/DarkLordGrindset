@@ -1,14 +1,18 @@
-"""Render a decoded score (JSON note list) to MIDI and a looping OGG/WAV.
+"""Render game music to a seamlessly looping OGG.
 
-Usage: python render_score.py <notes.json> <out_basename>
+Usage:
+  python render_score.py <notes.json> <out_basename>   decoded PDF score -> .mid + .ogg
+  python render_score.py <song.mid> <out_basename>     MIDI file -> .ogg
 
-Note JSON entries: {staff, steps, dur, bar, onset} where steps are diatonic
+Score JSON entries: {staff, steps, dur, bar, onset} where steps are diatonic
 steps above the staff's bottom line (D minor, one flat), as produced by
-decoding the ReportLab score PDF. Instruments are synthesised with numpy
-(additive/formant/pluck models) and a convolution reverb whose tail is
+decoding the ReportLab score PDF. MIDI tracks are matched to synths by their
+track names (see MIDI_PARTS). Instruments are synthesised with numpy
+(additive/formant/pluck/drum models) and a convolution reverb whose tail is
 wrapped back to the start so the track loops seamlessly.
 """
 import json
+import math
 import struct
 import sys
 
@@ -16,8 +20,9 @@ import numpy as np
 from scipy.signal import butter, fftconvolve, lfilter
 
 SR = 44100
-BPM = 78
-BEAT = 60.0 / BPM
+
+# ---------------------------------------------------------------- score input
+SCORE_BPM = 78
 BAR_BEATS = 4
 
 LETTERS = [0, 2, 4, 5, 7, 9, 11]  # C D E F G A B
@@ -46,6 +51,29 @@ PARTS = {
     "Timpani":     ("timpani", 0.40,  0.00, 47, 9),
     "Celesta":     ("celesta", 0.14,  0.55, 8, 10),
 }
+
+# ----------------------------------------------------------------- MIDI input
+# track-name prefix -> (synth, gain, pan); velocity scales each note.
+# "strings" plays short notes staccato and long notes legato (see synth).
+MIDI_PARTS = {
+    "Trombones": ("brass",   0.30,  0.25),
+    "French horns": ("horn", 0.24, -0.15),
+    "Violas and cellos": ("strings", 0.22, 0.35),
+    "Violins": ("strings",   0.16, -0.40),
+    "Double Bass": ("strings", 0.24, 0.50),
+    "Male choir": ("choir",  0.26,  0.00),
+    "Trumpets": ("trumpet",  0.16, -0.05),
+    "War drums": ("drums",   0.55,  0.00),
+    "Timpani": ("timpani",   0.55,  0.05),
+    "Metallic": ("anvil",    0.20,  0.30),
+    "Flute": ("flute",       0.34, -0.25),
+    "Oboe": ("oboe",         0.26,  0.20),
+    "Clarinet": ("clarinet", 0.24, -0.10),
+    "Harp": ("harp",         0.30, -0.55),
+    "Celesta": ("celesta",   0.22,  0.55),
+}
+# notes shorter than this (seconds) on a "strings" track are bowed staccato
+STACCATO_BELOW = 0.35
 
 
 def midi_pitch(staff, steps):
@@ -82,6 +110,11 @@ def lowpass(x, cutoff):
     return lfilter(b, a, x)
 
 
+def highpass(x, cutoff):
+    b, a = butter(2, cutoff / (SR / 2), btype="high")
+    return lfilter(b, a, x)
+
+
 def bandpass(x, lo, hi):
     b, a = butter(2, [lo / (SR / 2), hi / (SR / 2)], btype="band")
     return lfilter(b, a, x)
@@ -90,23 +123,83 @@ def bandpass(x, lo, hi):
 RNG = np.random.default_rng(7)
 
 
+def drum(m, n):
+    """General MIDI drum note -> war-drum/metal hit."""
+    t = np.arange(n) / SR
+    if m in (35, 36):  # big taiko-style bass drum
+        f = 48 + 40 * np.exp(-t * 25)
+        ph = 2 * np.pi * np.cumsum(f) / SR
+        x = np.sin(ph) * np.exp(-t * 4.5)
+        # skin "body" an octave and a fifth up, so small speakers still hear the hit
+        x += 0.6 * np.sin(2 * ph) * np.exp(-t * 9) + 0.3 * np.sin(3 * ph) * np.exp(-t * 14)
+        x += bandpass(RNG.standard_normal(n), 120, 2500) * np.exp(-t * 35) * 0.9
+        return x * 1.2
+    if m in (41, 43, 45, 47, 48, 50):  # toms
+        base = {41: 80, 43: 95, 45: 115, 47: 135, 48: 160, 50: 185}[m]
+        f = base * (1 + 0.35 * np.exp(-t * 30))
+        x = np.sin(2 * np.pi * np.cumsum(f) / SR) * np.exp(-t * 7)
+        x += bandpass(RNG.standard_normal(n), 150, 1500) * np.exp(-t * 40) * 0.5
+        return x
+    if m in (49, 57, 52, 55):  # crash
+        x = highpass(RNG.standard_normal(n), 3000) * np.exp(-t * 1.8)
+        x += 0.3 * sum(np.sin(2 * np.pi * f * t) for f in (3150, 4870, 6630)) / 3 * np.exp(-t * 2.5)
+        return x * 0.35 * np.minimum(1, t / 0.002)
+    return anvil(m, n)
+
+
+def anvil(m, n):
+    t = np.arange(n) / SR
+    f = hz(m) if m > 60 else 900
+    x = sum(a * np.sin(2 * np.pi * f * r * t) * np.exp(-t * d)
+            for r, a, d in ((1, 1, 5), (2.76, 0.6, 7), (5.40, 0.35, 10), (8.93, 0.2, 14)))
+    x += highpass(RNG.standard_normal(n), 2000) * np.exp(-t * 60) * 0.4
+    return x * np.minimum(1, t / 0.001)
+
+
 def synth(kind, m, dur):
     f = hz(m)
-    if kind in ("strings", "choir", "horn", "flute"):
-        rel = {"strings": 0.45, "choir": 0.9, "horn": 0.35, "flute": 0.25}[kind]
+    if kind == "strings" and dur < STACCATO_BELOW:
+        kind = "strings_stacc"
+    if kind in ("strings", "strings_stacc", "choir", "horn", "flute", "brass", "trumpet",
+                "oboe", "clarinet"):
+        rel = {"strings": 0.45, "strings_stacc": 0.12, "choir": 0.9, "horn": 0.35,
+               "flute": 0.25, "brass": 0.15, "trumpet": 0.12, "oboe": 0.2,
+               "clarinet": 0.25}[kind]
         n = int((dur + rel) * SR)
         t = np.arange(n) / SR
-        if kind == "strings":
+        if kind in ("strings", "strings_stacc"):
             saw = [1 / k for k in range(1, 40)]
             x = sum(additive(f, t, saw, vib=0.004, vib_rate=5.2 + d * 30, detune=d)
                     for d in (-0.003, 0.0, 0.0035)) / 3
-            x = lowpass(x, 2200 + f * 2)
-            e = env(n, 0.18, rel, dur)
+            if kind == "strings":
+                x = lowpass(x, 2200 + f * 2)
+                e = env(n, 0.18, rel, dur)
+            else:  # short bowed attack with a little bite
+                x = lowpass(x, 3000 + f * 3)
+                e = env(n, 0.012, rel, dur) * (0.75 + 0.25 * np.exp(-t * 18))
         elif kind == "horn":
             w = [1 / k ** 1.2 for k in range(1, 16)]
             x = additive(f, t, w, vib=0.002) + 0.6 * additive(f, t, w, detune=0.002)
             x = lowpass(x, 1100 + f)
             e = env(n, 0.12, rel, dur)
+        elif kind in ("brass", "trumpet"):
+            # brassy: harmonics open up during the attack ("blat"), then settle
+            w = [1 / k ** 0.9 for k in range(1, 30)]
+            x = additive(f, t, w, vib=0.0015) + 0.5 * additive(f, t, w, detune=0.003)
+            bright = (1800 if kind == "brass" else 3500) + f * 2
+            x = lowpass(x, bright) * 0.7 + lowpass(x, bright * 2.2) * 0.3 * np.exp(-t * 6)
+            e = env(n, 0.03, rel, dur) * (0.8 + 0.3 * np.exp(-t * 10))
+        elif kind == "oboe":
+            # reedy and nasal: strong upper harmonics, pushed through a formant near 1.3 kHz
+            w = [1, 0.9, 0.8, 0.55, 0.4, 0.3, 0.2, 0.14, 0.1, 0.07]
+            src = additive(f, t, w, vib=0.005, vib_rate=5.4)
+            x = src * 0.6 + bandpass(src, 1000, 1700) * 1.2
+            e = env(n, 0.05, rel, dur)
+        elif kind == "clarinet":
+            # hollow: odd harmonics dominate in the low register
+            w = [1, 0.08, 0.5, 0.06, 0.3, 0.05, 0.18, 0.04, 0.1]
+            x = lowpass(additive(f, t, w, vib=0.003, vib_rate=4.8), 2500 + f)
+            e = env(n, 0.06, rel, dur)
         elif kind == "flute":
             x = additive(f, t, [1, 0.25, 0.12, 0.04], vib=0.006, vib_rate=5.0)
             breath = bandpass(RNG.standard_normal(n), f * 0.8, min(f * 3, 15000)) * 0.08
@@ -138,6 +231,8 @@ def synth(kind, m, dur):
              + 0.15 * np.sin(2 * np.pi * f2 * 7.1 * t) * np.exp(-t * 10))
         return x * np.minimum(1, t / 0.002)
     if kind == "timpani":
+        while f < 70:  # keep below-range notes on a playable drum
+            f *= 2
         n = int((dur + 2.0) * SR)
         t = np.arange(n) / SR
         fp = f * (1 + 0.04 * np.exp(-t * 20))
@@ -145,10 +240,14 @@ def synth(kind, m, dur):
         x = (np.sin(ph) + 0.5 * np.sin(1.5 * ph) * np.exp(-t * 3)) * np.exp(-t * 1.3)
         x += lowpass(RNG.standard_normal(n), 400) * np.exp(-t * 30) * 0.6
         return x
+    if kind == "drums":
+        return drum(m, int(2.0 * SR))
+    if kind == "anvil":
+        return anvil(m, int(1.5 * SR))
     raise ValueError(kind)
 
 
-def section_gain(beat_pos, total_beats):
+def score_gain(beat_pos):
     """Gentle arc: soft intro, fuller middle, easing out so the loop reconnects."""
     bar = beat_pos / BAR_BEATS
     pts = [(0, 0.55), (4, 0.7), (16, 0.85), (24, 1.0), (32, 0.9), (40, 0.75),
@@ -166,7 +265,7 @@ def write_midi(notes, path):
         events.append((start, 1, bytes([0x90 | ch, m, 80])))
         events.append((end, 0, bytes([0x80 | ch, m, 0])))
     head = bytearray()
-    head += b"\x00\xff\x51\x03" + int(60_000_000 / BPM).to_bytes(3, "big")
+    head += b"\x00\xff\x51\x03" + int(60_000_000 / SCORE_BPM).to_bytes(3, "big")
     head += b"\x00\xff\x58\x04\x04\x02\x18\x08"
     head += b"\x00\xff\x59\x02\xff\x01"  # D minor
     for name, (_, _, pan, prog, ch) in PARTS.items():
@@ -190,22 +289,97 @@ def write_midi(notes, path):
         fh.write(b"MTrk" + struct.pack(">I", len(track)) + track)
 
 
-def main(src, out):
+def events_from_score(src, out):
+    """-> (events [(kind, gain, pan, midi, start_s, dur_s)], loop length in seconds)"""
     notes = json.load(open(src))
     for nt in notes:
         nt["midi"] = midi_pitch(nt["staff"], nt["steps"])
     write_midi(notes, out + ".mid")
-
-    total_beats = (max(n["bar"] for n in notes) + 1) * BAR_BEATS
-    length = int(total_beats * BEAT * SR)
-    pad = 4 * SR
-    mix = np.zeros((2, length + pad))
+    beat_s = 60.0 / SCORE_BPM
+    events = []
     for nt in notes:
         kind, gain, pan, _, _ = PARTS[nt["staff"]]
         beat = nt["bar"] * BAR_BEATS + nt["onset"]
-        x = synth(kind, nt["midi"], nt["dur"] * BEAT)
-        x *= gain * section_gain(beat, total_beats)
-        s = int(beat * BEAT * SR)
+        events.append((kind, gain * score_gain(beat), pan, nt["midi"], beat * beat_s, nt["dur"] * beat_s))
+    bars = max(n["bar"] for n in notes) + 1
+    return events, bars * BAR_BEATS * beat_s
+
+
+def events_from_midi(src):
+    import mido
+    mid = mido.MidiFile(src)
+    tempo, bar_beats = 500000, BAR_BEATS
+    for msg in mid.tracks[0]:
+        if msg.type == "set_tempo":
+            tempo = msg.tempo
+        elif msg.type == "time_signature":
+            bar_beats = msg.numerator * 4 / msg.denominator
+    tick_s = tempo / 1e6 / mid.ticks_per_beat
+    bar_ticks = mid.ticks_per_beat * bar_beats
+    events, last_tick = [], 0
+    for track in mid.tracks:
+        part = next((v for k, v in MIDI_PARTS.items() if track.name.startswith(k)), None)
+        if part is None:
+            continue
+        kind, gain, pan = part
+        tick, held = 0, {}
+        for msg in track:
+            tick += msg.time
+            if msg.type == "note_on" and msg.velocity > 0:
+                held.setdefault(msg.note, []).append((tick, msg.velocity))
+            elif msg.type in ("note_on", "note_off") and held.get(msg.note):
+                start, vel = held[msg.note].pop(0)
+                events.append((kind, gain * vel / 100, pan, msg.note,
+                               start * tick_s, max(tick - start, 1) * tick_s))
+                last_tick = max(last_tick, tick)
+    # loop at the end of the last bar that has notes in it
+    return events, math.ceil(last_tick / bar_ticks - 0.05) * bar_ticks * tick_s
+
+
+def level_quiet_passages(loop, max_boost_db=12.0, keep=0.4):
+    """Lift passages far below the track's average loudness (e.g. a sparse intro) so they
+    stay audible in game, while keeping some of the dynamics (`keep` of the dB difference).
+    The loudness envelope is computed circularly, so the loop seam stays seamless."""
+    mono = (loop ** 2).mean(axis=0)
+    win = int(2.0 * SR)
+    padded = np.concatenate([mono[-win:], mono, mono[:win]])
+    kernel = np.hanning(2 * win + 1)
+    kernel /= kernel.sum()
+    rms = np.sqrt(fftconvolve(padded, kernel, mode="same")[win:-win] + 1e-12)
+    target = np.sqrt(mono.mean())
+    boost_db = np.clip(20 * np.log10(target / rms) * (1 - keep), 0, max_boost_db)
+    return loop * 10 ** (boost_db / 20)
+
+
+def limit(loop, target_rms_db=-12.5, ceiling=0.89):
+    """Brings the track to a normal music loudness. Drum and brass peaks would otherwise cap
+    the level, so a smooth look-ahead limiter turns down only the moments that would clip."""
+    from scipy.ndimage import minimum_filter1d
+    from scipy.signal import filtfilt
+    rms = np.sqrt((loop ** 2).mean())
+    x = loop * (10 ** (target_rms_db / 20) / rms)
+    peak = np.abs(x).max(axis=0)
+    gain = np.minimum(1.0, ceiling / np.maximum(peak, 1e-9))
+    gain = minimum_filter1d(gain, int(0.012 * SR), mode="wrap")
+    # one-pole smoothing run forwards and backwards: ~30 ms ramps around each peak
+    a = np.exp(-1 / (0.03 * SR))
+    gain = filtfilt([1 - a], [1, -a], gain)
+    x *= np.minimum(gain, ceiling / np.maximum(np.abs(x).max(axis=0), 1e-9))
+    return x
+
+
+def main(src, out):
+    if src.lower().endswith(".mid"):
+        events, loop_s = events_from_midi(src)
+    else:
+        events, loop_s = events_from_score(src, out)
+
+    length = int(loop_s * SR)
+    pad = 4 * SR
+    mix = np.zeros((2, length + pad))
+    for kind, gain, pan, m, start_s, dur_s in events:
+        x = synth(kind, m, dur_s) * gain
+        s = int(start_s * SR)
         x = x[: mix.shape[1] - s]
         mix[0, s:s + len(x)] += x * np.sqrt((1 - pan) / 2)
         mix[1, s:s + len(x)] += x * np.sqrt((1 + pan) / 2)
@@ -226,7 +400,8 @@ def main(src, out):
     loop = out_sig[:, :length].copy()
     tail = out_sig[:, length:]
     loop[:, : tail.shape[1]] += tail
-    loop /= np.max(np.abs(loop)) / 0.89
+    loop = level_quiet_passages(loop)
+    loop = limit(loop)
     loop = loop.T.astype(np.float32)
 
     try:
@@ -240,7 +415,7 @@ def main(src, out):
         from scipy.io import wavfile
         wavfile.write(out + ".wav", SR, (loop * 32767).astype(np.int16))
         print("ogg failed (%s); wrote %s.wav" % (e, out))
-    print("wrote", out + ".mid", "| %.1f s, %d notes" % (length / SR, len(notes)))
+    print("%.1f s, %d notes" % (length / SR, len(events)))
 
 
 if __name__ == "__main__":

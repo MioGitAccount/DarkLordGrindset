@@ -13,18 +13,18 @@
 
 [sub_resource type="Resource" id="Resource_attrs"]
 script = ExtResource("9_attrs")
-Deadliness = 4
-Strength = 6
-Durability = 4
+Deadliness = 3
+Strength = 5
+Durability = 3
 Cleverness = 1
 Quickness = 3
 
 [sub_resource type="Resource" id="Resource_mlt17"]
 script = ExtResource("1_4tidt")
-attack = 4
-defence = 3
-health = 20
-maxHealth = 20
+attack = 2
+defence = 1
+health = 15
+maxHealth = 15
 mana = 0
 maxMana = 0
 initiative = 0

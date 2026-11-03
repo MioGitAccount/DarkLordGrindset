@@ -184,7 +184,7 @@ QUESTS = {
                 roll("Skin the pelts", "Heavy, messy work.", {"STR": 1}, 3, 20, "InjureContinue")],
         reward=dict(res={"gold": 30, "wood": 15}, xp=30)),
     "ambush_the_caravan": dict(
-        title="Ambush the Caravan", level=3, biomes=["Plains"], deadline=300, weight=1, minagents=2, maxagents=3,
+        title="Ambush the Merchant Caravan", level=3, biomes=["Plains"], deadline=300, weight=1, minagents=2, maxagents=3,
         story="A merchant caravan with a militia escort will pass here soon, heavy with coin and ore.",
         stages=[roll("Lie in wait", "Hide by the road and keep still.", {"QUI": 0.5, "CLE": 0.5}, 4, 30, "EndQuest"),
                 battle("Ambush!", "The escort draws their weapons.", ["villager_militia", "villager_militia", "villager_archer"]),
@@ -221,6 +221,113 @@ QUESTS = {
                 battle("The Elder wakes", "The grove rises against you.", ["treant", "druid", "elf_blade_dancer", "elf_archer"]),
                 roll("Burn the heartwood", "Make sure it never grows back.", {"DEA": 0.5, "STR": 0.5}, 5, 25, "InjureContinue", dmg=4)],
         reward=dict(res={"gold": 50, "mana": 40}, xp=50, removeperks=["old_growth"])),
+    # --- Thefts and killings in town -------------------------------------------------------------
+    "steal_from_the_mage": dict(
+        title="Steal from the Mage", level=3, biomes=["Village", "City"], deadline=360, weight=0.8, minattr={"CLE": 4},
+        story="A travelling mage keeps his grimoire behind locks no thief can see. Only a sharp mind gets past them.",
+        stages=[roll("Study his habits", "When does he sleep? What does he fear?", {"CLE": 1}, 5, 30, "Retry", 20),
+                roll("Unpick the wards", "One wrong thought and the runes burn.", {"CLE": 1}, 6, 30, "EndQuest", dmg=4),
+                roll("Take the grimoire", "Out before the wards wake again.", {"CLE": 0.5, "QUI": 0.5}, 4, 20, "InjureContinue", dmg=4)],
+        reward=dict(res={"mana": 40, "crystal": 20}, xp=30)),
+    "steal_the_blacksmiths_sword": dict(
+        title="Steal the Blacksmith's Sword", level=2, biomes=["Village"], deadline=240, weight=0.9,
+        story="The blacksmith has just finished a sword for the baron's captain. It would be a shame if the captain never got it.",
+        stages=[roll("Distract the smith", "Haggle over horseshoes until he looks away.", {"CLE": 0.7, "STR": 0.3}, 4, 25, "Retry", 15),
+                roll("Take the sword", "Still hot from the forge.", {"QUI": 0.7, "STR": 0.3}, 4, 20, "EndQuest", dmg=3)],
+        reward=dict(res={"gold": 30, "ore": 30}, xp=25)),
+    "assassinate_the_priest": dict(
+        title="Assassinate the Priest", level=3, biomes=["Village", "City"], deadline=360, weight=0.8, minattr={"DEA": 3},
+        story="The village priest preaches every day against the Dark Lord, and the people listen. Silence him during his own prayers.",
+        stages=[roll("Enter the temple", "Kneel among the faithful. Look pious.", {"CLE": 1}, 5, 30, "Retry", 20),
+                roll("Strike during the prayer", "Every eye is closed. Almost.", {"DEA": 0.8, "QUI": 0.2}, 5, 15, "EndQuest", dmg=4, death=0.15),
+                roll("Slip out with the crowd", "Panic is the best cover.", {"QUI": 0.5, "CLE": 0.5}, 4, 20, "InjureContinue", dmg=4)],
+        reward=dict(res={"gold": 30, "mana": 30}, xp=30)),
+    # --- Caravans (Ambush the Caravan above is the merchant one) --------------------------------
+    "rob_the_farmers_cart": dict(
+        title="Rob the Farmers' Cart", level=2, biomes=["Plains"], deadline=180, weight=0.9,
+        story="Farmers are taking their harvest and firewood to market. Their only guard is a dog.",
+        stages=[roll("Wait by the road", "Patience. The cart is slow.", {"QUI": 1}, 3, 25, "Retry", 15),
+                roll("Scare them off", "Farmers don't fight for turnips.", {"DEA": 0.5, "STR": 0.5}, 4, 20, "EndQuest", dmg=2)],
+        reward=dict(res={"gold": 20, "wood": 25}, xp=20)),
+    "ambush_the_elven_envoy": dict(
+        title="Ambush the Elven Envoy", level=3, biomes=["Forest", "Plains"], deadline=300, weight=0.8, maxagents=3,
+        story="Elven envoys are carrying gifts of crystal to the human king. Their guards are few, but deadly.",
+        stages=[roll("Find their path", "Elves leave almost no tracks.", {"CLE": 1}, 5, 30, "Retry", 20),
+                battle("Ambush!", "The blade dancer is already moving.", ["elf_blade_dancer", "elf_archer", "elf_archer"]),
+                roll("Take the gifts", "Fragile crystal, carefully packed.", {"CLE": 0.5, "QUI": 0.5}, 4, 20, "InjureContinue")],
+        reward=dict(res={"crystal": 25, "mana": 25}, xp=30)),
+    "ambush_the_dwarf_ore_train": dict(
+        title="Ambush the Dwarf Ore Train", level=4, biomes=["Mountain", "Plains"], deadline=360, weight=0.7, minagents=2, maxagents=3,
+        story="A train of dwarf wagons heavy with ore is leaving the mountain. Dwarfs guard their ore like their own children.",
+        stages=[roll("Block the pass", "Roll rocks onto the road.", {"STR": 1}, 6, 30, "EndQuest", dmg=3),
+                battle("Ambush!", "Axes out, crossbows up.", ["dwarf_axeman", "dwarf_axeman", "dwarf_crossbowman"]),
+                roll("Haul the ore", "Dwarf wagons are built heavy.", {"STR": 0.6, "DUR": 0.4}, 5, 30, "InjureContinue", dmg=3)],
+        reward=dict(res={"ore": 60, "crystal": 20}, xp=35)),
+    "ambush_the_royal_treasury": dict(
+        title="Ambush the Royal Treasury", level=5, biomes=["Plains"], deadline=480, weight=0.5, minagents=2, maxagents=4,
+        story="The king's tax collectors are bringing a year of gold to the capital, with soldiers on every side.",
+        stages=[roll("Learn the route", "Bribe a clerk, read the orders.", {"CLE": 1}, 6, 35, "Retry", 25),
+                roll("Lie in wait", "Hours in a ditch, without a sound.", {"QUI": 0.5, "DUR": 0.5}, 6, 30, "EndQuest"),
+                battle("Ambush!", "The sergeant shouts the escort into line.",
+                       ["village_sergeant", "night_watchman", "villager_militia", "villager_archer", "villager_archer"]),
+                roll("Escape with the chests", "Riders will come from the capital.", {"QUI": 0.5, "STR": 0.5}, 6, 25, "InjureContinue", dmg=5)],
+        reward=dict(res={"gold": 100}, xp=50)),
+    # --- One attribute only: every stage checks the same attribute --------------------------------
+    "haul_the_timber": dict(
+        title="Haul the Timber", level=1, biomes=["Forest"], deadline=0, weight=0.8,
+        story="Woodcutters left a pile of felled trees behind. They are yours if you can drag them.",
+        stages=[roll("Drag the logs", "Pure muscle.", {"STR": 1}, 3, 30, "Retry", 15)],
+        reward=dict(res={"wood": 30}, xp=20)),
+    "shift_the_boulder": dict(
+        title="Shift the Boulder", level=2, biomes=["Mountain"], deadline=0, weight=0.8,
+        story="A rockfall sealed an old tunnel. Behind it, the miners say, is a vein nobody worked.",
+        stages=[roll("Lever it loose", "Put your back into it.", {"STR": 1}, 4, 30, "Retry", 20),
+                roll("Roll it clear", "Don't let it roll back on you.", {"STR": 1}, 4, 25, "InjureContinue", dmg=3)],
+        reward=dict(res={"ore": 30, "crystal": 10}, xp=25)),
+    "decipher_the_old_map": dict(
+        title="Decipher the Old Map", level=1, biomes=["Castle"], deadline=0, weight=0.8,
+        story="A crumbling map was found in the castle vaults. The ink has faded, but someone clever could read it.",
+        stages=[roll("Read the faded ink", "Old words, older places.", {"CLE": 1}, 3, 30, "Retry", 15)],
+        reward=dict(res={"gold": 15, "crystal": 10}, xp=25)),
+    "forge_the_royal_seal": dict(
+        title="Forge the Royal Seal", level=2, biomes=["Village", "City"], deadline=300, weight=0.8,
+        story="With a copy of the king's seal, your orders would open any gate. You only need one real letter to copy.",
+        stages=[roll("Study a real seal", "Every curl of the crown matters.", {"CLE": 1}, 4, 30, "Retry", 15),
+                roll("Carve the copy", "A forgery is hanged if it is caught.", {"CLE": 1}, 4, 30, "EndQuest")],
+        reward=dict(res={"gold": 45}, xp=25)),
+    "cull_the_wild_boar": dict(
+        title="Cull the Wild Boar", level=1, biomes=["Forest"], deadline=180, weight=0.8,
+        story="A huge boar tears up the woods. One clean kill, and its hide and meat are yours.",
+        stages=[roll("Kill it clean", "Miss, and it gores you.", {"DEA": 1}, 3, 20, "EndQuest", dmg=3)],
+        reward=dict(res={"gold": 15, "wood": 10}, xp=25)),
+    "silence_the_witness": dict(
+        title="Silence the Witness", level=2, biomes=["Village"], deadline=240, weight=0.8,
+        story="A stable boy saw one of your agents where he shouldn't have been. He is telling everyone.",
+        stages=[roll("Corner him", "Somewhere nobody will hear.", {"DEA": 1}, 4, 25, "Retry", 15),
+                roll("Make it quiet", "Quick and final.", {"DEA": 1}, 4, 15, "EndQuest", dmg=2)],
+        reward=dict(res={"gold": 40}, xp=25)),
+    "endure_the_initiation": dict(
+        title="Endure the Initiation", level=1, biomes=["Castle"], deadline=180, weight=0.7,
+        story="The old guard of the castle will only respect an agent who takes their beating without a sound.",
+        stages=[roll("Take the punishment", "Don't fall. Don't cry out.", {"DUR": 1}, 3, 25, "EndQuest", dmg=3)],
+        reward=dict(xp=45)),
+    "survive_the_deep_shafts": dict(
+        title="Survive the Deep Shafts", level=2, biomes=["Mountain"], deadline=0, weight=0.8,
+        story="Crystals grow at the bottom of the deepest shafts, where the air itself makes miners faint.",
+        stages=[roll("Climb down", "Hours on a rope in the dark.", {"DUR": 1}, 4, 30, "Retry", 20, dmg=2),
+                roll("Breathe the bad air", "Stay long enough to dig them out.", {"DUR": 1}, 4, 30, "InjureContinue", dmg=4)],
+        reward=dict(res={"crystal": 25, "ore": 20}, xp=25)),
+    "catch_the_messenger": dict(
+        title="Catch the Messenger", level=1, biomes=["Plains"], deadline=120, weight=0.8,
+        story="A messenger is running across the fields with a letter for the baron. Catch him before he reaches the road.",
+        stages=[roll("Run him down", "He is fast. Be faster.", {"QUI": 1}, 3, 20, "EndQuest")],
+        reward=dict(res={"gold": 20}, xp=20)),
+    "steal_the_lords_horse": dict(
+        title="Steal the Lord's Horse", level=2, biomes=["Village", "Castle"], deadline=240, weight=0.8,
+        story="The local lord's warhorse is worth a small fortune - if you can get it out of the stable and away.",
+        stages=[roll("Slip into the stable", "Between the grooms' rounds.", {"QUI": 1}, 4, 25, "Retry", 15),
+                roll("Ride hard", "His riders know these roads.", {"QUI": 1}, 4, 25, "InjureContinue", dmg=3)],
+        reward=dict(res={"gold": 45}, xp=25)),
 }
 
 

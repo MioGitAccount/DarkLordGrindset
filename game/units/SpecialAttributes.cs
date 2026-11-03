@@ -11,8 +11,8 @@ public partial class SpecialAttributes : Resource
 	public const int MaxValue = 10;
 
 	public const int AttackPerDeadliness = 1;
-	public const int HealthPerStrength = 2;
-	public const int DefencePerDurability = 1;
+	public const int HealthPerStrength = 1;
+	public const int DurabilityPerDefence = 2; // +1 defence for every 2 points, rounded down
 	public const int ManaPerCleverness = 1;
 	public const float MoveSpeedPerQuickness = 0.1f; // +10% movement speed per point
 
@@ -64,6 +64,8 @@ public partial class SpecialAttributes : Resource
 		}
 	}
 
+	public static int DefenceFrom(int durability) => durability / DurabilityPerDefence;
+
 	public float MoveSpeedMultiplier => 1f + MoveSpeedPerQuickness * Quickness;
 
 	// Returns a new BattleStats: the base stats plus the attribute bonuses. The base is never modified,
@@ -74,7 +76,7 @@ public partial class SpecialAttributes : Resource
 		stats.attack += Deadliness * AttackPerDeadliness;
 		stats.health += Strength * HealthPerStrength;
 		stats.maxHealth += Strength * HealthPerStrength;
-		stats.defence += Durability * DefencePerDurability;
+		stats.defence += DefenceFrom(Durability);
 		stats.mana += Cleverness * ManaPerCleverness;
 		stats.maxMana += Cleverness * ManaPerCleverness;
 		return stats;

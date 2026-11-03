@@ -19,10 +19,10 @@ Quickness = 2
 
 [sub_resource type="Resource" id="Resource_stats"]
 script = ExtResource("2_stats")
-attack = 4
-defence = 4
-health = 24
-maxHealth = 24
+attack = 2
+defence = 1
+health = 15
+maxHealth = 15
 mana = 14
 maxMana = 14
 initiative = 0

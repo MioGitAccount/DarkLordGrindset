@@ -83,7 +83,7 @@ RemoveNeutrals = []
 
 [resource]
 script = ExtResource("def")
-Title = "Ambush the Caravan"
+Title = "Ambush the Merchant Caravan"
 Story = "A merchant caravan with a militia escort will pass here soon, heavy with coin and ore."
 Level = 3
 Biomes = [4]
