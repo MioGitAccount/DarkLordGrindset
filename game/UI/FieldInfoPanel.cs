@@ -228,6 +228,28 @@ public partial class FieldInfoPanel : PanelContainer
 			slot.Setup(neutral.GetIcon(), () => UIText.UnitTooltip(name, neutral.GetEffectiveStats(), neutral.GetAttributes()) + "\n" + UIText.Threat(neutral.Level));
 			NeutralUnitsRow.AddChild(slot);
 		}
+
+		// What they guard: the items once scouted, a "?" before
+		NeutralUnitsRow.AddChild(new VSeparator());
+		if (!_field.LootRevealed)
+			NeutralUnitsRow.AddChild(new Label
+			{
+				Text = "?",
+				TooltipText = UIText.Loot(_field, true),
+				MouseFilter = MouseFilterEnum.Pass,
+				CustomMinimumSize = new Vector2(UnitSlotSize, UnitSlotSize),
+				HorizontalAlignment = HorizontalAlignment.Center,
+				VerticalAlignment = VerticalAlignment.Center,
+			});
+		else if (_field.Loot.Count == 0)
+			NeutralUnitsRow.AddChild(new Label { Text = "no loot", ThemeTypeVariation = "MutedLabel", SizeFlagsVertical = SizeFlags.ShrinkCenter });
+		else
+			foreach (var loot in _field.Loot)
+			{
+				var view = ItemSlotView.ForInventory(new Item(loot), UnitSlotSize);
+				view.Hint = () => "Guarded loot: clear the field to take it";
+				NeutralUnitsRow.AddChild(view);
+			}
 	}
 
 	private void RefreshPlayerUnits()

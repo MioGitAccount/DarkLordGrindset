@@ -1,4 +1,5 @@
 using Godot;
+using System.Linq;
 
 // Bottom-left panel for the selected player unit: portrait, level/XP, stats and ability buttons
 public partial class SelectedUnitPanel : PanelContainer
@@ -26,6 +27,7 @@ public partial class SelectedUnitPanel : PanelContainer
 	private Label _levelLabel;
 	private ProgressBar _experienceBar;
 	private Button _skillsButton;
+	private HBoxContainer _itemsRow;
 
 	public override void _Ready()
 	{
@@ -73,6 +75,11 @@ public partial class SelectedUnitPanel : PanelContainer
 		_skillsButton.Pressed += () => SkillsRequested?.Invoke(_unit);
 		buttons.AddChild(inspectButton);
 		buttons.AddChild(_skillsButton);
+		// The agent's three item slots; items can be dropped here too
+		_itemsRow = new HBoxContainer { Name = "Items" };
+		_itemsRow.AddThemeConstantOverride("separation", 3);
+		buttons.AddChild(new Control { SizeFlagsHorizontal = SizeFlags.ExpandFill, MouseFilter = MouseFilterEnum.Ignore });
+		buttons.AddChild(_itemsRow);
 		details.AddChild(buttons);
 		ShowUnit(null);
 	}
@@ -119,13 +126,24 @@ public partial class SelectedUnitPanel : PanelContainer
 				AttributesChart.Attributes = _unit.Attributes;
 			RefreshAbilities();
 			RefreshProgress();
+			AgentItemsRow.Build(_itemsRow, _unit, 30);
 		}
 		if (_unit.isMoving)
-			LocationLabel.Text = "Moving...";
+			LocationLabel.Text = $"Moving to {_unit.RemainingPath.Last().type?.Name ?? "a field"}...";
 		else if (_unit.OnQuest)
 			LocationLabel.Text = $"{_unit.currentField?.type?.Name}: on {_unit.ActiveQuest.Title}";
 		else
 			LocationLabel.Text = _unit.currentField?.type?.Name ?? "";
+	}
+
+	// An item dropped anywhere on the panel goes to its slot on the shown agent
+	public override bool _CanDropData(Vector2 atPosition, Variant data) =>
+		IsInstanceValid(_unit) && ItemMoves.ReadDragData(data, out var item, out var from) && ItemMoves.BlockedReason(item, from, _unit) == null;
+
+	public override void _DropData(Vector2 atPosition, Variant data)
+	{
+		if (ItemMoves.ReadDragData(data, out var item, out var from))
+			ItemMoves.Move(item, from, _unit);
 	}
 
 	private void RefreshProgress()

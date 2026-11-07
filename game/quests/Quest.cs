@@ -152,7 +152,7 @@ public class Quest
 		if (won)
 		{
 			_manager.Notify(this, $"{Title}: {stage.Name} won");
-			BeginStage(StageIndex + 1);
+			StagePassed();
 		}
 		else
 			StageFailed(stage, null);
@@ -179,6 +179,17 @@ public class Quest
 		Changed?.Invoke(this);
 	}
 
+	// Every agent gets this stage's share of the quest XP, then the next stage begins
+	private void StagePassed()
+	{
+		var reward = Definition.Reward;
+		int experience = reward?.ExperiencePerStage(Definition.RewardMultiplier, Definition.Stages.Count) ?? 0;
+		if (experience > 0)
+			foreach (var agent in Agents.Where(GodotObject.IsInstanceValid).ToList())
+				agent.AddExperience(experience);
+		BeginStage(StageIndex + 1);
+	}
+
 	private void PrepareBattle(QuestStage stage)
 	{
 		Enemies.Clear();
@@ -197,7 +208,7 @@ public class Quest
 		if (agent != null && GD.Randf() < chance)
 		{
 			_manager.Notify(this, $"{Title}: {stage.Name} passed ({chance * 100:0}%)");
-			BeginStage(StageIndex + 1);
+			StagePassed();
 		}
 		else
 			StageFailed(stage, agent);

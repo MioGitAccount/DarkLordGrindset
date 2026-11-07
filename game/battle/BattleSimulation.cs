@@ -64,6 +64,12 @@ public class RootedTurnEvent : BattleEvent
 
 public class SkipEvent : BattleEvent { }
 
+// The actor moved to another slot of its side; SwappedWith (alive or fallen) took its old slot
+public class MoveEvent : BattleEvent
+{
+	public Combatant SwappedWith;
+}
+
 // Battle rules without any visuals: turn order, targeting, attacks, passives and abilities.
 // Every round, the living units act once each, highest initiative first (ties: higher Quickness,
 // then random). The battle screen asks for the next actor, runs its turn and animates the events.
@@ -261,10 +267,72 @@ public class BattleSimulation
 		}
 		else
 		{
-			ChooseAndAct(actor, events);
+			// Stunned and rooted units keep their move for when they're free
+			if (actor.QueuedMove == actor.Slot)
+				actor.QueuedMove = -1;
+			int moveTo = actor.IsPlayer ? actor.QueuedMove : AiMoveSlot(actor);
+			if (moveTo >= 0)
+				Move(actor, moveTo, events);
+			else
+				ChooseAndAct(actor, events);
 		}
 		EndTurn(actor, events);
 		return events;
+	}
+
+	// The actor's turn goes on swapping places with whoever stands in `slot` (a fallen unit's body too).
+	// Their other orders stay for the next turn, unless the new places put the targets out of reach.
+	private void Move(Combatant actor, int slot, List<BattleEvent> events)
+	{
+		actor.QueuedMove = -1;
+		var slots = AlliesOf(actor);
+		int from = actor.Slot;
+		var other = slots[slot];
+		slots[from] = other;
+		if (other != null)
+			other.Slot = from;
+		slots[slot] = actor;
+		actor.Slot = slot;
+		events.Add(new MoveEvent
+		{
+			Actor = actor,
+			SwappedWith = other,
+			Message = $"{Label(actor)} moves to the {BattleFormation.SlotName(slot)}" + (other != null && other.IsAlive ? $", swapping places with {Label(other)}" : ""),
+		});
+		DropUnreachableOrders(actor);
+		if (other != null)
+			DropUnreachableOrders(other);
+	}
+
+	// Orders the unit can't carry out from where it stands now; it falls back to the closest target
+	private void DropUnreachableOrders(Combatant combatant)
+	{
+		if (combatant.OrderedTarget != null && !ReachableTargets(combatant).Contains(combatant.OrderedTarget))
+			combatant.OrderedTarget = null;
+		var ability = combatant.QueuedAbility;
+		if (ability != null && ability.NeedsTarget && !ValidTargets(combatant, ability).Contains(combatant.QueuedAbilityTarget))
+		{
+			combatant.QueuedAbility = null;
+			combatant.QueuedAbilityTarget = null;
+		}
+	}
+
+	// Neutral AI: archers in the front row step back behind a melee unit (or into a free back slot),
+	// and melee units that lose attack in the back row step up into a free front slot or in front of
+	// an archer. -1 when the unit stays where it is.
+	private int AiMoveSlot(Combatant actor)
+	{
+		var allies = AlliesOf(actor);
+		bool Free(int slot) => allies[slot] == null || !allies[slot].IsAlive;
+		IEnumerable<int> candidates;
+		if (actor.Ranged && !BattleFormation.IsBack(actor.Slot))
+			candidates = BattleFormation.BackSlots.Where(slot => Free(slot) || !allies[slot].Ranged);
+		else if (HasBackRowPenalty(actor))
+			candidates = BattleFormation.FrontSlots.Where(slot => Free(slot) || allies[slot].Ranged);
+		else
+			return -1;
+		float lane = BattleFormation.Lane(actor.Slot);
+		return candidates.OrderBy(slot => Math.Abs(BattleFormation.Lane(slot) - lane)).DefaultIfEmpty(-1).First();
 	}
 
 	private void ChooseAndAct(Combatant actor, List<BattleEvent> events)

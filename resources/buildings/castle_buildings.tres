@@ -1,29 +1,39 @@
-[gd_resource type="Resource" script_class="BuildingTree" load_steps=105 format=3]
+[gd_resource type="Resource" script_class="BuildingTree" load_steps=114 format=3]
 
 [ext_resource type="Script" path="res://game/castle/BuildingTree.cs" id="tree"]
 [ext_resource type="Script" path="res://game/castle/BuildingDefinition.cs" id="building"]
 [ext_resource type="Script" path="res://game/castle/ResourceCost.cs" id="cost"]
-[ext_resource type="Resource" path="res://unit_templates/imp.tres" id="r3"]
-[ext_resource type="Resource" path="res://unit_templates/orc.tres" id="r4"]
-[ext_resource type="Resource" path="res://unit_templates/witch.tres" id="r5"]
-[ext_resource type="Resource" path="res://unit_templates/skeleton.tres" id="r6"]
-[ext_resource type="Resource" path="res://resources/quests/torture_loosen_a_tongue.tres" id="r7"]
-[ext_resource type="Resource" path="res://resources/quests/torture_the_silent_ranger.tres" id="r8"]
-[ext_resource type="Resource" path="res://resources/quests/torture_the_spy_in_chains.tres" id="r9"]
-[ext_resource type="Resource" path="res://resources/quests/arena_first_blood.tres" id="r10"]
-[ext_resource type="Resource" path="res://resources/quests/arena_pair_fight.tres" id="r11"]
-[ext_resource type="Resource" path="res://resources/quests/arena_the_gauntlet.tres" id="r12"]
-[ext_resource type="Resource" path="res://resources/quests/arena_twin_blades.tres" id="r13"]
-[ext_resource type="Resource" path="res://resources/quests/arena_champions_duel.tres" id="r14"]
-[ext_resource type="Resource" path="res://resources/quests/arena_grand_melee.tres" id="r15"]
-[ext_resource type="Resource" path="res://resources/quests/escaped_prisoner_find.tres" id="r16"]
-[ext_resource type="Resource" path="res://resources/quests/escaped_prisoner_kill.tres" id="r17"]
-[ext_resource type="Resource" path="res://resources/quests/escaped_prisoner_sheltered.tres" id="r18"]
+[ext_resource type="Texture2D" path="res://images/castle/tower_1.png" id="r3"]
+[ext_resource type="Texture2D" path="res://images/castle/tower_2.png" id="r4"]
+[ext_resource type="Texture2D" path="res://images/castle/tower_3.png" id="r5"]
+[ext_resource type="Texture2D" path="res://images/castle/imp_den_1.png" id="r6"]
+[ext_resource type="Texture2D" path="res://images/castle/imp_den_2.png" id="r7"]
+[ext_resource type="Texture2D" path="res://images/castle/imp_den_3.png" id="r8"]
+[ext_resource type="Resource" path="res://unit_templates/imp.tres" id="r9"]
+[ext_resource type="Texture2D" path="res://images/castle/orc_pit_1.png" id="r10"]
+[ext_resource type="Texture2D" path="res://images/castle/orc_pit_2.png" id="r11"]
+[ext_resource type="Texture2D" path="res://images/castle/orc_pit_3.png" id="r12"]
+[ext_resource type="Resource" path="res://unit_templates/orc.tres" id="r13"]
+[ext_resource type="Resource" path="res://unit_templates/witch.tres" id="r14"]
+[ext_resource type="Resource" path="res://unit_templates/skeleton.tres" id="r15"]
+[ext_resource type="Resource" path="res://resources/quests/torture_loosen_a_tongue.tres" id="r16"]
+[ext_resource type="Resource" path="res://resources/quests/torture_the_silent_ranger.tres" id="r17"]
+[ext_resource type="Resource" path="res://resources/quests/torture_the_spy_in_chains.tres" id="r18"]
+[ext_resource type="Resource" path="res://resources/quests/arena_first_blood.tres" id="r19"]
+[ext_resource type="Resource" path="res://resources/quests/arena_pair_fight.tres" id="r20"]
+[ext_resource type="Resource" path="res://resources/quests/arena_the_gauntlet.tres" id="r21"]
+[ext_resource type="Resource" path="res://resources/quests/arena_twin_blades.tres" id="r22"]
+[ext_resource type="Resource" path="res://resources/quests/arena_champions_duel.tres" id="r23"]
+[ext_resource type="Resource" path="res://resources/quests/arena_grand_melee.tres" id="r24"]
+[ext_resource type="Resource" path="res://resources/quests/escaped_prisoner_find.tres" id="r25"]
+[ext_resource type="Resource" path="res://resources/quests/escaped_prisoner_kill.tres" id="r26"]
+[ext_resource type="Resource" path="res://resources/quests/escaped_prisoner_sheltered.tres" id="r27"]
 
 [sub_resource type="Resource" id="Building_tower1"]
 script = ExtResource("building")
 Name = "Tower I"
 Description = "The dark lord's keep. Watches over the castle, brings in a little gold and lets the faction bases reach level 1."
+Icon = ExtResource("r3")
 Level = 1
 Cost = []
 Requires = []
@@ -52,6 +62,7 @@ Amount = 40.0
 script = ExtResource("building")
 Name = "Tower II"
 Description = "A taller tower of black stone. Sees further and lets the faction bases reach level 2."
+Icon = ExtResource("r4")
 Level = 2
 Cost = [SubResource("Cost_1"), SubResource("Cost_2"), SubResource("Cost_3")]
 Requires = [SubResource("Building_tower1")]
@@ -80,6 +91,7 @@ Amount = 60.0
 script = ExtResource("building")
 Name = "Tower III"
 Description = "The spire of the dark lord, seen from every corner of the land. Lets the faction bases reach level 3."
+Icon = ExtResource("r5")
 Level = 3
 Cost = [SubResource("Cost_5"), SubResource("Cost_6"), SubResource("Cost_7")]
 Requires = [SubResource("Building_tower2")]
@@ -133,6 +145,7 @@ Amount = 30.0
 script = ExtResource("building")
 Name = "Imp Den"
 Description = "A smoky burrow where imps breed, the heart of the Chaos layer. Lets you recruit imps."
+LevelIcons = [ExtResource("r6"), ExtResource("r7"), ExtResource("r8")]
 Level = 1
 Cost = [SubResource("Cost_9"), SubResource("Cost_10")]
 Requires = []
@@ -142,9 +155,9 @@ IsFactionBase = true
 UpgradeCostLevel2 = [SubResource("Cost_11"), SubResource("Cost_12")]
 UpgradeCostLevel3 = [SubResource("Cost_13"), SubResource("Cost_14"), SubResource("Cost_15")]
 UnitCapPerLevel = 2
-RecruitsUnit = ExtResource("r3")
+RecruitsUnit = ExtResource("r9")
 RecruitCost = [SubResource("Cost_16")]
-UnitCapFor = ExtResource("r3")
+UnitCapFor = ExtResource("r9")
 UnitCap = 4
 
 [sub_resource type="Resource" id="Cost_18"]
@@ -191,6 +204,7 @@ Amount = 50.0
 script = ExtResource("building")
 Name = "Orc Pit"
 Description = "A mud pit full of brawling orcs and goblins, the heart of the Stronghold layer. Lets you recruit orcs."
+LevelIcons = [ExtResource("r10"), ExtResource("r11"), ExtResource("r12")]
 Level = 1
 Cost = [SubResource("Cost_18"), SubResource("Cost_19")]
 Requires = []
@@ -200,52 +214,52 @@ IsFactionBase = true
 UpgradeCostLevel2 = [SubResource("Cost_20"), SubResource("Cost_21")]
 UpgradeCostLevel3 = [SubResource("Cost_22"), SubResource("Cost_23"), SubResource("Cost_24")]
 UnitCapPerLevel = 2
-RecruitsUnit = ExtResource("r4")
+RecruitsUnit = ExtResource("r13")
 RecruitCost = [SubResource("Cost_25")]
-UnitCapFor = ExtResource("r4")
+UnitCapFor = ExtResource("r13")
 UnitCap = 4
 
-[sub_resource type="Resource" id="Cost_28"]
+[sub_resource type="Resource" id="Cost_27"]
 script = ExtResource("cost")
 Type = 1
 Amount = 50.0
 
-[sub_resource type="Resource" id="Cost_29"]
+[sub_resource type="Resource" id="Cost_28"]
 script = ExtResource("cost")
 Type = 0
 Amount = 30.0
 
-[sub_resource type="Resource" id="Cost_30"]
+[sub_resource type="Resource" id="Cost_29"]
 script = ExtResource("cost")
 Type = 1
 Amount = 80.0
 
-[sub_resource type="Resource" id="Cost_31"]
+[sub_resource type="Resource" id="Cost_30"]
 script = ExtResource("cost")
 Type = 0
 Amount = 60.0
 
-[sub_resource type="Resource" id="Cost_32"]
+[sub_resource type="Resource" id="Cost_31"]
 script = ExtResource("cost")
 Type = 4
 Amount = 20.0
 
-[sub_resource type="Resource" id="Cost_33"]
+[sub_resource type="Resource" id="Cost_32"]
 script = ExtResource("cost")
 Type = 0
 Amount = 120.0
 
-[sub_resource type="Resource" id="Cost_34"]
+[sub_resource type="Resource" id="Cost_33"]
 script = ExtResource("cost")
 Type = 3
 Amount = 40.0
 
-[sub_resource type="Resource" id="Cost_35"]
+[sub_resource type="Resource" id="Cost_34"]
 script = ExtResource("cost")
 Type = 4
 Amount = 60.0
 
-[sub_resource type="Resource" id="Cost_36"]
+[sub_resource type="Resource" id="Cost_35"]
 script = ExtResource("cost")
 Type = 0
 Amount = 60.0
@@ -255,55 +269,55 @@ script = ExtResource("building")
 Name = "Witch's Hut"
 Description = "A crooked hut at the edge of the woods, the heart of the Dark Humans layer. Lets you recruit witches."
 Level = 1
-Cost = [SubResource("Cost_28"), SubResource("Cost_29")]
+Cost = [SubResource("Cost_27"), SubResource("Cost_28")]
 Requires = []
 BuiltAtStart = true
 Faction = 3
 IsFactionBase = true
-UpgradeCostLevel2 = [SubResource("Cost_30"), SubResource("Cost_31"), SubResource("Cost_32")]
-UpgradeCostLevel3 = [SubResource("Cost_33"), SubResource("Cost_34"), SubResource("Cost_35")]
+UpgradeCostLevel2 = [SubResource("Cost_29"), SubResource("Cost_30"), SubResource("Cost_31")]
+UpgradeCostLevel3 = [SubResource("Cost_32"), SubResource("Cost_33"), SubResource("Cost_34")]
 UnitCapPerLevel = 1
-RecruitsUnit = ExtResource("r5")
-RecruitCost = [SubResource("Cost_36")]
-UnitCapFor = ExtResource("r5")
+RecruitsUnit = ExtResource("r14")
+RecruitCost = [SubResource("Cost_35")]
+UnitCapFor = ExtResource("r14")
 UnitCap = 2
 
-[sub_resource type="Resource" id="Cost_39"]
+[sub_resource type="Resource" id="Cost_37"]
 script = ExtResource("cost")
 Type = 2
 Amount = 40.0
 
-[sub_resource type="Resource" id="Cost_40"]
+[sub_resource type="Resource" id="Cost_38"]
 script = ExtResource("cost")
 Type = 0
 Amount = 30.0
 
-[sub_resource type="Resource" id="Cost_41"]
+[sub_resource type="Resource" id="Cost_39"]
 script = ExtResource("cost")
 Type = 2
 Amount = 80.0
 
-[sub_resource type="Resource" id="Cost_42"]
+[sub_resource type="Resource" id="Cost_40"]
 script = ExtResource("cost")
 Type = 0
 Amount = 60.0
 
-[sub_resource type="Resource" id="Cost_43"]
+[sub_resource type="Resource" id="Cost_41"]
 script = ExtResource("cost")
 Type = 0
 Amount = 120.0
 
-[sub_resource type="Resource" id="Cost_44"]
+[sub_resource type="Resource" id="Cost_42"]
 script = ExtResource("cost")
 Type = 2
 Amount = 80.0
 
-[sub_resource type="Resource" id="Cost_45"]
+[sub_resource type="Resource" id="Cost_43"]
 script = ExtResource("cost")
 Type = 3
 Amount = 40.0
 
-[sub_resource type="Resource" id="Cost_46"]
+[sub_resource type="Resource" id="Cost_44"]
 script = ExtResource("cost")
 Type = 0
 Amount = 40.0
@@ -313,25 +327,25 @@ script = ExtResource("building")
 Name = "Crypt"
 Description = "Cold stairs down to the restless dead, the heart of the Undead layer. Lets you raise skeletons."
 Level = 1
-Cost = [SubResource("Cost_39"), SubResource("Cost_40")]
+Cost = [SubResource("Cost_37"), SubResource("Cost_38")]
 Requires = []
 BuiltAtStart = true
 Faction = 4
 IsFactionBase = true
-UpgradeCostLevel2 = [SubResource("Cost_41"), SubResource("Cost_42")]
-UpgradeCostLevel3 = [SubResource("Cost_43"), SubResource("Cost_44"), SubResource("Cost_45")]
+UpgradeCostLevel2 = [SubResource("Cost_39"), SubResource("Cost_40")]
+UpgradeCostLevel3 = [SubResource("Cost_41"), SubResource("Cost_42"), SubResource("Cost_43")]
 UnitCapPerLevel = 2
-RecruitsUnit = ExtResource("r6")
-RecruitCost = [SubResource("Cost_46")]
-UnitCapFor = ExtResource("r6")
+RecruitsUnit = ExtResource("r15")
+RecruitCost = [SubResource("Cost_44")]
+UnitCapFor = ExtResource("r15")
 UnitCap = 4
 
-[sub_resource type="Resource" id="Cost_49"]
+[sub_resource type="Resource" id="Cost_46"]
 script = ExtResource("cost")
 Type = 1
 Amount = 60.0
 
-[sub_resource type="Resource" id="Cost_50"]
+[sub_resource type="Resource" id="Cost_47"]
 script = ExtResource("cost")
 Type = 0
 Amount = 40.0
@@ -341,23 +355,23 @@ script = ExtResource("building")
 Name = "Torture Chamber"
 Description = "Chains, irons and a prisoner who knows something. Hands out interrogation quests."
 Level = 1
-Cost = [SubResource("Cost_49"), SubResource("Cost_50")]
+Cost = [SubResource("Cost_46"), SubResource("Cost_47")]
 Requires = []
 Faction = 1
 MinBaseLevel = 1
-QuestPool = [ExtResource("r7"), ExtResource("r8"), ExtResource("r9")]
+QuestPool = [ExtResource("r16"), ExtResource("r17"), ExtResource("r18")]
 
-[sub_resource type="Resource" id="Cost_52"]
+[sub_resource type="Resource" id="Cost_49"]
 script = ExtResource("cost")
 Type = 1
 Amount = 80.0
 
-[sub_resource type="Resource" id="Cost_53"]
+[sub_resource type="Resource" id="Cost_50"]
 script = ExtResource("cost")
 Type = 0
 Amount = 60.0
 
-[sub_resource type="Resource" id="Cost_54"]
+[sub_resource type="Resource" id="Cost_51"]
 script = ExtResource("cost")
 Type = 3
 Amount = 20.0
@@ -367,26 +381,26 @@ script = ExtResource("building")
 Name = "Imp Academy"
 Description = "Old imps teach young ones dirty tricks. Imps are recruited 2 levels higher."
 Level = 2
-Cost = [SubResource("Cost_52"), SubResource("Cost_53"), SubResource("Cost_54")]
+Cost = [SubResource("Cost_49"), SubResource("Cost_50"), SubResource("Cost_51")]
 Requires = []
 Faction = 1
 MinBaseLevel = 2
-BonusLevelFor = ExtResource("r3")
+BonusLevelFor = ExtResource("r9")
 BonusRecruitLevel = 2
-UnitCapFor = ExtResource("r3")
+UnitCapFor = ExtResource("r9")
 UnitCap = 1
 
-[sub_resource type="Resource" id="Cost_56"]
+[sub_resource type="Resource" id="Cost_53"]
 script = ExtResource("cost")
 Type = 0
 Amount = 100.0
 
-[sub_resource type="Resource" id="Cost_57"]
+[sub_resource type="Resource" id="Cost_54"]
 script = ExtResource("cost")
 Type = 3
 Amount = 60.0
 
-[sub_resource type="Resource" id="Cost_58"]
+[sub_resource type="Resource" id="Cost_55"]
 script = ExtResource("cost")
 Type = 4
 Amount = 80.0
@@ -396,21 +410,21 @@ script = ExtResource("building")
 Name = "Infernal Library"
 Description = "Forbidden books, read by candlelight. Imps are recruited 2 more levels higher."
 Level = 3
-Cost = [SubResource("Cost_56"), SubResource("Cost_57"), SubResource("Cost_58")]
+Cost = [SubResource("Cost_53"), SubResource("Cost_54"), SubResource("Cost_55")]
 Requires = []
 Faction = 1
 MinBaseLevel = 3
-BonusLevelFor = ExtResource("r3")
+BonusLevelFor = ExtResource("r9")
 BonusRecruitLevel = 2
-UnitCapFor = ExtResource("r3")
+UnitCapFor = ExtResource("r9")
 UnitCap = 2
 
-[sub_resource type="Resource" id="Cost_60"]
+[sub_resource type="Resource" id="Cost_57"]
 script = ExtResource("cost")
 Type = 1
 Amount = 80.0
 
-[sub_resource type="Resource" id="Cost_61"]
+[sub_resource type="Resource" id="Cost_58"]
 script = ExtResource("cost")
 Type = 2
 Amount = 40.0
@@ -420,23 +434,23 @@ script = ExtResource("building")
 Name = "Arena"
 Description = "A sand pit ringed with jeering orcs. Hands out arena fights."
 Level = 1
-Cost = [SubResource("Cost_60"), SubResource("Cost_61")]
+Cost = [SubResource("Cost_57"), SubResource("Cost_58")]
 Requires = []
 Faction = 2
 MinBaseLevel = 1
-QuestPool = [ExtResource("r10"), ExtResource("r11"), ExtResource("r12"), ExtResource("r13"), ExtResource("r14"), ExtResource("r15")]
+QuestPool = [ExtResource("r19"), ExtResource("r20"), ExtResource("r21"), ExtResource("r22"), ExtResource("r23"), ExtResource("r24")]
 
-[sub_resource type="Resource" id="Cost_63"]
+[sub_resource type="Resource" id="Cost_60"]
 script = ExtResource("cost")
 Type = 1
 Amount = 100.0
 
-[sub_resource type="Resource" id="Cost_64"]
+[sub_resource type="Resource" id="Cost_61"]
 script = ExtResource("cost")
 Type = 2
 Amount = 80.0
 
-[sub_resource type="Resource" id="Cost_65"]
+[sub_resource type="Resource" id="Cost_62"]
 script = ExtResource("cost")
 Type = 0
 Amount = 40.0
@@ -446,26 +460,26 @@ script = ExtResource("building")
 Name = "Orc War Camp"
 Description = "Drills, fights and more fights. Orcs are recruited 2 levels higher."
 Level = 2
-Cost = [SubResource("Cost_63"), SubResource("Cost_64"), SubResource("Cost_65")]
+Cost = [SubResource("Cost_60"), SubResource("Cost_61"), SubResource("Cost_62")]
 Requires = []
 Faction = 2
 MinBaseLevel = 2
-BonusLevelFor = ExtResource("r4")
+BonusLevelFor = ExtResource("r13")
 BonusRecruitLevel = 2
-UnitCapFor = ExtResource("r4")
+UnitCapFor = ExtResource("r13")
 UnitCap = 1
 
-[sub_resource type="Resource" id="Cost_67"]
+[sub_resource type="Resource" id="Cost_64"]
 script = ExtResource("cost")
 Type = 0
 Amount = 150.0
 
-[sub_resource type="Resource" id="Cost_68"]
+[sub_resource type="Resource" id="Cost_65"]
 script = ExtResource("cost")
 Type = 2
 Amount = 100.0
 
-[sub_resource type="Resource" id="Cost_69"]
+[sub_resource type="Resource" id="Cost_66"]
 script = ExtResource("cost")
 Type = 3
 Amount = 50.0
@@ -475,21 +489,21 @@ script = ExtResource("building")
 Name = "Warlord's Hall"
 Description = "Only the toughest orcs leave it alive. Orcs are recruited 2 more levels higher."
 Level = 3
-Cost = [SubResource("Cost_67"), SubResource("Cost_68"), SubResource("Cost_69")]
+Cost = [SubResource("Cost_64"), SubResource("Cost_65"), SubResource("Cost_66")]
 Requires = []
 Faction = 2
 MinBaseLevel = 3
-BonusLevelFor = ExtResource("r4")
+BonusLevelFor = ExtResource("r13")
 BonusRecruitLevel = 2
-UnitCapFor = ExtResource("r4")
+UnitCapFor = ExtResource("r13")
 UnitCap = 2
 
-[sub_resource type="Resource" id="Cost_71"]
+[sub_resource type="Resource" id="Cost_68"]
 script = ExtResource("cost")
 Type = 2
 Amount = 60.0
 
-[sub_resource type="Resource" id="Cost_72"]
+[sub_resource type="Resource" id="Cost_69"]
 script = ExtResource("cost")
 Type = 1
 Amount = 40.0
@@ -499,18 +513,18 @@ script = ExtResource("building")
 Name = "Prison"
 Description = "Damp cells under the castle. Prisoners keep trying to get out, and someone has to bring them back."
 Level = 1
-Cost = [SubResource("Cost_71"), SubResource("Cost_72")]
+Cost = [SubResource("Cost_68"), SubResource("Cost_69")]
 Requires = []
 Faction = 3
 MinBaseLevel = 1
-QuestPool = [ExtResource("r16"), ExtResource("r17"), ExtResource("r18")]
+QuestPool = [ExtResource("r25"), ExtResource("r26"), ExtResource("r27")]
 
-[sub_resource type="Resource" id="Cost_74"]
+[sub_resource type="Resource" id="Cost_71"]
 script = ExtResource("cost")
 Type = 1
 Amount = 50.0
 
-[sub_resource type="Resource" id="Cost_75"]
+[sub_resource type="Resource" id="Cost_72"]
 script = ExtResource("cost")
 Type = 4
 Amount = 20.0
@@ -520,23 +534,23 @@ script = ExtResource("building")
 Name = "Healing Hut"
 Description = "Herbs, leeches and a witch who doesn't ask questions. Units on the castle field heal over time."
 Level = 1
-Cost = [SubResource("Cost_74"), SubResource("Cost_75")]
+Cost = [SubResource("Cost_71"), SubResource("Cost_72")]
 Requires = []
 Faction = 3
 MinBaseLevel = 1
 HealInterval = 8
 
-[sub_resource type="Resource" id="Cost_77"]
+[sub_resource type="Resource" id="Cost_74"]
 script = ExtResource("cost")
 Type = 2
 Amount = 60.0
 
-[sub_resource type="Resource" id="Cost_78"]
+[sub_resource type="Resource" id="Cost_75"]
 script = ExtResource("cost")
 Type = 0
 Amount = 60.0
 
-[sub_resource type="Resource" id="Cost_79"]
+[sub_resource type="Resource" id="Cost_76"]
 script = ExtResource("cost")
 Type = 4
 Amount = 30.0
@@ -546,21 +560,21 @@ script = ExtResource("building")
 Name = "Graveyard"
 Description = "Old bones, freshly dug. Skeletons are raised 2 levels higher."
 Level = 1
-Cost = [SubResource("Cost_77"), SubResource("Cost_78"), SubResource("Cost_79")]
+Cost = [SubResource("Cost_74"), SubResource("Cost_75"), SubResource("Cost_76")]
 Requires = []
 Faction = 4
 MinBaseLevel = 1
-BonusLevelFor = ExtResource("r6")
+BonusLevelFor = ExtResource("r15")
 BonusRecruitLevel = 2
-UnitCapFor = ExtResource("r6")
+UnitCapFor = ExtResource("r15")
 UnitCap = 1
 
-[sub_resource type="Resource" id="Cost_81"]
+[sub_resource type="Resource" id="Cost_78"]
 script = ExtResource("cost")
 Type = 0
 Amount = 120.0
 
-[sub_resource type="Resource" id="Cost_82"]
+[sub_resource type="Resource" id="Cost_79"]
 script = ExtResource("cost")
 Type = 1
 Amount = 40.0
@@ -570,23 +584,23 @@ script = ExtResource("building")
 Name = "Bank"
 Description = "A vault of stolen coin, lent out at cruel rates. Brings in gold every tick."
 Level = 1
-Cost = [SubResource("Cost_81"), SubResource("Cost_82")]
+Cost = [SubResource("Cost_78"), SubResource("Cost_79")]
 Requires = []
 Faction = 0
 MinBaseLevel = 1
 GoldPerTick = 0.5
 
-[sub_resource type="Resource" id="Cost_84"]
+[sub_resource type="Resource" id="Cost_81"]
 script = ExtResource("cost")
 Type = 0
 Amount = 200.0
 
-[sub_resource type="Resource" id="Cost_85"]
+[sub_resource type="Resource" id="Cost_82"]
 script = ExtResource("cost")
 Type = 3
 Amount = 80.0
 
-[sub_resource type="Resource" id="Cost_86"]
+[sub_resource type="Resource" id="Cost_83"]
 script = ExtResource("cost")
 Type = 4
 Amount = 100.0
@@ -596,7 +610,7 @@ script = ExtResource("building")
 Name = "Dark Throne"
 Description = "Every recruit kneels before the dark lord first. All units are recruited 1 level higher."
 Level = 3
-Cost = [SubResource("Cost_84"), SubResource("Cost_85"), SubResource("Cost_86")]
+Cost = [SubResource("Cost_81"), SubResource("Cost_82"), SubResource("Cost_83")]
 Requires = []
 Faction = 0
 MinBaseLevel = 1

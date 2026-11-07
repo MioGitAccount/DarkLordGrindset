@@ -66,6 +66,9 @@ public class Combatant
 	public Combatant OrderedTarget;
 	public CombatAbility QueuedAbility;
 	public Combatant QueuedAbilityTarget;
+	// A move to this slot (swapping with whoever stands there) that takes the next turn; -1 for none.
+	// The other orders wait for the turn after.
+	public int QueuedMove = -1;
 
 	public bool IsAlive => Health > 0;
 	public bool IsPlayer => Side == BattleSide.Player;

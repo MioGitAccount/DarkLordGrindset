@@ -6,7 +6,7 @@ using System.Linq;
 // Every quest in play. Random quests appear every 75-105 seconds on explored fields that fit them
 // (at most MaxRandomQuests waiting at once, one quest per field), up to one level above the
 // player's best agent, near the castle: a quest of level L appears at most L + 5 steps away, and
-// closer fields are picked more often. Quests come out of shuffle bags, so one doesn't repeat until
+// closer fields are picked more often; as agents level up, quests off the castle move further out. Quests come out of shuffle bags, so one doesn't repeat until
 // the others had their turn. Castle buildings with a QuestPool (Arena, Prison...) hand
 // out their own quests, one at a time each: on the castle, or near it for quests of other biomes;
 // those quests never appear at random. Story quests come from the map file. Ticks the quests and
@@ -21,6 +21,10 @@ public partial class QuestManager : Node
 	public const int ExtraStepsPerLevel = 5;
 	// How much less likely each step away from the castle is (weight / (1 + steps * this))
 	public const float DistanceFalloff = 0.5f;
+	// As the game goes on, quests move out: every level of the best agent above 1 pushes quests that
+	// aren't on the castle itself one step further out (both the nearest and the farthest step they
+	// may appear at), up to this many steps
+	public const int MaxOutwardSteps = 4;
 
 	// Set by the map: the player's castle field; random quests appear around it
 	public field Home;
@@ -64,6 +68,24 @@ public partial class QuestManager : Node
 	public IEnumerable<Quest> QuestsOn(field place) => _quests.Where(q => q.Field == place);
 
 	// Highest level of random quest that can appear: one above the player's best agent
+	public static int OutwardSteps(IEnumerable<unit> agents) => Math.Clamp(BestAgentLevel(agents) - 1, 0, MaxOutwardSteps);
+
+	// Whether a quest of `level` may appear `steps` from the castle, pushed out by `outward`, and how
+	// likely that field is compared with the nearest allowed one (0 = not allowed). The castle itself is
+	// never pushed out.
+	public static float DistanceWeight(int level, int steps, int outward)
+	{
+		if (steps == 0)
+			return 1f;
+		int beyond = steps - outward;
+		if (beyond < 0 || steps > level + ExtraStepsPerLevel + outward)
+			return 0f;
+		return 1f / (1 + beyond * DistanceFalloff);
+	}
+
+	private static int BestAgentLevel(IEnumerable<unit> agents) =>
+		agents.Where(GodotObject.IsInstanceValid).Select(a => a.Progression.Level).DefaultIfEmpty(1).Max();
+
 	public static int MaxSpawnLevel(IEnumerable<unit> agents) =>
 		Math.Min(QuestDefinition.MaxLevel, 1 + agents.Where(GodotObject.IsInstanceValid).Select(a => a.Progression.Level).DefaultIfEmpty(0).Max());
 
@@ -176,6 +198,7 @@ public partial class QuestManager : Node
 		var taken = _quests.Select(q => q.Field).ToHashSet();
 		var open = _quests.Select(q => q.Definition).ToHashSet();
 		int maxLevel = MaxSpawnLevel(PlayerUnits());
+		int outward = OutwardSteps(PlayerUnits());
 		var stepsFromHome = StepsFromHome();
 		var pooled = PooledQuests();
 		var options = new List<(QuestDefinition, field, float)>();
@@ -187,8 +210,8 @@ public partial class QuestManager : Node
 			int steps = stepsFromHome.Count == 0 ? 0 : stepsFromHome.TryGetValue(place, out int s) ? s : int.MaxValue;
 			foreach (var definition in bag)
 				if (definition.SpawnWeight > 0 && !pooled.Contains(definition) && !open.Contains(definition) && definition.Level <= maxLevel
-					&& steps <= definition.Level + ExtraStepsPerLevel && definition.FitsField(place))
-					options.Add((definition, place, definition.SpawnWeight / (1 + steps * DistanceFalloff)));
+					&& DistanceWeight(definition.Level, steps, outward) > 0 && definition.FitsField(place))
+					options.Add((definition, place, definition.SpawnWeight * DistanceWeight(definition.Level, steps, outward)));
 		}
 		return options;
 	}
@@ -271,10 +294,11 @@ public partial class QuestManager : Node
 	private field PickNearHome(QuestDefinition definition)
 	{
 		var taken = _quests.Select(q => q.Field).ToHashSet();
+		int outward = OutwardSteps(PlayerUnits());
 		var options = StepsFromHome()
 			.Where(p => GodotObject.IsInstanceValid(p.Key) && p.Key.Fog != FogState.Unexplored && !taken.Contains(p.Key)
-				&& p.Value <= definition.Level + ExtraStepsPerLevel && definition.FitsField(p.Key))
-			.Select(p => (place: p.Key, weight: 1f / (1 + p.Value * DistanceFalloff)))
+				&& DistanceWeight(definition.Level, p.Value, outward) > 0 && definition.FitsField(p.Key))
+			.Select(p => (place: p.Key, weight: DistanceWeight(definition.Level, p.Value, outward)))
 			.ToList();
 		if (options.Count == 0)
 			return null;
@@ -298,9 +322,7 @@ public partial class QuestManager : Node
 		foreach (var cost in reward.Resources)
 			if (cost != null)
 				PlayerResources.Add(cost.Type, reward.ResourceAmount(cost, multiplier));
-		if (reward.Experience > 0)
-			foreach (var agent in agents)
-				agent.AddExperience(reward.ExperienceFor(multiplier));
+		// XP was paid stage by stage (Quest.StagePassed)
 		var place = quest.Field;
 		foreach (var perk in reward.AddPerks)
 		{
@@ -317,6 +339,8 @@ public partial class QuestManager : Node
 		foreach (var template in reward.RemoveNeutrals)
 			if (template != null)
 				place.RemoveNeutralOfType(template);
+		if (reward.GivesItem)
+			PlayerInventory.Add(reward.Item ?? ItemCatalog.RandomOfTier(reward.ItemTier), $"reward for {quest.Title}");
 		if (reward.JoiningUnit != null && SpawnUnit != null)
 		{
 			SpawnUnit(reward.JoiningUnit, place, reward.JoiningUnitLevel);

@@ -120,6 +120,9 @@ terrain texture (one tile covers 512 world px). Run new textures through
   `unit_templates/neutral_unit_templates/` or `unit_templates/` without `.tres`.
 - `quests` (optional): story quests waiting on the field from the start, with no timer; files in
   `resources/quests/` without `.tres`. Random quests appear on their own during play.
+- `loot` (optional, guarded fields): items the guards sit on, by id from `game/items/ItemCatalog.cs`
+  (e.g. `["rune_sword"]`). Leave it out to roll loot from the guards' level when the game starts;
+  `[]` means no loot. The player gets it when the last guard is gone.
 - `factions` (optional, Castle fields only): which faction bases stand at the start, at level 1,
   e.g. `["Chaos", "Stronghold"]` (also `DarkHumans`, `Undead`). Left out = all four.
 - The player's starting units begin on the **first `Castle` field** in the list.

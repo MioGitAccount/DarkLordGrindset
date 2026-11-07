@@ -72,7 +72,17 @@ public partial class UnitManager : Node
 	}
 	public bool MoveSelectedUnitTo(field targetNode)
 	{
-		if (selectedUnit == null || selectedUnit.currentField == null || selectedUnit.isMoving) return false;
+		if (selectedUnit == null) return false;
+		if (selectedUnit.isMoving)
+		{
+			// Already on the way: a new route from the field it is walking to
+			var route = PathFindingUtil.FindPath(selectedUnit.NextField, targetNode);
+			if (route == null || route.Count == 0 || route[0] != selectedUnit.NextField || route[^1] != targetNode)
+				return false;
+			selectedUnit.Redirect(route);
+			return true;
+		}
+		if (selectedUnit.currentField == null) return false;
 		if (selectedUnit.OnQuest) return false; // stuck on its field until the quest ends
 
 		List<field> path = PathFindingUtil.FindPath(selectedUnit.currentField, targetNode);

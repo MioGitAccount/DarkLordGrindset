@@ -16,6 +16,22 @@ PERKS = "res://resources/field_perks/"
 # 4 -> three hard rolls, 5 -> four stages
 STAGES_PER_LEVEL = {1: 1, 2: 2, 3: 3, 4: 3, 5: 4}
 
+# Timing rules, applied to every quest by timing() (the dur and deadline written in the table below are
+# overridden): a roll stage takes 90s, or 120s when it is the quest's only roll stage. A quest with a
+# timer gets DEADLINE_PER_LEVEL seconds to be finished (deadline=0 in the table = no timer); low
+# levels get the most spare time for how short they are.
+ROLL_SECONDS = 90
+SINGLE_ROLL_SECONDS = 120
+DEADLINE_PER_LEVEL = {1: 360, 2: 420, 3: 480, 4: 540, 5: 600}
+
+
+def timing(q):
+    rolls = [st for st in q["stages"] if st["kind"] == 0]
+    for st in rolls:
+        st["dur"] = SINGLE_ROLL_SECONDS if len(rolls) == 1 else ROLL_SECONDS
+    if q["deadline"] > 0:
+        q["deadline"] = DEADLINE_PER_LEVEL[q["level"]]
+
 
 def roll(name, desc, weights, diff, dur=30, fail="EndQuest", retry=20, dmg=0, death=0.0):
     return dict(kind=0, name=name, desc=desc, weights=weights, diff=diff, dur=dur, fail=fail,
@@ -52,7 +68,7 @@ QUESTS = {
         title="Rob a Traveller", level=1, biomes=["Plains"], deadline=120, weight=1,
         story="A lone traveller is crossing the open road with a heavy pack.",
         stages=[roll("Jump him", "Fast and frightening.", {"DEA": 0.5, "QUI": 0.5}, 3, 20, "EndQuest", dmg=2)],
-        reward=dict(res={"gold": 25}, xp=20)),
+        reward=dict(res={"gold": 25}, xp=20, itemtier=1)),
     "prospect_the_tunnels": dict(
         title="Prospect the Tunnels", level=1, biomes=["Mountain"], deadline=0, weight=1,
         story="Abandoned side tunnels may still hold ore the miners missed.",
@@ -69,7 +85,7 @@ QUESTS = {
         story="A merchant passing through town wears a ruby ring worth more than the whole market. He leaves when his business is done.",
         stages=[roll("Blend into the crowd", "Look like just another face at the market.", {"CLE": 0.7, "QUI": 0.3}, 4, 25, "Retry", 15),
                 roll("Lift the ring", "One quick touch while he haggles.", {"QUI": 1}, 4, 20, "EndQuest", dmg=3)],
-        reward=dict(res={"gold": 50}, xp=30)),
+        reward=dict(res={"gold": 50}, xp=30, item="gold_ring")),
     "the_lost_wolf_pup": dict(
         title="The Lost Wolf Pup", level=2, biomes=["Forest"], deadline=300, weight=0.7,
         story="A wolf pup whimpers somewhere in the undergrowth, lost from its pack. Raised by you, it would grow into a loyal hunter.",
@@ -101,21 +117,21 @@ QUESTS = {
         story="The pit is open to anyone who signs the roll. One fight, one on one, and the crowd pays the winner.",
         stages=[ENTRY(3),
                 battle("Round 1", "A militiaman with something to prove.", ["villager_militia"])],
-        reward=dict(res={"gold": 30}, xp=40)),
+        reward=dict(res={"gold": 30}, xp=40, itemtier=1)),
     "arena_the_gauntlet": dict(
         title="Arena: The Gauntlet", level=3, biomes=ARENA, deadline=300, weight=0.35, arena=True,
         story="Two opponents, back to back, one on one. No healing between rounds.",
         stages=[ENTRY(4),
                 battle("Round 1", "A night watchman, earning extra coin.", ["night_watchman"]),
                 battle("Round 2", "An elf blade dancer, fast and smiling.", ["elf_blade_dancer"])],
-        reward=dict(res={"gold": 35}, xp=45)),
+        reward=dict(res={"gold": 35}, xp=45, itemtier=2)),
     "arena_champions_duel": dict(
         title="Arena: Champion's Duel", level=4, biomes=ARENA, deadline=360, weight=0.3, arena=True,
         story="Three rounds, one on one, ending against the reigning champion. Win, and the whole town knows your name.",
         stages=[battle("Round 1", "A dwarf axeman far from his mine.", ["dwarf_axeman"]),
                 battle("Round 2", "A night watchman who never loses twice.", ["night_watchman"]),
                 battle("Round 3", "The champion: a sergeant who has never lost.", ["village_sergeant"])],
-        reward=dict(res={"gold": 45}, xp=50)),
+        reward=dict(res={"gold": 45}, xp=50, itemtier=3)),
     "arena_pair_fight": dict(
         title="Arena: Pair Fight", level=2, biomes=ARENA, deadline=240, weight=0.4, arena=True, minagents=2, maxagents=2,
         story="Two on two in the pit. Bring a partner you trust.",
@@ -135,7 +151,7 @@ QUESTS = {
         stages=[battle("Round 1", "A night watchman and an archer.", ["night_watchman", "villager_archer"]),
                 battle("Round 2", "A blade dancer and an elf archer.", ["elf_blade_dancer", "elf_archer"]),
                 battle("Round 3", "The champions: a sergeant and a dwarf axeman.", ["village_sergeant", "dwarf_axeman"])],
-        reward=dict(res={"gold": 45}, xp=50)),
+        reward=dict(res={"gold": 45}, xp=50, itemtier=3)),
     # --- Escaped Prisoner (levels 1-3): one of the Dark Lord's prisoners broke out of the dungeon
     "escaped_prisoner_find": dict(
         title="Escaped Prisoner", level=1, biomes=["Plains", "Forest"], deadline=180, weight=0.5,
@@ -182,7 +198,7 @@ QUESTS = {
         stages=[roll("Track them", "Follow the prints and the blood.", {"CLE": 0.5, "QUI": 0.5}, 4, 30, "Retry", 20),
                 battle("Fight the pack", "The wolves turn to face you.", ["wolf", "wolf", "wolf"]),
                 roll("Skin the pelts", "Heavy, messy work.", {"STR": 1}, 3, 20, "InjureContinue")],
-        reward=dict(res={"gold": 30, "wood": 15}, xp=30)),
+        reward=dict(res={"gold": 30, "wood": 15}, xp=30, item="fur_cloak")),
     "ambush_the_caravan": dict(
         title="Ambush the Merchant Caravan", level=3, biomes=["Plains"], deadline=300, weight=1, minagents=2, maxagents=3,
         story="A merchant caravan with a militia escort will pass here soon, heavy with coin and ore.",
@@ -203,7 +219,7 @@ QUESTS = {
         stages=[roll("Find the way", "Read the old carvings in the dark.", {"CLE": 1}, 5, 35, "Retry", 20),
                 roll("Dig it out", "Break the rock around it.", {"STR": 0.7, "DUR": 0.3}, 4, 35, "Retry", 20, dmg=3),
                 roll("Escape the collapse", "The tunnel comes down behind you.", {"DUR": 0.6, "QUI": 0.4}, 4, 15, "InjureContinue", dmg=6, death=0.1)],
-        reward=dict(res={"crystal": 20, "mana": 15}, xp=30, addperks=["ore_vein"])),
+        reward=dict(res={"crystal": 20, "mana": 15}, xp=30, addperks=["ore_vein"], itemtier=2)),
     # --- Level 4 -------------------------------------------------------------------------------
     "assassinate_the_baron": dict(
         title="Assassinate the Baron", level=4, biomes=["Village"], deadline=420, weight=0.8, minattr={"DEA": 4},
@@ -211,7 +227,7 @@ QUESTS = {
         stages=[roll("Get close", "Find a way past his retinue.", {"CLE": 0.6, "QUI": 0.4}, 6, 30, "Retry", 20, dmg=2),
                 roll("Strike", "There will be only one chance.", {"DEA": 0.7, "QUI": 0.3}, 6, 15, "EndQuest", dmg=6, death=0.25),
                 roll("Escape", "The guards are coming.", {"QUI": 1}, 6, 25, "InjureContinue", dmg=6)],
-        reward=dict(res={"gold": 60}, xp=30, removeneutrals=["village_sergeant"])),
+        reward=dict(res={"gold": 60}, xp=30, removeneutrals=["village_sergeant"], item="silver_signet")),
     # --- Level 5 -------------------------------------------------------------------------------
     "slay_the_elder_treant": dict(
         title="Slay the Elder Treant", level=5, biomes=["Forest"], deadline=0, weight=0.6, minagents=2, maxagents=4,
@@ -220,7 +236,7 @@ QUESTS = {
                 roll("Break the wards", "Old magic in the roots.", {"CLE": 0.5, "DEA": 0.5}, 6, 30, "EndQuest", dmg=4),
                 battle("The Elder wakes", "The grove rises against you.", ["treant", "druid", "elf_blade_dancer", "elf_archer"]),
                 roll("Burn the heartwood", "Make sure it never grows back.", {"DEA": 0.5, "STR": 0.5}, 5, 25, "InjureContinue", dmg=4)],
-        reward=dict(res={"gold": 50, "mana": 40}, xp=50, removeperks=["old_growth"])),
+        reward=dict(res={"gold": 50, "mana": 40}, xp=50, removeperks=["old_growth"], itemtier=3)),
     # --- Thefts and killings in town -------------------------------------------------------------
     "steal_from_the_mage": dict(
         title="Steal from the Mage", level=3, biomes=["Village", "City"], deadline=360, weight=0.8, minattr={"CLE": 4},
@@ -228,20 +244,20 @@ QUESTS = {
         stages=[roll("Study his habits", "When does he sleep? What does he fear?", {"CLE": 1}, 5, 30, "Retry", 20),
                 roll("Unpick the wards", "One wrong thought and the runes burn.", {"CLE": 1}, 6, 30, "EndQuest", dmg=4),
                 roll("Take the grimoire", "Out before the wards wake again.", {"CLE": 0.5, "QUI": 0.5}, 4, 20, "InjureContinue", dmg=4)],
-        reward=dict(res={"mana": 40, "crystal": 20}, xp=30)),
+        reward=dict(res={"mana": 40, "crystal": 20}, xp=30, item="book_of_hexes")),
     "steal_the_blacksmiths_sword": dict(
         title="Steal the Blacksmith's Sword", level=2, biomes=["Village"], deadline=240, weight=0.9,
         story="The blacksmith has just finished a sword for the baron's captain. It would be a shame if the captain never got it.",
         stages=[roll("Distract the smith", "Haggle over horseshoes until he looks away.", {"CLE": 0.7, "STR": 0.3}, 4, 25, "Retry", 15),
                 roll("Take the sword", "Still hot from the forge.", {"QUI": 0.7, "STR": 0.3}, 4, 20, "EndQuest", dmg=3)],
-        reward=dict(res={"gold": 30, "ore": 30}, xp=25)),
+        reward=dict(res={"gold": 30, "ore": 30}, xp=25, item="steel_sword")),
     "assassinate_the_priest": dict(
         title="Assassinate the Priest", level=3, biomes=["Village", "City"], deadline=360, weight=0.8, minattr={"DEA": 3},
         story="The village priest preaches every day against the Dark Lord, and the people listen. Silence him during his own prayers.",
         stages=[roll("Enter the temple", "Kneel among the faithful. Look pious.", {"CLE": 1}, 5, 30, "Retry", 20),
                 roll("Strike during the prayer", "Every eye is closed. Almost.", {"DEA": 0.8, "QUI": 0.2}, 5, 15, "EndQuest", dmg=4, death=0.15),
                 roll("Slip out with the crowd", "Panic is the best cover.", {"QUI": 0.5, "CLE": 0.5}, 4, 20, "InjureContinue", dmg=4)],
-        reward=dict(res={"gold": 30, "mana": 30}, xp=30)),
+        reward=dict(res={"gold": 30, "mana": 30}, xp=30, item="dark_robe")),
     # --- Caravans (Ambush the Caravan above is the merchant one) --------------------------------
     "rob_the_farmers_cart": dict(
         title="Rob the Farmers' Cart", level=2, biomes=["Plains"], deadline=180, weight=0.9,
@@ -255,14 +271,14 @@ QUESTS = {
         stages=[roll("Find their path", "Elves leave almost no tracks.", {"CLE": 1}, 5, 30, "Retry", 20),
                 battle("Ambush!", "The blade dancer is already moving.", ["elf_blade_dancer", "elf_archer", "elf_archer"]),
                 roll("Take the gifts", "Fragile crystal, carefully packed.", {"CLE": 0.5, "QUI": 0.5}, 4, 20, "InjureContinue")],
-        reward=dict(res={"crystal": 25, "mana": 25}, xp=30)),
+        reward=dict(res={"crystal": 25, "mana": 25}, xp=30, itemtier=2)),
     "ambush_the_dwarf_ore_train": dict(
         title="Ambush the Dwarf Ore Train", level=4, biomes=["Mountain", "Plains"], deadline=360, weight=0.7, minagents=2, maxagents=3,
         story="A train of dwarf wagons heavy with ore is leaving the mountain. Dwarfs guard their ore like their own children.",
         stages=[roll("Block the pass", "Roll rocks onto the road.", {"STR": 1}, 6, 30, "EndQuest", dmg=3),
                 battle("Ambush!", "Axes out, crossbows up.", ["dwarf_axeman", "dwarf_axeman", "dwarf_crossbowman"]),
                 roll("Haul the ore", "Dwarf wagons are built heavy.", {"STR": 0.6, "DUR": 0.4}, 5, 30, "InjureContinue", dmg=3)],
-        reward=dict(res={"ore": 60, "crystal": 20}, xp=35)),
+        reward=dict(res={"ore": 60, "crystal": 20}, xp=35, itemtier=3)),
     "ambush_the_royal_treasury": dict(
         title="Ambush the Royal Treasury", level=5, biomes=["Plains"], deadline=480, weight=0.5, minagents=2, maxagents=4,
         story="The king's tax collectors are bringing a year of gold to the capital, with soldiers on every side.",
@@ -271,7 +287,7 @@ QUESTS = {
                 battle("Ambush!", "The sergeant shouts the escort into line.",
                        ["village_sergeant", "night_watchman", "villager_militia", "villager_archer", "villager_archer"]),
                 roll("Escape with the chests", "Riders will come from the capital.", {"QUI": 0.5, "STR": 0.5}, 6, 25, "InjureContinue", dmg=5)],
-        reward=dict(res={"gold": 100}, xp=50)),
+        reward=dict(res={"gold": 100}, xp=50, itemtier=3)),
     # --- One attribute only: every stage checks the same attribute --------------------------------
     "haul_the_timber": dict(
         title="Haul the Timber", level=1, biomes=["Forest"], deadline=0, weight=0.8,
@@ -331,8 +347,16 @@ QUESTS = {
 }
 
 
+ITEMS_CS = os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "..", "game", "items", "ItemCatalog.cs")
+
+
 def check(qid, q):
     level = q["level"]
+    item = q["reward"].get("item")
+    if item:
+        with open(ITEMS_CS, encoding="utf-8") as f:
+            assert f'I("{item}",' in f.read(), f"{qid}: unknown item {item}"
+
     assert len(q["stages"]) == STAGES_PER_LEVEL[level], f"{qid}: level {level} needs {STAGES_PER_LEVEL[level]} stages"
     assert level >= 3 or q.get("arena") or all(st["kind"] == 0 for st in q["stages"]), f"{qid}: battles only from level 3"
     assert q["biomes"] and all(b in BIOMES for b in q["biomes"]), f"{qid}: unknown or missing biome"
@@ -376,6 +400,11 @@ def write(root, qid, q):
     lines = ['script = ExtResource("reward")', f"Resources = {array(costs)}", f'Experience = {r.get("xp", 0)}']
     if "unit" in r:
         lines.append(f'JoiningUnit = {ext_ref(NEUTRALS + r["unit"] + ".tres")}')
+    # An item to the inventory: a named one (id from game/items/ItemCatalog.cs) or a random one of a tier
+    if "item" in r:
+        lines.append(f'ItemId = "{r["item"]}"')
+    if "itemtier" in r:
+        lines.append(f'ItemTier = {r["itemtier"]}')
     lines += [f'AddPerks = {array(ext_ref(PERKS + p + ".tres") for p in r.get("addperks", []))}',
               f'AddPerksSeconds = {r.get("perkseconds", 0)}',
               f'RemovePerks = {array(ext_ref(PERKS + p + ".tres") for p in r.get("removeperks", []))}',
@@ -406,6 +435,7 @@ if __name__ == "__main__":
     os.makedirs(folder, exist_ok=True)
     for qid, q in QUESTS.items():
         check(qid, q)
+        timing(q)
     # Quests dropped from the table go too
     for name in os.listdir(folder):
         if name.endswith(".tres") and name[:-5] not in QUESTS:

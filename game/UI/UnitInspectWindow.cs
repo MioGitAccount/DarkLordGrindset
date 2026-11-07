@@ -11,6 +11,9 @@ public partial class UnitInspectWindow : PanelContainer
 	private Label _stats;
 	private GridContainer _attributeRows;
 	private AttributePentagon _pentagon;
+	private HBoxContainer _itemsRow;
+	// Opens/closes the inventory next to this window; set by UIManager
+	public event System.Action ItemsRequested;
 	private unit _unit;
 	private double _refreshTimer;
 	private int _shownRevision = -1;
@@ -58,6 +61,17 @@ public partial class UnitInspectWindow : PanelContainer
 		_attributeRows = new GridContainer { Columns = 3 };
 		_attributeRows.AddThemeConstantOverride("h_separation", 12);
 		left.AddChild(_attributeRows);
+
+		// Items: hand, jewelry, wear
+		var itemsHeader = new HBoxContainer();
+		itemsHeader.AddChild(new Label { Text = "Items", ThemeTypeVariation = "MutedLabel", SizeFlagsHorizontal = SizeFlags.ExpandFill });
+		var itemsButton = new Button { Text = "Your items...", FocusMode = FocusModeEnum.None, TooltipText = "Open your items; drag them onto these slots" };
+		itemsButton.Pressed += () => ItemsRequested?.Invoke();
+		itemsHeader.AddChild(itemsButton);
+		left.AddChild(itemsHeader);
+		_itemsRow = new HBoxContainer();
+		_itemsRow.AddThemeConstantOverride("separation", 6);
+		left.AddChild(_itemsRow);
 
 		// Right column: the big pentagon
 		_pentagon = new AttributePentagon
@@ -128,7 +142,18 @@ public partial class UnitInspectWindow : PanelContainer
 			_shownRevision = _unit.Revision;
 			_pentagon.Attributes = _unit.Attributes;
 			BuildAttributeRows();
+			AgentItemsRow.Build(_itemsRow, _unit, 52);
 		}
+	}
+
+	// An item dropped anywhere on the panel goes to its slot on the shown agent
+	public override bool _CanDropData(Vector2 atPosition, Variant data) =>
+		IsInstanceValid(_unit) && ItemMoves.ReadDragData(data, out var item, out var from) && ItemMoves.BlockedReason(item, from, _unit) == null;
+
+	public override void _DropData(Vector2 atPosition, Variant data)
+	{
+		if (ItemMoves.ReadDragData(data, out var item, out var from))
+			ItemMoves.Move(item, from, _unit);
 	}
 
 	private void BuildAttributeRows()

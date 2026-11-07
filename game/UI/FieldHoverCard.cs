@@ -78,6 +78,10 @@ public partial class FieldHoverCard : PanelContainer
 	private void RefreshQuests()
 	{
 		var lines = new System.Collections.Generic.List<string>();
+		bool visible = _field.Fog == FogState.Visible;
+		string loot = UIText.Loot(_field, (visible ? _field.presentNeutralUnits : _field.LastSeenNeutrals).Count > 0);
+		if (loot != null)
+			lines.Add(loot.Replace(" - move an agent here or next to it to scout", ""));
 		if (Quests != null)
 			foreach (var quest in Quests.QuestsOn(_field))
 				lines.Add($"! {quest.Title} (Lv {quest.Definition.Level})" + (quest.HasDeadline ? $"  {quest.TimeLeftText}" : "") + (quest.IsStarted ? "  (in progress)" : ""));

@@ -13,7 +13,10 @@ public partial class BuildingDefinition : Resource
 
 	[Export] public string Name = "Building";
 	[Export(PropertyHint.MultilineText)] public string Description = "";
+	// The building's picture on the castle screen (images/castle/); a base uses LevelIcons instead
 	[Export] public Texture2D Icon;
+	// Base only: its picture at levels 1, 2 and 3 (missing ones fall back to Icon)
+	[Export] public Godot.Collections.Array<Texture2D> LevelIcons = new();
 
 	// Needs a Tower of this level (a tower: of the level below)
 	[Export(PropertyHint.Range, "1,3,1")] public int Level = 1;
@@ -22,6 +25,10 @@ public partial class BuildingDefinition : Resource
 	[Export] public Godot.Collections.Array<BuildingDefinition> Requires = new();
 	// Standing from the start of the game (the Tower I, the faction bases); a map can override bases
 	[Export] public bool BuiltAtStart;
+	// Seconds to build it at level 1, and how many more each level above that takes (a tower's
+	// level, the level a base is raised to, a slot building's Level)
+	[Export] public int BuildSeconds = 120;
+	[Export] public int BuildSecondsPerLevel = 60;
 
 	// Factions
 	// A base: the layer it heads. A slot building: the layer it fits (None = any layer).
@@ -46,6 +53,7 @@ public partial class BuildingDefinition : Resource
 	// Lets the player recruit this unit at the castle
 	[Export] public UnitTemplate RecruitsUnit;
 	[Export] public Godot.Collections.Array<ResourceCost> RecruitCost = new();
+	[Export] public int RecruitSeconds = 40;
 	// Units of this type recruited at the castle start this many levels higher (all types when empty)
 	[Export] public UnitTemplate BonusLevelFor;
 	[Export(PropertyHint.Range, "0,10,1")] public int BonusRecruitLevel;
@@ -64,6 +72,10 @@ public partial class BuildingDefinition : Resource
 
 	public bool IsTower => TowerLevel > 0;
 	public bool IsSlotBuilding => !IsTower && !IsFactionBase;
+
+	// The picture for this level (bases change with their level); null when there is no art yet
+	public Texture2D IconAt(int level) =>
+		level >= 1 && level <= LevelIcons.Count && LevelIcons[level - 1] != null ? LevelIcons[level - 1] : Icon;
 
 	// A tower is unlocked by the tower below it, every other building by the tower of its own level
 	public int RequiredTowerLevel => TowerLevel >= Level ? Level - 1 : Level;

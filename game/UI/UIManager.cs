@@ -28,6 +28,10 @@ public partial class UIManager : CanvasLayer
 	private QuestWindow QuestView;
 	private QuestToasts Toasts;
 	private BattleScreen Battle;
+	private InventoryWindow Inventory;
+	private Button _itemsButton;
+	// The unit shown in the unit panel; right-clicking an item gives it to this one
+	private unit _selectedUnit;
 	// The field shown in the field panel; the Battle button fights there
 	private field _shownField;
 
@@ -54,6 +58,15 @@ public partial class UIManager : CanvasLayer
 		Toasts = new QuestToasts { Name = "QuestToasts" };
 		FieldInfo.GetParent().AddChild(Toasts);
 		Toasts.QuestClicked += ShowQuest;
+		// The inventory isn't one of the centre windows: it stays open beside the Inspect window
+		Inventory = new InventoryWindow { Name = "Inventory" };
+		FieldInfo.GetParent().AddChild(Inventory);
+		FieldInfo.GetParent().MoveChild(Inventory, Toasts.GetIndex()); // toasts stay on top
+		Inventory.TargetAgent = () => IsInstanceValid(_selectedUnit) ? _selectedUnit : null;
+		Inventory.Beside = UnitInspect;
+		UnitInspect.ItemsRequested += Inventory.Toggle;
+		CreateItemsButton();
+		PlayerInventory.ItemFound += OnItemFound;
 		// Last child, so the full-screen battle covers the rest of the HUD
 		Battle = new BattleScreen { Name = "Battle" };
 		FieldInfo.GetParent().AddChild(Battle);
@@ -103,6 +116,8 @@ public partial class UIManager : CanvasLayer
 	public override void _ExitTree()
 	{
 		PlayerAgents.Changed -= UpdateAgentsCounter;
+		PlayerInventory.Changed -= UpdateItemsButton;
+		PlayerInventory.ItemFound -= OnItemFound;
 		if (_shownField != null)
 			_shownField.ContentsChanged -= UpdateBattleButton;
 	}
@@ -134,6 +149,7 @@ public partial class UIManager : CanvasLayer
 
 	public void ShowUnit(unit selectedUnit)
 	{
+		_selectedUnit = selectedUnit;
 		SelectedUnit.ShowUnit(selectedUnit);
 		// An open inspect window follows the selection
 		if (UnitInspect.Visible)
@@ -174,6 +190,34 @@ public partial class UIManager : CanvasLayer
 		bar.MoveChild(_agentsLabel, _playerCounters.Values.Max(c => c.GetIndex()) + 1);
 		PlayerAgents.Changed += UpdateAgentsCounter;
 		UpdateAgentsCounter();
+	}
+
+	// "Items (3)" after the agents counter; opens the inventory
+	private void CreateItemsButton()
+	{
+		_itemsButton = new Button { Name = "ItemsButton", FocusMode = Control.FocusModeEnum.None, TooltipText = "Your items: loot and quest rewards (I)" };
+		_itemsButton.Pressed += Inventory.Toggle;
+		var bar = PlayerGold.GetParent();
+		bar.AddChild(_itemsButton);
+		bar.MoveChild(_itemsButton, _agentsLabel.GetIndex() + 1);
+		PlayerInventory.Changed += UpdateItemsButton;
+		UpdateItemsButton();
+	}
+
+	private void UpdateItemsButton() => _itemsButton.Text = $"Items ({PlayerInventory.Count})";
+
+	private void OnItemFound(Item item, string source)
+	{
+		Toasts.AddMessage($"Found {item.Name} ({item.Definition.StatsText()}) - {source}");
+	}
+
+	public override void _UnhandledKeyInput(InputEvent @event)
+	{
+		if (@event is InputEventKey { Pressed: true, Echo: false, Keycode: Key.I } && !Battle.Visible)
+		{
+			Inventory.Toggle();
+			GetViewport().SetInputAsHandled();
+		}
 	}
 
 	private void UpdateAgentsCounter()

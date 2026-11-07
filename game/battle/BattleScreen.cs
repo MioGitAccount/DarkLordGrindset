@@ -8,7 +8,8 @@ using System.Threading.Tasks;
 // 1. Positioning: put up to 5 of your units into the 3 front and 2 back positions.
 // 2. Planning: 3 seconds to change targets before anyone moves.
 // 3. Fighting: units act one at a time by initiative. Click one of your units, then an enemy to
-//    change its target, or an ability button to have it use that ability on its next turn.
+//    change its target, or an ability button to have it use that ability on its next turn, or
+//    Move and then a position to spend its next turn moving there (swapping with an ally).
 // 4. Result: the outcome is written back to the units and the field.
 // The world is paused while the screen is open. Built in code, like BuildWindow.
 public partial class BattleScreen : Control
@@ -46,6 +47,8 @@ public partial class BattleScreen : Control
 	private readonly Dictionary<Combatant, BattleFighterView> _views = new();
 	private Combatant _selected;
 	private CombatAbility _armedAbility;
+	// Move was pressed: the next click on one of your positions queues the selected unit's move
+	private bool _armingMove;
 	private Combatant _activeActor;
 	private float _speed = 1f; // the speed button: 1x, 2x, 3x
 	// Everything in battle runs at this fraction of real time at 1x
@@ -396,9 +399,7 @@ public partial class BattleScreen : Control
 					continue;
 				var feet = SlotPosition(side, slot);
 				bool open = _phase == Phase.Positioning && side == BattleSide.Player;
-				DrawSetTransform(feet, 0, new Vector2(1, 0.32f));
-				DrawArc(Vector2.Zero, 44, 0, Mathf.Tau, 40, open ? (_selected != null ? Gold : Muted) : Muted with { A = 0.12f }, open ? 2.5f : 1.5f, true);
-				DrawSetTransform(Vector2.Zero, 0, Vector2.One);
+				DrawSlotRing(feet, open ? (_selected != null ? Gold : Muted) : Muted with { A = 0.12f }, open ? 2.5f : 1.5f);
 				if (open)
 					DrawString(ThemeDB.FallbackFont, feet + new Vector2(-50, 5), BattleFormation.IsBack(slot) ? "Back" : "Front",
 						HorizontalAlignment.Center, 100, 13, Muted);
@@ -406,7 +407,35 @@ public partial class BattleScreen : Control
 		}
 
 		if (_phase == Phase.Planning || _phase == Phase.Fighting)
+		{
+			DrawMoves();
 			DrawTargetLines();
+		}
+	}
+
+	private void DrawSlotRing(Vector2 feet, Color color, float width)
+	{
+		DrawSetTransform(feet, 0, new Vector2(1, 0.32f));
+		DrawArc(Vector2.Zero, 44, 0, Mathf.Tau, 40, color, width, true);
+		DrawSetTransform(Vector2.Zero, 0, Vector2.One);
+	}
+
+	// Positions the selected unit may move to, and the queued moves
+	private void DrawMoves()
+	{
+		if (_armingMove && _selected != null)
+			for (int slot = 0; slot < BattleFormation.SlotCount; slot++)
+				if (slot != _selected.Slot)
+					DrawSlotRing(SlotPosition(BattleSide.Player, slot), Gold, 2.5f);
+		foreach (var combatant in _sim.Players)
+		{
+			if (!combatant.IsAlive || combatant.QueuedMove < 0)
+				continue;
+			var color = Gold with { A = combatant == _selected ? 0.9f : 0.4f };
+			Vector2 from = SlotPosition(BattleSide.Player, combatant.Slot), to = SlotPosition(BattleSide.Player, combatant.QueuedMove);
+			DrawSlotRing(to, color, 3f);
+			DrawDashedLine(from, to, color, 2f, 8f);
+		}
 	}
 
 	private void DrawTargetLines()
@@ -471,6 +500,7 @@ public partial class BattleScreen : Control
 	{
 		_selected = combatant;
 		_armedAbility = null;
+		_armingMove = false;
 		RefreshAll();
 	}
 
@@ -538,16 +568,30 @@ public partial class BattleScreen : Control
 		if (_phase == Phase.Positioning && _selected != null)
 		{
 			// Click on an empty slot
-			for (int slot = 0; slot < BattleFormation.SlotCount; slot++)
+			int slot = SlotAt(mouse.Position);
+			if (slot >= 0)
 			{
-				if (mouse.Position.DistanceTo(SlotPosition(BattleSide.Player, slot) + new Vector2(0, -35)) < 55)
-				{
-					PlaceSelected(slot);
-					return;
-				}
+				PlaceSelected(slot);
+				return;
 			}
 		}
+		if (_armingMove && _selected != null && _selected.IsAlive)
+		{
+			int slot = SlotAt(mouse.Position);
+			if (slot >= 0)
+				QueueMove(slot);
+			return;
+		}
 		Select(null);
+	}
+
+	// Your position under `point`, or -1
+	private int SlotAt(Vector2 point)
+	{
+		for (int slot = 0; slot < BattleFormation.SlotCount; slot++)
+			if (point.DistanceTo(SlotPosition(BattleSide.Player, slot) + new Vector2(0, -35)) < 55)
+				return slot;
+		return -1;
 	}
 
 	// The unit whose body is nearest to `point`, so overlapping units can all be clicked
@@ -600,6 +644,12 @@ public partial class BattleScreen : Control
 			Select(null);
 			return;
 		}
+		// Picking where to move: an ally's position means swapping with it
+		if (_armingMove && _selected != null && _selected.IsAlive && clicked.IsPlayer)
+		{
+			QueueMove(clicked.Slot);
+			return;
+		}
 		// Clicking your own unit selects it, unless a heal is waiting for its target
 		bool pickingAlly = _armedAbility != null && _armedAbility.TargetsAlly && _selected != null && _selected.IsAlive;
 		if (clicked.IsPlayer && !pickingAlly)
@@ -620,6 +670,7 @@ public partial class BattleScreen : Control
 	private void OrderAgainst(Combatant enemy)
 	{
 		var unit = _selected;
+		_armingMove = false;
 		if (_armedAbility != null)
 		{
 			if (!_sim.ValidTargets(unit, _armedAbility).Contains(enemy))
@@ -642,11 +693,45 @@ public partial class BattleScreen : Control
 		RefreshAll();
 	}
 
+	private void OnMovePressed()
+	{
+		var unit = _selected;
+		if (unit == null)
+			return;
+		_armedAbility = null;
+		if (unit.QueuedMove >= 0)
+		{
+			unit.QueuedMove = -1; // cancel
+			_armingMove = false;
+		}
+		else
+			_armingMove = !_armingMove;
+		RefreshAll();
+	}
+
+	// The selected unit spends its next turn moving to `slot`; its own position cancels the move
+	private void QueueMove(int slot)
+	{
+		var unit = _selected;
+		_armingMove = false;
+		if (slot == unit.Slot)
+			unit.QueuedMove = -1;
+		else
+		{
+			unit.QueuedMove = slot;
+			var occupant = _sim.PlayerSlots[slot];
+			Log($"{unit.Name} will move to the {BattleFormation.SlotName(slot)} on its turn"
+				+ (occupant != null && occupant.IsAlive ? $", swapping places with {occupant.Name}" : ""));
+		}
+		RefreshAll();
+	}
+
 	private void OnAbilityPressed(CombatAbility ability)
 	{
 		var unit = _selected;
 		if (unit == null)
 			return;
+		_armingMove = false;
 		if (unit.QueuedAbility == ability)
 		{
 			unit.QueuedAbility = null; // cancel
@@ -680,6 +765,22 @@ public partial class BattleScreen : Control
 			: target.Name + (unit.OrderedTarget == target ? " (your order)" : " (closest)");
 		_orderLabel.Text = $"{unit.Name}   HP {unit.Health}/{unit.MaxHealth}   ATK {_sim.EffectiveAttack(unit)}   DEF {unit.Defence}"
 			+ (unit.MaxMana > 0 ? $"   MP {unit.Mana}/{unit.MaxMana}" : "") + $"   -   attacks {targetText}";
+
+		bool moving = unit.QueuedMove >= 0;
+		var move = new Button
+		{
+			Text = moving ? $"Move to {BattleFormation.SlotName(unit.QueuedMove)} - queued" : "Move",
+			ToggleMode = true,
+			ButtonPressed = moving || _armingMove,
+			FocusMode = FocusModeEnum.None,
+			CustomMinimumSize = new Vector2(0, 34),
+			TooltipText = "Spend the next turn moving to another position (an ally standing there swaps places).\n"
+				+ "Its target and queued ability wait for the turn after, unless they are out of reach from the new position."
+				+ (unit.RootedTurns > 0 ? "\nHeld by roots: moves once free" : "")
+				+ (moving ? "\nClick to cancel" : ""),
+		};
+		move.Pressed += () => Callable.From(OnMovePressed).CallDeferred();
+		_abilityRow.AddChild(move);
 
 		foreach (var ability in unit.Abilities)
 		{
@@ -729,7 +830,12 @@ public partial class BattleScreen : Control
 			view.Selected = combatant == _selected;
 			view.Targetable = reachable.Contains(combatant);
 			view.Active = combatant == _activeActor;
-			view.Status = combatant.IsPlayer && combatant.QueuedAbility != null ? $"{combatant.QueuedAbility.Name} queued" : "";
+			var orders = new List<string>();
+			if (combatant.IsPlayer && combatant.QueuedMove >= 0)
+				orders.Add("Moving");
+			if (combatant.IsPlayer && combatant.QueuedAbility != null)
+				orders.Add($"{combatant.QueuedAbility.Name} queued");
+			view.Status = string.Join(", then ", orders);
 			view.Refresh();
 		}
 		if (positioning)
@@ -751,6 +857,8 @@ public partial class BattleScreen : Control
 					: $"Click a position for {_selected.Name}.") + bench;
 			case Phase.Planning:
 			case Phase.Fighting:
+				if (_armingMove && _selected != null)
+					return $"Click the position {_selected.Name} should move to (an ally there swaps places)";
 				if (_armedAbility != null)
 					return $"Pick a target for {_armedAbility.Name}";
 				return _selected == null ? "Click one of your units to give it orders" : $"Click an enemy for {_selected.Name} to attack, or pick an ability";
@@ -995,6 +1103,9 @@ public partial class BattleScreen : Control
 				await Wait(0.6, battleId);
 				actorView.PlayIdle();
 				break;
+			case MoveEvent move:
+				await AnimateMove(move, actorView);
+				break;
 			case SkipEvent:
 				Popup(actorView, "Stunned", new Color(0.75f, 0.55f, 1f), 18);
 				await Wait(0.7, battleId);
@@ -1038,6 +1149,18 @@ public partial class BattleScreen : Control
 		attacker.PlayIdle();
 		if (melee)
 			await attacker.MoveTo(home, 0.3, Pace);
+		SortFighters();
+	}
+
+	// Both units walk to their new places at the same time
+	private async Task AnimateMove(MoveEvent move, BattleFighterView mover)
+	{
+		_fighters.MoveChild(mover, -1);
+		Popup(mover, "Moves", Gold, 18);
+		var walks = new List<Task> { mover.MoveTo(HomePosition(move.Actor), 0.5, Pace) };
+		if (move.SwappedWith != null && _views.TryGetValue(move.SwappedWith, out var other))
+			walks.Add(other.MoveTo(HomePosition(move.SwappedWith), 0.5, Pace));
+		await Task.WhenAll(walks);
 		SortFighters();
 	}
 
@@ -1172,6 +1295,10 @@ public partial class BattleScreen : Control
 			lines.Add(combatant.IsAlive
 				? $"{combatant.Name}: {combatant.Health}/{combatant.MaxHealth} HP" + (experience > 0 ? $", +{experience} XP" : "")
 				: $"{combatant.Name} has fallen");
+		// Clearing a field's guards wins what they sat on (see field.ClaimLoot)
+		if (Won && _onFinished == null && _field != null)
+			foreach (var loot in _field.Loot)
+				lines.Add($"Loot: {loot.Name} ({loot.StatsText()}) - added to your items");
 		_resultText.Text = string.Join("\n", lines);
 		_resultPanel.Visible = true;
 		Layout();

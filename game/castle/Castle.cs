@@ -13,12 +13,16 @@ public enum BuildingStatus
 	NeedsBase,      // its faction's base is too low (or the slot is still locked)
 	WrongLayer,     // a faction building offered for another faction's slot
 	MaxLevel,       // a tower or base that can't go any higher
+	Busy,           // another building is under construction (one at a time)
+	UnderConstruction, // this one is being built right now
 }
 
 // The player's castle on a field: the tower in the middle and the four faction layers around it.
 // Each faction has a base (levels 1-3, one slot per level) and slots for buildings; a slot
 // building is unique in the whole castle and can be demolished for half its cost back. Also the
 // tower level, how far the castle sees, its income, caps and which units can be recruited there.
+// Building and recruiting take time: one building goes up at a time and one unit trains at a time
+// (Construction and Training), paid when started and refunded in full when cancelled.
 // Created by a field whose perks include one with Buildings (see field.Castle).
 public class Castle
 {
@@ -36,10 +40,16 @@ public class Castle
 	// Faction -> what stands in each of its slots (null = empty)
 	private readonly Dictionary<Faction, BuildingDefinition[]> _slots = new();
 
-	// Raised after something is built, upgraded or demolished
+	// Raised after something is built, upgraded or demolished, or work starts, ends or is cancelled
 	public event Action Changed;
+	// Raised every tick while something is being built or trained
+	public event Action Progressed;
 	// (unit type, starting level): the map spawns the unit on the castle's field
 	public event Action<UnitTemplate, int> UnitRecruited;
+
+	// The building going up right now, and the unit in training; null when idle
+	public CastleWork Construction { get; private set; }
+	public CastleWork Training { get; private set; }
 
 	public Castle(field castleField, BuildingTree tree)
 	{
@@ -82,8 +92,72 @@ public class Castle
 	// Built buildings that hand out quests (see QuestManager)
 	public IEnumerable<BuildingDefinition> QuestBuildings => _built.Where(b => b.QuestPool.Count > 0);
 
-	// Called by the castle's field every tick
-	public void CollectIncome() => PlayerResources.Add(ResourceType.Gold, GoldPerTick);
+	// Called by the castle's field every tick: income, and a second of building and training
+	public void Tick()
+	{
+		PlayerResources.Add(ResourceType.Gold, GoldPerTick);
+		if (Construction == null && Training == null)
+			return;
+		if (Construction != null && --Construction.SecondsLeft <= 0)
+			FinishConstruction();
+		if (Training != null && --Training.SecondsLeft <= 0)
+			FinishTraining();
+		Progressed?.Invoke();
+	}
+
+	// --- Construction ----------------------------------------------------------------------------
+
+	public bool IsUnderConstruction(BuildingDefinition building) => building != null && Construction?.Building == building;
+
+	// How long building it to `level` takes
+	public static int BuildSeconds(BuildingDefinition building, int level) =>
+		building.BuildSeconds + Math.Max(0, level - 1) * building.BuildSecondsPerLevel;
+
+	// The status of a building that meets every other requirement: can the player start it now?
+	private BuildingStatus StartStatus(BuildingDefinition building, IEnumerable<ResourceCost> cost)
+	{
+		if (IsUnderConstruction(building))
+			return BuildingStatus.UnderConstruction;
+		if (Construction != null)
+			return BuildingStatus.Busy;
+		return ResourceCost.CanAfford(cost) ? BuildingStatus.Available : BuildingStatus.NoResources;
+	}
+
+	private void StartConstruction(CastleWork work, IEnumerable<ResourceCost> cost)
+	{
+		work.Paid = CastleWork.Copy(cost);
+		work.TotalSeconds = work.SecondsLeft = BuildSeconds(work.Building, work.Level);
+		Construction = work;
+		Changed?.Invoke();
+	}
+
+	private void FinishConstruction()
+	{
+		var work = Construction;
+		Construction = null;
+		if (work.Building.IsFactionBase)
+			_baseLevels[work.Faction] = Math.Max(BaseLevel(work.Faction), work.Level);
+		else if (work.Slot >= 0)
+			_slots[work.Faction][work.Slot] = work.Building;
+		_built.Add(work.Building);
+		Changed?.Invoke();
+	}
+
+	// Stops the building going up and pays its whole cost back
+	public void CancelConstruction()
+	{
+		if (Construction == null)
+			return;
+		Refund(Construction.Paid);
+		Construction = null;
+		Changed?.Invoke();
+	}
+
+	private static void Refund(IEnumerable<ResourceCost> paid)
+	{
+		foreach (var cost in paid)
+			PlayerResources.Add(cost.Type, cost.Amount);
+	}
 
 	// --- Faction bases ---------------------------------------------------------------------------
 
@@ -129,20 +203,20 @@ public class Castle
 		int level = BaseLevel(faction);
 		if (building == null || level >= BuildingDefinition.MaxLevel)
 			return BuildingStatus.MaxLevel;
+		if (IsUnderConstruction(building))
+			return BuildingStatus.UnderConstruction;
 		if (TowerLevel < level + 1)
 			return BuildingStatus.NeedsTower;
-		if (!ResourceCost.CanAfford(NextBaseCost(faction)))
-			return BuildingStatus.NoResources;
-		return BuildingStatus.Available;
+		return StartStatus(building, NextBaseCost(faction));
 	}
 
+	// Starts building the base, or raising it to its next level
 	public bool TryUpgradeBase(Faction faction)
 	{
-		if (BaseStatus(faction) != BuildingStatus.Available || !ResourceCost.TryPay(NextBaseCost(faction)))
+		var cost = NextBaseCost(faction);
+		if (BaseStatus(faction) != BuildingStatus.Available || !ResourceCost.TryPay(cost))
 			return false;
-		_baseLevels[faction] = BaseLevel(faction) + 1;
-		_built.Add(Base(faction));
-		Changed?.Invoke();
+		StartConstruction(new CastleWork { Building = Base(faction), Faction = faction, Level = BaseLevel(faction) + 1 }, cost);
 		return true;
 	}
 
@@ -169,6 +243,8 @@ public class Castle
 	{
 		if (IsBuilt(building))
 			return BuildingStatus.Built;
+		if (IsUnderConstruction(building))
+			return BuildingStatus.UnderConstruction;
 		if (building.Faction != Faction.None && building.Faction != faction)
 			return BuildingStatus.WrongLayer;
 		if (building.Requires.Any(required => required != null && !IsBuilt(required)))
@@ -177,9 +253,7 @@ public class Castle
 			return BuildingStatus.NeedsTower;
 		if (BaseLevel(faction) < building.MinBaseLevel)
 			return BuildingStatus.NeedsBase;
-		if (!ResourceCost.CanAfford(building.Cost))
-			return BuildingStatus.NoResources;
-		return BuildingStatus.Available;
+		return StartStatus(building, building.Cost);
 	}
 
 	// Slot buildings that could ever go into this faction's layer: its own, then the neutral ones
@@ -191,11 +265,13 @@ public class Castle
 		if (building == null || !building.IsSlotBuilding || slot < 0 || slot >= SlotCount(faction) || SlotAt(faction, slot) != null
 			|| SlotStatus(building, faction) != BuildingStatus.Available || !ResourceCost.TryPay(building.Cost))
 			return false;
-		_slots[faction][slot] = building;
-		_built.Add(building);
-		Changed?.Invoke();
+		StartConstruction(new CastleWork { Building = building, Faction = faction, Slot = slot, Level = building.Level }, building.Cost);
 		return true;
 	}
+
+	// The slot the building going up will stand in, if it is a slot building
+	public bool IsSlotUnderConstruction(Faction faction, int slot) =>
+		Construction != null && Construction.Slot == slot && Construction.Faction == faction;
 
 	// Tears down a slot building and pays back DemolishRefund of its cost
 	public bool TryDemolish(Faction faction, int slot)
@@ -203,6 +279,8 @@ public class Castle
 		var building = SlotAt(faction, slot);
 		if (building == null)
 			return false;
+		if (Training?.Building == building)
+			CancelTraining();
 		_slots[faction][slot] = null;
 		_built.Remove(building);
 		foreach (var cost in building.Cost)
@@ -218,21 +296,20 @@ public class Castle
 	{
 		if (IsBuilt(tower))
 			return tower == Towers.LastOrDefault() ? BuildingStatus.MaxLevel : BuildingStatus.Built;
+		if (IsUnderConstruction(tower))
+			return BuildingStatus.UnderConstruction;
 		if (tower.Requires.Any(required => required != null && !IsBuilt(required)))
 			return BuildingStatus.NeedsBuildings;
 		if (TowerLevel < tower.RequiredTowerLevel)
 			return BuildingStatus.NeedsTower;
-		if (!ResourceCost.CanAfford(tower.Cost))
-			return BuildingStatus.NoResources;
-		return BuildingStatus.Available;
+		return StartStatus(tower, tower.Cost);
 	}
 
 	public bool TryBuildTower(BuildingDefinition tower)
 	{
 		if (tower == null || !tower.IsTower || TowerStatus(tower) != BuildingStatus.Available || !ResourceCost.TryPay(tower.Cost))
 			return false;
-		_built.Add(tower);
-		Changed?.Invoke();
+		StartConstruction(new CastleWork { Building = tower, Level = tower.TowerLevel }, tower.Cost);
 		return true;
 	}
 
@@ -249,14 +326,41 @@ public class Castle
 	}
 
 	public bool CanRecruit(BuildingDefinition building) =>
-		IsBuilt(building) && building.RecruitsUnit != null && ResourceCost.CanAfford(building.RecruitCost)
+		IsBuilt(building) && building.RecruitsUnit != null && Training == null && ResourceCost.CanAfford(building.RecruitCost)
 		&& PlayerAgents.RecruitBlockedReason(building.RecruitsUnit) == null;
 
+	// Starts training a unit; it joins on the castle's field when its time is up
 	public bool TryRecruit(BuildingDefinition building)
 	{
 		if (!CanRecruit(building) || !ResourceCost.TryPay(building.RecruitCost))
 			return false;
-		UnitRecruited?.Invoke(building.RecruitsUnit, RecruitLevel(building.RecruitsUnit));
+		Training = new CastleWork
+		{
+			Building = building,
+			Unit = building.RecruitsUnit,
+			Paid = CastleWork.Copy(building.RecruitCost),
+			TotalSeconds = building.RecruitSeconds,
+			SecondsLeft = building.RecruitSeconds,
+		};
+		Changed?.Invoke();
 		return true;
+	}
+
+	private void FinishTraining()
+	{
+		var work = Training;
+		Training = null;
+		UnitRecruited?.Invoke(work.Unit, RecruitLevel(work.Unit));
+		Changed?.Invoke();
+	}
+
+	// Stops the unit in training and pays its whole cost back
+	public void CancelTraining()
+	{
+		if (Training == null)
+			return;
+		Refund(Training.Paid);
+		Training = null;
+		Changed?.Invoke();
 	}
 }

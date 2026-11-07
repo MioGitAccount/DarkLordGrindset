@@ -39,6 +39,7 @@ public partial class map : Node2D
 	{
 		Data = MapSelection.LoadSelected() ?? new MapData();
 		PlayerAgents.Reset();
+		PlayerInventory.Reset();
 		var view = new MapView { Name = "MapView", ShowBehindParent = true };
 		AddChild(view);
 		MoveChild(view, 0);
@@ -123,6 +124,13 @@ public partial class map : Node2D
 
 	public override void _Process(double delta)
 	{
+		// The selected unit's route follows it while it walks, and goes away once it arrives
+		var selected = unitManager?.selectedUnit;
+		bool showPath = IsInstanceValid(selected) && selected.isMoving;
+		if (showPath || _drewPath)
+			QueueRedraw();
+		_drewPath = showPath;
+
 		field underMouse = null;
 		if (!IsPointerOverUI())
 		{
@@ -157,6 +165,25 @@ public partial class map : Node2D
 				DrawDashedLine(pos1, pos2, Colors.Gray, 2);
 			}
 		}
+		DrawSelectedPath();
+	}
+
+	private bool _drewPath;
+	private static readonly Color PathColor = new Color(1f, 0.8f, 0.3f);
+
+	// The selected moving unit's route: from where it is now through every field still ahead
+	private void DrawSelectedPath()
+	{
+		var mover = unitManager?.selectedUnit;
+		if (!IsInstanceValid(mover) || !mover.isMoving)
+			return;
+		var points = new List<Vector2> { mover.Position };
+		points.AddRange(mover.RemainingPath.Select(f => f.Position));
+		DrawPolyline(points.ToArray(), PathColor with { A = 0.85f }, 4f, true);
+		for (int i = 1; i < points.Count - 1; i++)
+			DrawCircle(points[i], 6f, PathColor);
+		DrawArc(points[^1], 22f, 0, Mathf.Tau, 40, PathColor, 3f, true);
+		DrawCircle(points[^1], 7f, PathColor);
 	}
 	// Unhandled input, so clicks on UI panels don't also select things on the map
 	public override void _UnhandledInput(InputEvent inputEvent)
@@ -298,10 +325,36 @@ public partial class map : Node2D
 				for (int i = 0; i < neutral.Count; i++)
 					newField.presentNeutralUnits.Add(new NeutralUnit { Template = template });
 			}
+			SetLoot(newField, data);
 			AddChild(newField);
 			fields[data.Id] = newField;
 		}
 	}
+
+	// What the field's guards sit on: the items the map file names, or a roll by the strongest guard
+	private void SetLoot(field newField, FieldData data)
+	{
+		if (data.Loot != null)
+		{
+			foreach (var id in data.Loot)
+			{
+				var item = ItemCatalog.Get(id);
+				if (item != null)
+					newField.Loot.Add(item);
+				else
+					GD.PushWarning($"Map: field {data.Id} has unknown loot item '{id}'");
+			}
+			return;
+		}
+		if (newField.presentNeutralUnits.Count == 0)
+			return;
+		int guardLevel = newField.presentNeutralUnits.Max(n => n.Level);
+		var rolled = ItemCatalog.RollGuardLoot(guardLevel, _lootRng);
+		if (rolled != null)
+			newField.Loot.Add(rolled);
+	}
+
+	private readonly RandomNumberGenerator _lootRng = new();
 
 	private void ConnectAllNodes()
 	{

@@ -3,28 +3,31 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 
-// Centred window showing a castle: the tower in the middle, two faction layers on each side.
-// A layer is its faction base at the bottom (level pips) with up to 3 slots above it: built,
-// empty (click to pick a building for it) or locked (needs a higher base level). Click a card to
-// see its details below, then Build / Upgrade / Recruit / Demolish. Built in code, like SkillTreeWindow.
+// Centred window showing a castle as a painted scene: the tower in the middle, two faction layers
+// on each side, each building drawn on its spot (CastleLayout). A layer is its faction base in
+// front with up to 3 slots behind it: built, empty (a plot: click to pick a building for it) or
+// locked (rubble: needs a higher base level). Click a building to see its details in the column on
+// the right, then Build / Upgrade / Recruit / Demolish. Under the header, a bar for the building
+// going up and one for the unit in training, each with Cancel. Built in code, like SkillTreeWindow.
 public partial class BuildWindow : PanelContainer
 {
-	private static readonly Vector2 CardSize = new Vector2(190, 60);
-	private const float ColumnGap = 18;
-	private const float RowGap = 10;
-	private const float HeaderHeight = 26;
+	private const float DetailsWidth = 330;
 
-	private static readonly Color Gold = new Color(0.85f, 0.65f, 0.3f);
 	private static readonly Color BrightGold = new Color(1f, 0.82f, 0.4f);
 	private static readonly Color LockedGrey = new Color(0.35f, 0.33f, 0.33f);
-
-	private enum CardLook { Built, Available, NoResources, Locked, Empty }
 
 	private enum Pick { None, Tower, Base, Slot }
 
 	private Label _title;
 	private Label _progressLabel;
-	private Control _canvas;
+	private Control _scene;
+	private CastleLayout _layout;
+	private Texture2D _backgroundArt;
+	// Shown until a building has its own picture
+	private Texture2D _placeholderArt, _towerArt, _plotArt, _lockedArt, _scaffoldArt;
+	private readonly Dictionary<string, CastleSpot> _spots = new();
+	private bool _layoutMode;
+	private Button _layoutButton;
 	private Label _detailName;
 	private Label _detailInfo;
 	private Label _detailEffects;
@@ -33,6 +36,8 @@ public partial class BuildWindow : PanelContainer
 	private Button _buildButton;
 	private Button _recruitButton;
 	private Button _demolishButton;
+	// One row each for Castle.Construction and Castle.Training
+	private (Control row, Label name, ProgressBar bar, Label time) _buildRow, _trainRow;
 
 	private Castle _castle;
 	private Pick _pick;
@@ -42,8 +47,8 @@ public partial class BuildWindow : PanelContainer
 	private BuildingDefinition _candidate;
 	// Demolish needs a second click
 	private bool _confirmDemolish;
-	// Called on every Refresh to update one card each
-	private readonly List<Action> _cardUpdates = new();
+	// Called on every Refresh to update one spot each
+	private readonly List<Action> _spotUpdates = new();
 	// The picker's buttons, rebuilt only when another slot is picked (Refresh runs every tick)
 	private readonly List<(Button button, BuildingDefinition option)> _pickerButtons = new();
 	private string _pickerKey;
@@ -51,6 +56,11 @@ public partial class BuildWindow : PanelContainer
 	public override void _Ready()
 	{
 		Visible = false;
+		_placeholderArt = LoadArt("res://images/castle/placeholder_building.png");
+		_towerArt = LoadArt("res://images/map_objects/dark_tower.png");
+		_plotArt = LoadArt("res://images/castle/plot_empty.png");
+		_lockedArt = LoadArt("res://images/castle/plot_locked.png");
+		_scaffoldArt = LoadArt("res://images/castle/plot_scaffold.png");
 
 		var box = new VBoxContainer();
 		box.AddThemeConstantOverride("separation", 10);
@@ -69,6 +79,9 @@ public partial class BuildWindow : PanelContainer
 					PlayerResources.Add(type, 200);
 			};
 			header.AddChild(debugResources);
+			_layoutButton = new Button { Text = "Edit layout", FocusMode = FocusModeEnum.None, TooltipText = "Drag the buildings and plots, mouse wheel to resize (or F9)" };
+			_layoutButton.Pressed += ToggleLayoutMode;
+			header.AddChild(_layoutButton);
 		}
 		var close = new Button { Text = "Close", FocusMode = FocusModeEnum.None };
 		close.Pressed += Close;
@@ -77,37 +90,38 @@ public partial class BuildWindow : PanelContainer
 
 		_progressLabel = new Label { ThemeTypeVariation = "MutedLabel" };
 		box.AddChild(_progressLabel);
+		_buildRow = MakeWorkRow(box, new Color(1f, 0.75f, 0.3f), () => _castle?.CancelConstruction(), "Stop building and get the whole cost back");
+		_trainRow = MakeWorkRow(box, new Color(0.55f, 0.8f, 1f), () => _castle?.CancelTraining(), "Stop training and get the whole cost back");
 		box.AddChild(new HSeparator());
 
-		_canvas = new Control { MouseFilter = MouseFilterEnum.Pass };
-		_canvas.Draw += DrawLayers;
-		box.AddChild(_canvas);
+		var main = new HBoxContainer();
+		main.AddThemeConstantOverride("separation", 12);
+		box.AddChild(main);
+		_scene = new Control { MouseFilter = MouseFilterEnum.Pass, ClipContents = true, SizeFlagsVertical = SizeFlags.ShrinkBegin };
+		main.AddChild(_scene);
 
-		box.AddChild(new HSeparator());
-		var details = new HBoxContainer();
-		details.AddThemeConstantOverride("separation", 12);
-		box.AddChild(details);
-		var text = new VBoxContainer { SizeFlagsHorizontal = SizeFlags.ExpandFill };
-		details.AddChild(text);
-		_detailName = new Label { ThemeTypeVariation = "HeaderLabel" };
+		// Details column on the right
+		var text = new VBoxContainer { CustomMinimumSize = new Vector2(DetailsWidth, 0) };
+		text.AddThemeConstantOverride("separation", 8);
+		main.AddChild(text);
 		// Wrapping labels need a width, or they wrap after every word and the window grows very tall
-		_detailInfo = new Label { AutowrapMode = TextServer.AutowrapMode.WordSmart, CustomMinimumSize = new Vector2(440, 0), SizeFlagsHorizontal = SizeFlags.ExpandFill };
-		_detailEffects = new Label { CustomMinimumSize = new Vector2(320, 0) };
+		_detailName = new Label { ThemeTypeVariation = "HeaderLabel", AutowrapMode = TextServer.AutowrapMode.WordSmart, CustomMinimumSize = new Vector2(DetailsWidth, 0) };
+		_detailInfo = new Label { AutowrapMode = TextServer.AutowrapMode.WordSmart, CustomMinimumSize = new Vector2(DetailsWidth, 0) };
+		_detailEffects = new Label { AutowrapMode = TextServer.AutowrapMode.WordSmart, CustomMinimumSize = new Vector2(DetailsWidth, 0) };
 		_detailEffects.AddThemeColorOverride("font_color", BrightGold);
-		_detailStatus = new Label { ThemeTypeVariation = "MutedLabel", AutowrapMode = TextServer.AutowrapMode.WordSmart, CustomMinimumSize = new Vector2(560, 0) };
-		_picker = new HFlowContainer { CustomMinimumSize = new Vector2(560, 0) };
+		_detailStatus = new Label { ThemeTypeVariation = "MutedLabel", AutowrapMode = TextServer.AutowrapMode.WordSmart, CustomMinimumSize = new Vector2(DetailsWidth, 0) };
+		_picker = new HFlowContainer { CustomMinimumSize = new Vector2(DetailsWidth, 0) };
 		_picker.AddThemeConstantOverride("h_separation", 6);
 		_picker.AddThemeConstantOverride("v_separation", 6);
 		text.AddChild(_detailName);
 		text.AddChild(_picker);
-		var infoRow = new HBoxContainer();
-		infoRow.AddThemeConstantOverride("separation", 16);
-		infoRow.AddChild(_detailInfo);
-		infoRow.AddChild(_detailEffects);
-		text.AddChild(infoRow);
+		text.AddChild(_detailInfo);
+		text.AddChild(_detailEffects);
 		text.AddChild(_detailStatus);
-		var buttons = new VBoxContainer { SizeFlagsVertical = SizeFlags.ShrinkCenter };
-		details.AddChild(buttons);
+		var buttons = new HFlowContainer();
+		buttons.AddThemeConstantOverride("h_separation", 8);
+		buttons.AddThemeConstantOverride("v_separation", 8);
+		text.AddChild(buttons);
 		_buildButton = new Button { Text = "Build", FocusMode = FocusModeEnum.None, CustomMinimumSize = new Vector2(150, 36) };
 		_buildButton.Pressed += BuildPressed;
 		buttons.AddChild(_buildButton);
@@ -117,6 +131,49 @@ public partial class BuildWindow : PanelContainer
 		_demolishButton = new Button { Text = "Demolish", FocusMode = FocusModeEnum.None, CustomMinimumSize = new Vector2(150, 36) };
 		_demolishButton.Pressed += DemolishPressed;
 		buttons.AddChild(_demolishButton);
+	}
+
+	private static (Control, Label, ProgressBar, Label) MakeWorkRow(Container parent, Color color, Action cancel, string cancelTip)
+	{
+		var row = new HBoxContainer { Visible = false };
+		row.AddThemeConstantOverride("separation", 10);
+		var name = new Label { CustomMinimumSize = new Vector2(320, 0) };
+		name.AddThemeColorOverride("font_color", color);
+		var bar = new ProgressBar
+		{
+			ShowPercentage = false,
+			MaxValue = 1,
+			Step = 0,
+			CustomMinimumSize = new Vector2(0, 12),
+			SizeFlagsHorizontal = SizeFlags.ExpandFill,
+			SizeFlagsVertical = SizeFlags.ShrinkCenter,
+		};
+		var back = new StyleBoxFlat { BgColor = new Color(0.12f, 0.1f, 0.1f), BorderColor = color.Darkened(0.5f) };
+		back.SetBorderWidthAll(1);
+		back.SetCornerRadiusAll(3);
+		var fill = new StyleBoxFlat { BgColor = color.Darkened(0.15f) };
+		fill.SetCornerRadiusAll(3);
+		bar.AddThemeStyleboxOverride("background", back);
+		bar.AddThemeStyleboxOverride("fill", fill);
+		var time = new Label { CustomMinimumSize = new Vector2(90, 0), HorizontalAlignment = HorizontalAlignment.Right };
+		var cancelButton = new Button { Text = "Cancel", TooltipText = cancelTip, FocusMode = FocusModeEnum.None };
+		cancelButton.Pressed += cancel;
+		row.AddChild(name);
+		row.AddChild(bar);
+		row.AddChild(time);
+		row.AddChild(cancelButton);
+		parent.AddChild(row);
+		return (row, name, bar, time);
+	}
+
+	private static void ShowWork((Control row, Label name, ProgressBar bar, Label time) ui, CastleWork work, string verb)
+	{
+		ui.row.Visible = work != null;
+		if (work == null)
+			return;
+		ui.name.Text = $"{verb} {work.Name}";
+		ui.bar.Value = work.Progress;
+		ui.time.Text = $"{work.TimeLeft} left";
 	}
 
 	public override void _ExitTree()
@@ -138,11 +195,12 @@ public partial class BuildWindow : PanelContainer
 			_candidate = null;
 			_castle = castle;
 			_castle.Changed += Refresh;
+			_castle.Progressed += Refresh;
 			PlayerResources.Changed += OnResourcesChanged;
 			PlayerAgents.Changed += Refresh;
 		}
 		_title.Text = $"{_castle.Tree.Name} - buildings";
-		BuildCards();
+		BuildScene();
 		Refresh();
 		Visible = true;
 		ResetSize();
@@ -161,12 +219,15 @@ public partial class BuildWindow : PanelContainer
 	private void Unsubscribe()
 	{
 		if (_castle != null)
+		{
 			_castle.Changed -= Refresh;
+			_castle.Progressed -= Refresh;
+		}
 		PlayerResources.Changed -= OnResourcesChanged;
 		PlayerAgents.Changed -= Refresh;
 	}
 
-	// What the player can afford decides which cards light up
+	// What the player can afford decides what the details show
 	private void OnResourcesChanged(ResourceType type, float amount) => Refresh();
 
 	public override void _UnhandledInput(InputEvent @event)
@@ -176,166 +237,164 @@ public partial class BuildWindow : PanelContainer
 			Close();
 			GetViewport().SetInputAsHandled();
 		}
+		else if (Visible && OS.IsDebugBuild() && @event is InputEventKey { Pressed: true, Echo: false, Keycode: Key.F9 })
+		{
+			ToggleLayoutMode();
+			GetViewport().SetInputAsHandled();
+		}
 	}
 
-	// --- Layout ----------------------------------------------------------------------------------
+	// --- Scene -----------------------------------------------------------------------------------
 
-	// Columns: Chaos, Stronghold, Tower, Dark Humans, Undead
-	private static float ColumnX(int column) => column * (CardSize.X + ColumnGap);
+	private static Texture2D LoadArt(string path) => ResourceLoader.Exists(path) ? GD.Load<Texture2D>(path) : null;
 
-	private static int ColumnOf(Faction faction)
+	// As large as fits next to the details column, keeping the background's shape
+	private Vector2 SceneSize()
 	{
-		int index = Array.IndexOf(Factions.All, faction);
-		return index < 2 ? index : index + 1;
+		var view = GetViewportRect().Size;
+		float aspect = _backgroundArt == null ? 16f / 9f : (float)_backgroundArt.GetWidth() / _backgroundArt.GetHeight();
+		float width = Mathf.Min(view.X - DetailsWidth - 70, (view.Y - 250) * aspect);
+		width = Mathf.Max(width, 480);
+		return new Vector2(width, width / aspect);
 	}
 
-	// Row 0 = top slot (slot 3) ... row 3 = the base
-	private static float RowY(int row) => HeaderHeight + row * (CardSize.Y + RowGap);
-
-	private static Vector2 SlotPosition(Faction faction, int slot) => new Vector2(ColumnX(ColumnOf(faction)), RowY(Castle.MaxSlots - 1 - slot));
-
-	private static Vector2 BasePosition(Faction faction) => new Vector2(ColumnX(ColumnOf(faction)), RowY(Castle.MaxSlots));
-
-	private void BuildCards()
+	private void BuildScene()
 	{
-		UIText.ClearChildren(_canvas);
-		_cardUpdates.Clear();
+		UIText.ClearChildren(_scene);
+		_spots.Clear();
+		_spotUpdates.Clear();
 		_pickerKey = null;
-		_canvas.CustomMinimumSize = new Vector2(ColumnX(5) - ColumnGap, RowY(Castle.MaxSlots + 1) - RowGap);
+		_layout = CastleLayout.Load();
+		_backgroundArt = LoadArt(_layout.Background);
+		var size = SceneSize();
+		_scene.CustomMinimumSize = size;
+		_scene.Size = size;
+		_scene.AddChild(new TextureRect
+		{
+			Texture = _backgroundArt,
+			ExpandMode = TextureRect.ExpandModeEnum.IgnoreSize,
+			StretchMode = TextureRect.StretchModeEnum.Scale,
+			Size = size,
+			MouseFilter = MouseFilterEnum.Ignore,
+		});
 
+		AddSpot(CastleLayout.TowerKey, SelectTower, UpdateTowerSpot);
 		foreach (var faction in Factions.All)
 		{
-			var header = new Label
-			{
-				Text = Factions.Name(faction),
-				ThemeTypeVariation = "MutedLabel",
-				HorizontalAlignment = HorizontalAlignment.Center,
-				Position = new Vector2(ColumnX(ColumnOf(faction)), 0),
-				Size = new Vector2(CardSize.X, HeaderHeight),
-				MouseFilter = MouseFilterEnum.Ignore,
-			};
-			_canvas.AddChild(header);
-
 			var layer = faction;
-			var baseCard = MakeCard(BasePosition(faction), CardSize, () => SelectBase(layer));
-			_cardUpdates.Add(() => UpdateBaseCard(baseCard, layer));
+			AddSpot(CastleLayout.BaseKey(faction), () => SelectBase(layer), spot => UpdateBaseSpot(spot, layer));
 			for (int slot = 0; slot < Castle.MaxSlots; slot++)
 			{
 				int index = slot;
-				var slotCard = MakeCard(SlotPosition(faction, slot), CardSize, () => SelectSlot(layer, index));
-				_cardUpdates.Add(() => UpdateSlotCard(slotCard, layer, index));
+				AddSpot(CastleLayout.SlotKey(faction, slot), () => SelectSlot(layer, index), spot => UpdateSlotSpot(spot, layer, index));
 			}
-		}
-
-		var towerHeader = new Label
-		{
-			Text = "Tower",
-			ThemeTypeVariation = "MutedLabel",
-			HorizontalAlignment = HorizontalAlignment.Center,
-			Position = new Vector2(ColumnX(2), 0),
-			Size = new Vector2(CardSize.X, HeaderHeight),
-			MouseFilter = MouseFilterEnum.Ignore,
-		};
-		_canvas.AddChild(towerHeader);
-		var towerCard = MakeCard(new Vector2(ColumnX(2), RowY(0)), new Vector2(CardSize.X, RowY(Castle.MaxSlots + 1) - RowGap - RowY(0)), SelectTower);
-		_cardUpdates.Add(() => UpdateTowerCard(towerCard));
-	}
-
-	// A card button with three centred lines: Name, Sub and Cost
-	private Button MakeCard(Vector2 position, Vector2 size, Action pressed)
-	{
-		var button = new Button
-		{
-			Position = position,
-			Size = size,
-			CustomMinimumSize = size,
-			FocusMode = FocusModeEnum.None,
-			ClipText = true,
-		};
-		var labels = new VBoxContainer { MouseFilter = MouseFilterEnum.Ignore, Alignment = BoxContainer.AlignmentMode.Center };
-		labels.SetAnchorsAndOffsetsPreset(LayoutPreset.FullRect);
-		labels.AddThemeConstantOverride("separation", 0);
-		foreach (var name in new[] { "Name", "Sub", "Cost" })
-			labels.AddChild(new Label
+			var label = new Label
 			{
-				Name = name,
+				Text = Factions.Name(faction),
+				ThemeTypeVariation = "HeaderLabel",
 				HorizontalAlignment = HorizontalAlignment.Center,
-				ThemeTypeVariation = name == "Name" ? "" : "MutedLabel",
-				ClipText = true,
 				MouseFilter = MouseFilterEnum.Ignore,
-			});
-		button.AddChild(labels);
-		button.Pressed += pressed;
-		_canvas.AddChild(button);
-		return button;
+				Size = new Vector2(200, 30),
+				Position = new Vector2(_layout.Get(CastleLayout.BaseKey(faction)).X * size.X - 100, _layout.LabelY * size.Y),
+			};
+			label.AddThemeColorOverride("font_outline_color", Colors.Black);
+			label.AddThemeConstantOverride("outline_size", 6);
+			_scene.AddChild(label);
+		}
+		// Back spots first, so the ones in front draw (and take clicks) over them
+		foreach (var spot in _spots.Values.OrderBy(s => _layout.Get(s.Key).Y))
+			_scene.MoveChild(spot, -1);
+		foreach (var label in _scene.GetChildren().OfType<Label>().ToList())
+			_scene.MoveChild(label, -1);
 	}
 
-	private static void SetCardText(Button card, string name, string sub, string cost)
+	private void AddSpot(string key, Action pressed, Action<CastleSpot> update)
 	{
-		var labels = card.GetChild(0);
-		labels.GetNode<Label>("Name").Text = name;
-		labels.GetNode<Label>("Sub").Text = sub;
-		labels.GetNode<Label>("Cost").Text = cost;
+		var spot = new CastleSpot { Key = key };
+		spot.Clicked += pressed;
+		spot.Dragged += feet => MoveSpot(spot, feet);
+		spot.Scaled += factor => ScaleSpot(spot, factor);
+		_scene.AddChild(spot);
+		_spots[key] = spot;
+		_spotUpdates.Add(() => update(spot));
+	}
+
+	// Puts the spot's picture on its place from the layout
+	private void Place(CastleSpot spot, Texture2D picture)
+	{
+		var at = _layout.Get(spot.Key);
+		var size = _scene.Size;
+		spot.Place(picture, new Vector2(at.X * size.X, at.Y * size.Y), at.Width * size.X);
+	}
+
+	private void ShowSpot(CastleSpot spot, Texture2D picture, string caption, string detail, bool always, bool selected, bool dim = false)
+	{
+		spot.Caption = caption;
+		spot.Detail = detail;
+		spot.AlwaysCaption = always;
+		spot.Selected = selected;
+		spot.Dim = dim;
+		spot.Editing = _layoutMode;
+		Place(spot, picture);
 	}
 
 	// e.g. "●●○"
 	private static string Pips(int level) =>
 		new string('●', level) + new string('○', Math.Max(0, BuildingDefinition.MaxLevel - level));
 
-	private void UpdateTowerCard(Button card)
+	private void UpdateTowerSpot(CastleSpot spot)
 	{
 		var tower = _castle.Towers.LastOrDefault(t => _castle.IsBuilt(t));
 		var next = _castle.NextTower;
 		var status = next == null ? BuildingStatus.MaxLevel : _castle.TowerStatus(next);
-		string nextText = status switch
+		string detail = status switch
 		{
-			BuildingStatus.MaxLevel or BuildingStatus.Built => "Max level",
-			_ => $"Next: {next.Name}\n{ResourceCost.Text(next.Cost).Replace(", ", "\n")}",
+			BuildingStatus.UnderConstruction => $"Building {next.Name}: {_castle.Construction.TimeLeft}",
+			BuildingStatus.Available => $"{next.Name} ready to build",
+			_ => "",
 		};
-		SetCardText(card, tower?.Name ?? "No tower", $"Level {Pips(_castle.TowerLevel)}", nextText);
-		StyleCard(card, status == BuildingStatus.Available ? CardLook.Available : CardLook.Built, _pick == Pick.Tower);
+		ShowSpot(spot, tower?.Icon ?? _towerArt, $"{tower?.Name ?? "No tower"}  {Pips(_castle.TowerLevel)}", detail, true, _pick == Pick.Tower);
 	}
 
-	private void UpdateBaseCard(Button card, Faction faction)
+	private void UpdateBaseSpot(CastleSpot spot, Faction faction)
 	{
 		var building = _castle.Base(faction);
 		int level = _castle.BaseLevel(faction);
 		var status = _castle.BaseStatus(faction);
-		string cost = status switch
+		bool selected = _pick == Pick.Base && _pickFaction == faction;
+		string name = building?.Name ?? $"{Factions.Name(faction)} base";
+		if (level == 0)
 		{
-			BuildingStatus.MaxLevel => "Max level",
-			BuildingStatus.NeedsTower => $"Needs Tower {level + 1}",
-			_ => level == 0 ? "Click to build" : $"Upgrade to level {level + 1}",
+			bool building_ = status == BuildingStatus.UnderConstruction;
+			ShowSpot(spot, building_ ? _scaffoldArt : _plotArt, name,
+				building_ ? $"Building: {_castle.Construction.TimeLeft}" : "Not built",
+				true, selected);
+			return;
+		}
+		string detail = status switch
+		{
+			BuildingStatus.UnderConstruction => $"Level {level + 1}: {_castle.Construction.TimeLeft}",
+			BuildingStatus.Available => $"Level {level + 1} ready to build",
+			_ => "",
 		};
-		SetCardText(card, building?.Name ?? $"{Factions.Name(faction)} base", $"Level {Pips(level)}", cost);
-		var look = level == 0
-			? (status == BuildingStatus.Available ? CardLook.Available : CardLook.Locked)
-			: status == BuildingStatus.Available ? CardLook.Available : CardLook.Built;
-		StyleCard(card, look, _pick == Pick.Base && _pickFaction == faction);
+		ShowSpot(spot, building?.IconAt(level) ?? _placeholderArt, $"{name}  {Pips(level)}", detail, true, selected);
 	}
 
-	private void UpdateSlotCard(Button card, Faction faction, int slot)
+	private void UpdateSlotSpot(CastleSpot spot, Faction faction, int slot)
 	{
 		bool selected = _pick == Pick.Slot && _pickFaction == faction && _pickSlot == slot;
 		var building = _castle.SlotAt(faction, slot);
 		if (building != null)
-		{
-			SetCardText(card, building.Name, ShortEffect(building), "Built");
-			StyleCard(card, CardLook.Built, selected);
-		}
+			ShowSpot(spot, building.Icon ?? _placeholderArt, building.Name, ShortEffect(building), false, selected);
+		else if (_castle.IsSlotUnderConstruction(faction, slot))
+			ShowSpot(spot, _scaffoldArt, _castle.Construction.Building.Name, _castle.Construction.TimeLeft, true, selected);
 		else if (slot < _castle.SlotCount(faction))
-		{
-			SetCardText(card, "Empty slot", "Click to build", "");
-			StyleCard(card, CardLook.Empty, selected);
-		}
+			ShowSpot(spot, _plotArt, "Empty slot", "Click to build", false, selected);
 		else
-		{
-			SetCardText(card, "Locked", $"Base level {slot + 1}", "");
-			StyleCard(card, CardLook.Locked, selected);
-		}
+			ShowSpot(spot, _lockedArt, "Locked", $"Needs base level {slot + 1}", false, selected, dim: true);
 	}
 
-	// One line that fits on a card, e.g. "Recruit Imp", "Imp +2 lv", "Quests"
+	// One short line, e.g. "Recruit Imp", "Imp +2 lv", "Quests"
 	private static string ShortEffect(BuildingDefinition building)
 	{
 		var parts = new List<string>();
@@ -354,45 +413,37 @@ public partial class BuildWindow : PanelContainer
 		return string.Join(", ", parts);
 	}
 
-	private void DrawLayers()
+	// --- Layout mode (debug builds): the Edit layout button or F9; drag spots, wheel to resize,
+	// the button (or F9) again to save --------------------------------------------------------------
+
+	private void ToggleLayoutMode()
 	{
-		if (_castle == null)
-			return;
-		// Faint band behind each faction layer, and behind the slots it has opened
-		foreach (var faction in Factions.All)
-		{
-			float x = ColumnX(ColumnOf(faction)) - 6;
-			var column = new Rect2(x, HeaderHeight - 4, CardSize.X + 12, RowY(Castle.MaxSlots + 1) - RowGap - HeaderHeight + 8);
-			_canvas.DrawRect(column, new Color(1, 1, 1, 0.025f));
-			int open = _castle.SlotCount(faction);
-			if (open > 0)
-			{
-				float top = SlotPosition(faction, open - 1).Y - 4;
-				_canvas.DrawRect(new Rect2(x, top, CardSize.X + 12, RowY(Castle.MaxSlots) - top - 4), new Color(1, 1, 1, 0.03f));
-			}
-		}
+		_layoutMode = !_layoutMode;
+		if (!_layoutMode)
+			_layout.Save();
+		if (_layoutButton != null)
+			_layoutButton.Text = _layoutMode ? "Save layout" : "Edit layout";
+		Refresh();
 	}
 
-	private void StyleCard(Button button, CardLook look, bool selected)
+	private void MoveSpot(CastleSpot spot, Vector2 feet)
 	{
-		(Color bg, Color border, Color text) = look switch
-		{
-			CardLook.Built => (new Color(0.38f, 0.16f, 0.1f), BrightGold, new Color(1f, 0.92f, 0.75f)),
-			CardLook.Available => (new Color(0.16f, 0.13f, 0.12f), BrightGold, new Color(1f, 0.92f, 0.75f)),
-			CardLook.NoResources => (new Color(0.13f, 0.11f, 0.11f), Gold.Darkened(0.4f), new Color(0.8f, 0.75f, 0.68f)),
-			CardLook.Empty => (new Color(0.12f, 0.1f, 0.1f), Gold.Darkened(0.3f), new Color(0.85f, 0.78f, 0.68f)),
-			_ => (new Color(0.09f, 0.085f, 0.09f), LockedGrey, new Color(0.5f, 0.48f, 0.46f)),
-		};
-		var style = new StyleBoxFlat { BgColor = bg, BorderColor = selected ? Colors.White : border };
-		style.SetBorderWidthAll(selected ? 3 : look == CardLook.Available ? 2 : 1);
-		style.SetCornerRadiusAll(5);
-		var hover = (StyleBoxFlat)style.Duplicate();
-		hover.BgColor = bg.Lightened(0.08f);
-		button.AddThemeStyleboxOverride("normal", style);
-		button.AddThemeStyleboxOverride("hover", hover);
-		button.AddThemeStyleboxOverride("pressed", hover);
-		button.GetChild(0).GetNode<Label>("Name").AddThemeColorOverride("font_color", text);
+		var at = _layout.Get(spot.Key);
+		at.X = Mathf.Clamp(feet.X / _scene.Size.X, 0, 1);
+		at.Y = Mathf.Clamp(feet.Y / _scene.Size.Y, 0, 1);
+		_layout.Spots[spot.Key] = at;
+		Place(spot, spot.Picture);
 	}
+
+	private void ScaleSpot(CastleSpot spot, float factor)
+	{
+		var at = _layout.Get(spot.Key);
+		at.Width = Mathf.Clamp(at.Width * factor, 0.02f, 0.6f);
+		_layout.Spots[spot.Key] = at;
+		Place(spot, spot.Picture);
+	}
+
+	private enum CardLook { Built, Available, NoResources, Locked }
 
 	private static CardLook LookOf(BuildingStatus status) => status switch
 	{
@@ -428,10 +479,12 @@ public partial class BuildWindow : PanelContainer
 			return;
 		int slots = Factions.All.Sum(_castle.SlotCount);
 		int used = Factions.All.Sum(f => Enumerable.Range(0, Castle.MaxSlots).Count(i => _castle.SlotAt(f, i) != null));
-		_progressLabel.Text = $"Tower level {_castle.TowerLevel}   Vision {_castle.VisionRadius:0}   Slots used {used}/{slots}   Gold {_castle.GoldPerTick:0.##}/tick";
-		foreach (var update in _cardUpdates)
+		ShowWork(_buildRow, _castle.Construction, "Building");
+		ShowWork(_trainRow, _castle.Training, "Training");
+		_progressLabel.Text = _layoutMode ? "Layout mode: drag the buildings and plots, mouse wheel to resize, then Save layout."
+			: $"Tower level {_castle.TowerLevel}   Vision {_castle.VisionRadius:0}   Slots used {used}/{slots}   Gold {_castle.GoldPerTick:0.##}/tick";
+		foreach (var update in _spotUpdates)
 			update();
-		_canvas.QueueRedraw();
 		ShowDetails();
 	}
 
@@ -477,9 +530,9 @@ public partial class BuildWindow : PanelContainer
 		var status = _castle.TowerStatus(next);
 		bool maxed = status == BuildingStatus.MaxLevel || status == BuildingStatus.Built;
 		_detailName.Text = maxed ? next.Name : $"Tower {_castle.TowerLevel} → {next.Name}";
-		ShowBuildingText(next, maxed ? null : $"Costs {ResourceCost.Text(next.Cost)}");
+		ShowBuildingText(next, maxed ? null : $"Costs {ResourceCost.Text(next.Cost)}  ·  takes {BuildTime(next, next.TowerLevel)}");
 		_detailStatus.Text = maxed ? "The tower is at its highest level." : StatusText(status, next);
-		_buildButton.Visible = !maxed;
+		_buildButton.Visible = !maxed && status != BuildingStatus.UnderConstruction;
 		_buildButton.Text = "Upgrade";
 		_buildButton.Disabled = status != BuildingStatus.Available;
 	}
@@ -496,7 +549,7 @@ public partial class BuildWindow : PanelContainer
 		var status = _castle.BaseStatus(faction);
 		_detailName.Text = $"{building.Name} ({Factions.Name(faction)})  ·  level {level}/{BuildingDefinition.MaxLevel}";
 		ShowBuildingText(building, status == BuildingStatus.MaxLevel ? null
-			: $"{(level == 0 ? "Build" : $"Level {level + 1}")} costs {ResourceCost.Text(_castle.NextBaseCost(faction))}");
+			: $"{(level == 0 ? "Build" : $"Level {level + 1}")} costs {ResourceCost.Text(_castle.NextBaseCost(faction))}  ·  takes {BuildTime(building, level + 1)}");
 		if (building.UnitCapFor != null)
 			_detailEffects.Text += $"\n{building.UnitCapFor.Name} cap now {_castle.UnitCap(building.UnitCapFor)} (from all buildings)";
 		_detailStatus.Text = status switch
@@ -505,9 +558,9 @@ public partial class BuildWindow : PanelContainer
 			BuildingStatus.Available => level == 0 ? "Ready to build." : $"Ready to raise to level {level + 1}: opens slot {level + 1}.",
 			BuildingStatus.NoResources => "Not enough resources.",
 			BuildingStatus.NeedsTower => $"Needs Tower level {level + 1}.",
-			_ => "",
+			_ => StatusText(status, building, faction),
 		};
-		_buildButton.Visible = status != BuildingStatus.MaxLevel;
+		_buildButton.Visible = status != BuildingStatus.MaxLevel && status != BuildingStatus.UnderConstruction;
 		_buildButton.Text = level == 0 ? "Build" : "Upgrade";
 		_buildButton.Disabled = status != BuildingStatus.Available;
 		ShowRecruit(building, level > 0);
@@ -522,9 +575,11 @@ public partial class BuildWindow : PanelContainer
 		int level = _castle.RecruitLevel(type);
 		_recruitButton.Text = $"Recruit (lv {level})";
 		_recruitButton.Disabled = !_castle.CanRecruit(building);
-		string blocked = PlayerAgents.RecruitBlockedReason(type);
+		var training = _castle.Training;
+		string blocked = training != null ? $"Already training {Article(training.Name)} ({training.TimeLeft} left); one unit at a time"
+			: PlayerAgents.RecruitBlockedReason(type);
 		_recruitButton.TooltipText = !built ? "Build it first"
-			: blocked ?? $"Recruit a level {level} {type.Name} for {ResourceCost.Text(building.RecruitCost)}"
+			: blocked ?? $"Recruit a level {level} {type.Name} for {ResourceCost.Text(building.RecruitCost)}, ready in {CastleWork.Clock(building.RecruitSeconds)}"
 				+ $" ({type.Name} {PlayerAgents.CountOf(type)}/{PlayerAgents.CapFor(type)}, agents {PlayerAgents.Count}/{PlayerAgents.Cap})";
 		if (built && blocked != null)
 			_detailStatus.Text += $"  {blocked}.";
@@ -542,6 +597,14 @@ public partial class BuildWindow : PanelContainer
 			_demolishButton.TooltipText = $"Tear it down and get back {ResourceCost.Text(RefundOf(building))}";
 			_detailStatus.Text = $"Demolishing pays back {Castle.DemolishRefund:P0} of its cost ({ResourceCost.Text(RefundOf(building))}).";
 			ShowRecruit(building, true);
+			return;
+		}
+		if (_castle.IsSlotUnderConstruction(faction, slot))
+		{
+			var going = _castle.Construction.Building;
+			_detailName.Text = $"{going.Name}  ·  {Factions.Name(faction)} slot {slot + 1}";
+			ShowBuildingText(going, null);
+			_detailStatus.Text = StatusText(BuildingStatus.UnderConstruction, going, faction);
 			return;
 		}
 		if (slot >= _castle.SlotCount(faction))
@@ -589,7 +652,7 @@ public partial class BuildWindow : PanelContainer
 			return;
 		}
 		var candidateStatus = _castle.SlotStatus(_candidate, faction);
-		ShowBuildingText(_candidate, $"Costs {ResourceCost.Text(_candidate.Cost)}");
+		ShowBuildingText(_candidate, $"Costs {ResourceCost.Text(_candidate.Cost)}  ·  takes {BuildTime(_candidate, _candidate.Level)}");
 		_detailStatus.Text = StatusText(candidateStatus, _candidate, faction);
 		_buildButton.Visible = true;
 		_buildButton.Text = $"Build {_candidate.Name}";
@@ -628,8 +691,15 @@ public partial class BuildWindow : PanelContainer
 		BuildingStatus.NeedsTower => $"Needs Tower level {building.RequiredTowerLevel}.",
 		BuildingStatus.NeedsBase => $"Needs the {_castle.Base(faction)?.Name ?? "base"} at level {building.MinBaseLevel}.",
 		BuildingStatus.WrongLayer => $"Only fits the {Factions.Name(building.Faction)} layer.",
+		BuildingStatus.UnderConstruction => $"Under construction: {_castle.Construction.TimeLeft} left.",
+		BuildingStatus.Busy => $"{_castle.Construction.Name} is being built ({_castle.Construction.TimeLeft} left); one building at a time.",
 		_ => "Build the required buildings first.",
 	};
+
+	private static string BuildTime(BuildingDefinition building, int level) => CastleWork.Clock(Castle.BuildSeconds(building, level));
+
+	// "an Imp", "a Witch"
+	private static string Article(string name) => ("AEIOU".Contains(char.ToUpper(name[0])) ? "an " : "a ") + name;
 
 	private static IEnumerable<ResourceCost> RefundOf(BuildingDefinition building) =>
 		building.Cost.Where(c => c != null).Select(c => new ResourceCost { Type = c.Type, Amount = Mathf.Floor(c.Amount * Castle.DemolishRefund) });

@@ -41,6 +41,16 @@ public static class BattleFormation
 		_ => 2f,
 	};
 
+	// e.g. "front middle", "back top"
+	public static string SlotName(int slot) => slot switch
+	{
+		0 => "back top",
+		1 => "back bottom",
+		2 => "front top",
+		3 => "front middle",
+		_ => "front bottom",
+	};
+
 	public static bool IsGuarded(Combatant[] side, int slot)
 	{
 		foreach (int guard in GuardsOf(slot))

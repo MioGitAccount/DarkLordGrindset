@@ -18,6 +18,9 @@ public partial class QuestToasts : VBoxContainer
 		Position = new Vector2(8, 60);
 	}
 
+	// A message not tied to a quest (e.g. an item found)
+	public void AddMessage(string message) => AddToast(null, message);
+
 	public void AddToast(Quest quest, string message)
 	{
 		var toast = new Button
@@ -25,11 +28,11 @@ public partial class QuestToasts : VBoxContainer
 			Text = message,
 			FocusMode = FocusModeEnum.None,
 			Alignment = HorizontalAlignment.Left,
-			TooltipText = quest.IsOpen ? "Click to open the quest" : "",
+			TooltipText = quest?.IsOpen == true ? "Click to open the quest" : "",
 		};
 		toast.Pressed += () =>
 		{
-			if (quest.IsOpen)
+			if (quest?.IsOpen == true)
 				QuestClicked?.Invoke(quest);
 			toast.QueueFree();
 		};

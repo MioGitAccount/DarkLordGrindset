@@ -10,6 +10,8 @@ FACTIONS = ["None", "Chaos", "Stronghold", "DarkHumans", "Undead"]
 UNITS = {"imp": "res://unit_templates/imp.tres", "orc": "res://unit_templates/orc.tres",
          "witch": "res://unit_templates/witch.tres", "skeleton": "res://unit_templates/skeleton.tres"}
 QUESTS = "res://resources/quests/"
+# <id>.png, a tower tower_<level>.png, a base <id>_<level>.png
+ART = "res://images/castle/"
 
 TOWERS = [
     dict(id="tower1", name="Tower I", level=1, tower=1, start=True, vision=50, gold=0.25, agents=8,
@@ -29,15 +31,15 @@ BASES = [
          up2={"wood": 80, "gold": 60}, up3={"gold": 120, "crystal": 40, "mana": 40},
          desc="A smoky burrow where imps breed, the heart of the Chaos layer. Lets you recruit imps."),
     dict(id="orc_pit", name="Orc Pit", faction="Stronghold", unit="orc", cap=4, per_level=2,
-         cost={"wood": 60, "ore": 30}, recruit={"gold": 50, "ore": 10},
+         cost={"wood": 60, "ore": 30}, recruit={"gold": 50},
          up2={"wood": 100, "ore": 60}, up3={"gold": 120, "ore": 100, "crystal": 30},
          desc="A mud pit full of brawling orcs and goblins, the heart of the Stronghold layer. Lets you recruit orcs."),
     dict(id="witch_hut", name="Witch's Hut", faction="DarkHumans", unit="witch", cap=2, per_level=1,
-         cost={"wood": 50, "gold": 30}, recruit={"gold": 60, "wood": 20},
+         cost={"wood": 50, "gold": 30}, recruit={"gold": 60},
          up2={"wood": 80, "gold": 60, "mana": 20}, up3={"gold": 120, "crystal": 40, "mana": 60},
          desc="A crooked hut at the edge of the woods, the heart of the Dark Humans layer. Lets you recruit witches."),
     dict(id="crypt", name="Crypt", faction="Undead", unit="skeleton", cap=4, per_level=2,
-         cost={"ore": 40, "gold": 30}, recruit={"gold": 40, "ore": 10},
+         cost={"ore": 40, "gold": 30}, recruit={"gold": 40},
          up2={"ore": 80, "gold": 60}, up3={"gold": 120, "ore": 80, "crystal": 40},
          desc="Cold stairs down to the restless dead, the heart of the Undead layer. Lets you raise skeletons."),
 ]
@@ -110,6 +112,13 @@ def main():
 
     ids = []
 
+    # Castle screen art cut by tools/castle/cut_buildings.py; missing files are left out (the game
+    # shows its placeholder then)
+    def art(name):
+        if os.path.exists(os.path.join(root, "images", "castle", name + ".png")):
+            return ext_ref("Texture2D", ART + name + ".png")
+        return None
+
     def building(b, lines):
         lines = ['script = ExtResource("building")', f'Name = "{b["name"]}"', f'Description = "{b["desc"]}"'] + lines
         sid = "Building_" + b["id"]
@@ -117,18 +126,22 @@ def main():
         ids.append(sid)
 
     for t in TOWERS:
-        building(t, [f'Level = {t["level"]}', f'Cost = {costs(t.get("cost"))}',
+        icon = art(f'tower_{t["level"]}')
+        building(t, ([f"Icon = {icon}"] if icon else []) + [f'Level = {t["level"]}', f'Cost = {costs(t.get("cost"))}',
                      "Requires = [" + ", ".join(f'SubResource("Building_{r}")' for r in t.get("requires", [])) + "]",
                      f'BuiltAtStart = {"true" if t.get("start") else "false"}', f'TowerLevel = {t["tower"]}',
                      f'BonusVision = {float(t["vision"])}', f'GoldPerTick = {float(t.get("gold", 0))}', f'AgentCap = {t["agents"]}'])
     for b in BASES:
-        building(b, ["Level = 1", f'Cost = {costs(b["cost"])}', "Requires = []", "BuiltAtStart = true",
+        icons = [art(f'{b["id"]}_{level}') for level in (1, 2, 3)]
+        art_lines = ["LevelIcons = [" + ", ".join(i or "null" for i in icons) + "]"] if any(icons) else []
+        building(b, art_lines + ["Level = 1", f'Cost = {costs(b["cost"])}', "Requires = []", "BuiltAtStart = true",
                      f'Faction = {FACTIONS.index(b["faction"])}', "IsFactionBase = true",
                      f'UpgradeCostLevel2 = {costs(b["up2"])}', f'UpgradeCostLevel3 = {costs(b["up3"])}',
                      f'UnitCapPerLevel = {b["per_level"]}', f'RecruitsUnit = {unit(b["unit"])}',
                      f'RecruitCost = {costs(b["recruit"])}', f'UnitCapFor = {unit(b["unit"])}', f'UnitCap = {b["cap"]}'])
     for s in SLOTS:
-        lines = [f'Level = {s["level"]}', f'Cost = {costs(s["cost"])}', "Requires = []",
+        icon = art(s["id"])
+        lines = ([f"Icon = {icon}"] if icon else []) + [f'Level = {s["level"]}', f'Cost = {costs(s["cost"])}', "Requires = []",
                  f'Faction = {FACTIONS.index(s["faction"])}', f'MinBaseLevel = {s.get("base", 1)}']
         if s.get("gold"):
             lines.append(f'GoldPerTick = {float(s["gold"])}')

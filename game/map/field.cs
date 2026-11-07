@@ -31,6 +31,11 @@ public partial class field : Node2D
 	[Export] public Godot.Collections.Array<NeutralUnit> presentNeutralUnits = new();
 	// Raised when units enter or leave this field, or its fog state changes
 	public event Action ContentsChanged;
+	// Items the guards here sit on; they go to the player's inventory when the last guard is gone
+	public List<ItemDefinition> Loot { get; } = new();
+	// Set once an agent has stood on or next to this field: the panels show what the loot is
+	public bool LootRevealed { get; private set; }
+	public bool HasGuards => presentNeutralUnits.Count > 0;
 	public FogState Fog { get; private set; } = FogState.Unexplored;
 	// Neutral units as they were the last time a player unit could see this field
 	public Godot.Collections.Array<NeutralUnit> LastSeenNeutrals { get; private set; } = new();
@@ -59,13 +64,14 @@ public partial class field : Node2D
 				continue;
 			Castle = new Castle(this, perk.Buildings);
 			Castle.Changed += () => ContentsChanged?.Invoke();
+			Castle.Progressed += QueueRedraw; // the work bars over the marker
 			AddToGroup(FogOfWar.ViewerGroup); // the castle sees around itself, see Castle.VisionRadius
 			break;
 		}
 		GlobalTickManager.Instance.OnTick += TickTimedPerks;
 		GlobalTickManager.Instance.OnTick += TickHealing;
 		if (Castle != null)
-			GlobalTickManager.Instance.OnTick += Castle.CollectIncome;
+			GlobalTickManager.Instance.OnTick += Castle.Tick;
 	}
 
 	public override void _ExitTree()
@@ -75,7 +81,7 @@ public partial class field : Node2D
 			GlobalTickManager.Instance.OnTick -= TickTimedPerks;
 			GlobalTickManager.Instance.OnTick -= TickHealing;
 			if (Castle != null)
-				GlobalTickManager.Instance.OnTick -= Castle.CollectIncome;
+				GlobalTickManager.Instance.OnTick -= Castle.Tick;
 		}
 	}
 
@@ -230,6 +236,34 @@ public partial class field : Node2D
 		else if (isHovered)
 			DrawArc(Vector2.Zero, r, 0, Mathf.Tau, 48, new Color(1f, 1f, 1f, 0.6f), 1.5f, true);
 		DrawUnitDots(r);
+		DrawCastleWork(r);
+	}
+
+	private static readonly Color WorkBack = new Color(0.08f, 0.06f, 0.06f, 0.85f);
+	private static readonly Color BuildColor = new Color(1f, 0.75f, 0.3f);
+	private static readonly Color TrainColor = new Color(0.55f, 0.8f, 1f);
+
+	// Over a castle: what is being built and trained, each with a bar and the time left
+	private void DrawCastleWork(float markerRadius)
+	{
+		if (Castle == null || Fog == FogState.Unexplored)
+			return;
+		const float width = 70, height = 5;
+		float y = -markerRadius - 8;
+		var font = ThemeDB.FallbackFont;
+		foreach (var (work, color) in new[] { (Castle.Training, TrainColor), (Castle.Construction, BuildColor) })
+		{
+			if (work == null)
+				continue;
+			var bar = new Rect2(-width / 2, y, width, height);
+			DrawRect(bar.Grow(1), WorkBack);
+			DrawRect(new Rect2(bar.Position, new Vector2(width * work.Progress, height)), color);
+			string text = $"{work.Name} {work.TimeLeft}";
+			var at = new Vector2(-width / 2 - 20, y - 3);
+			DrawStringOutline(font, at, text, HorizontalAlignment.Center, width + 40, 11, 3, WorkBack);
+			DrawString(font, at, text, HorizontalAlignment.Center, width + 40, 11, color);
+			y -= 22;
+		}
 	}
 
 	// Dots in an arc along the bottom of the marker, centred under it; "+N" past MaxUnitDots
@@ -278,7 +312,29 @@ public partial class field : Node2D
 	public void AddPlayerUnit(unit newUnit)
 	{
 		presentPlayerUnits.Add(newUnit);
+		// Scouting: an agent here sees what this field's and the neighbouring guards hold
+		RevealLoot();
+		foreach (var neighbor in Neighbors)
+			neighbor.RevealLoot();
 		ContentsChanged?.Invoke();
+	}
+
+	public void RevealLoot()
+	{
+		if (LootRevealed)
+			return;
+		LootRevealed = true;
+		ContentsChanged?.Invoke();
+	}
+
+	// The guards are gone: their loot goes to the player
+	private void ClaimLoot()
+	{
+		if (HasGuards || Loot.Count == 0)
+			return;
+		foreach (var item in Loot)
+			PlayerInventory.Add(item, $"loot from {type?.Name ?? Name}");
+		Loot.Clear();
 	}
 	// Neutral units killed in battle
 	public void RemoveNeutralUnits(IEnumerable<NeutralUnit> killed)
@@ -290,6 +346,7 @@ public partial class field : Node2D
 			return;
 		if (Fog == FogState.Visible)
 			LastSeenNeutrals = presentNeutralUnits.Duplicate();
+		ClaimLoot();
 		ContentsChanged?.Invoke();
 	}
 

@@ -13,6 +13,7 @@ public partial class MusicPlayer : Node
 	{
 		("res://sound/music/beyond_the_ashen_crown.ogg", 0f),
 		("res://sound/music/pastoral_morning.ogg", 0f),
+		("res://sound/music/morning_over_the_meadows.ogg", 0f),
 	};
 	private const string BattleTrack = "res://sound/music/march_of_the_black_legion.ogg";
 	// Linear volume of the playing theme (1 = full level; the rendered tracks are already mastered softly)

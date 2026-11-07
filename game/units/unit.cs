@@ -3,6 +3,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
+using System.Linq;
 
 public partial class unit : Node2D
 {
@@ -40,6 +41,8 @@ public partial class unit : Node2D
 	public bool OnQuest => ActiveQuest != null;
 	// Raised when the unit dies (in battle), right before it is removed from the game
 	public event Action<unit> Died;
+	// Items the agent carries, one per slot (see ItemSlot); they add to attributes and stats
+	private readonly Dictionary<ItemSlot, Item> _equipment = new();
 
 	private BattleStats _baseStats;
 	private SpecialAttributes _baseAttributes;
@@ -147,6 +150,9 @@ public partial class unit : Node2D
 				if (ability != null)
 					experienceMultipliers[ability] = experienceMultipliers.GetValueOrDefault(ability, 1f) + skill.ExperienceBonus;
 		}
+		foreach (var item in _equipment.Values)
+			for (int i = 0; i < SpecialAttributes.Count; i++)
+				attributes.Set(i, attributes.Get(i) + item.Definition.Attributes[i]);
 		// Upgrades (Raid II, Firebolt II, ...) take the place of the version they replace
 		RemoveReplaced(abilities, a => a.Replaces);
 		RemoveReplaced(combatPassives, p => p.Replaces);
@@ -156,10 +162,18 @@ public partial class unit : Node2D
 		int levelHealth = UnitProgression.HealthPerLevel * (Progression.Level - 1);
 		stats.maxHealth += levelHealth;
 		stats.health += levelHealth;
+		foreach (var item in _equipment.Values)
+		{
+			stats.attack += item.Definition.Attack;
+			stats.defence += item.Definition.Defence;
+			stats.maxHealth += item.Definition.Health;
+			stats.health += item.Definition.Health;
+		}
 		if (battleStats != null)
 		{
+			// Damage taken carries over; taking off a health item never kills
 			if (battleStats.maxHealth > 0)
-				stats.health = Math.Max(0, stats.maxHealth - (battleStats.maxHealth - battleStats.health));
+				stats.health = Math.Max(1, stats.maxHealth - (battleStats.maxHealth - battleStats.health));
 			stats.mana = Math.Max(0, stats.maxMana - (battleStats.maxMana - battleStats.mana));
 		}
 
@@ -217,9 +231,64 @@ public partial class unit : Node2D
 		return true;
 	}
 
-	// Killed in battle: leaves its field and the game
+	// --- Items ---------------------------------------------------------------------------------
+
+	public Item GetItem(ItemSlot slot) => _equipment.GetValueOrDefault(slot);
+	public IEnumerable<Item> Items => _equipment.Values;
+
+	// Why this item can't go onto the unit right now, or null when it can
+	public string EquipBlockedReason(Item item)
+	{
+		if (item?.Definition == null)
+			return "No item";
+		var current = GetItem(item.Definition.Slot);
+		if (current != null && current.IsLocked)
+			return $"{current.Name} is locked on this agent for {Math.Ceiling(current.LockSecondsLeft)}s";
+		return null;
+	}
+
+	// Why the item in this slot can't be taken off, or null when it can (or the slot is empty)
+	public string UnequipBlockedReason(ItemSlot slot)
+	{
+		var current = GetItem(slot);
+		if (current != null && current.IsLocked)
+			return $"{current.Name} was just given - locked for {Math.Ceiling(current.LockSecondsLeft)}s";
+		return null;
+	}
+
+	// Moves an inventory item onto the unit. The item already in that slot goes back to the
+	// inventory. The new item is locked on the unit for Item.LockSeconds.
+	public bool Equip(Item item)
+	{
+		if (EquipBlockedReason(item) != null || !PlayerInventory.Remove(item))
+			return false;
+		var slot = item.Definition.Slot;
+		if (_equipment.Remove(slot, out var old))
+			PlayerInventory.Return(old);
+		_equipment[slot] = item;
+		item.Lock();
+		RecalculateStats();
+		currentField?.NotifyContentsChanged();
+		return true;
+	}
+
+	// Takes the item in this slot back to the inventory
+	public Item Unequip(ItemSlot slot)
+	{
+		if (UnequipBlockedReason(slot) != null || !_equipment.Remove(slot, out var item))
+			return null;
+		PlayerInventory.Return(item);
+		RecalculateStats();
+		currentField?.NotifyContentsChanged();
+		return item;
+	}
+
+	// Killed in battle: leaves its field and the game. Its items go back to the inventory.
 	public void Die()
 	{
+		foreach (var item in _equipment.Values)
+			PlayerInventory.Return(item);
+		_equipment.Clear();
 		abilityRunner?.StopAbility();
 		currentField?.RemovePlayerUnit(this);
 		currentField = null;
@@ -361,6 +430,21 @@ public partial class unit : Node2D
 		isMoving = true;
 		abilityRunner.StopAbility(); // a new order ends whatever the unit was doing
 		leaveCurrentField();
+	}
+
+	// The field the unit is walking to right now; null when it stands still
+	public field NextField => isMoving ? path[pathIndex] : null;
+	// The fields still ahead, the next one first (empty when standing still)
+	public IEnumerable<field> RemainingPath => isMoving ? path.Skip(pathIndex) : Enumerable.Empty<field>();
+
+	// A new route for a moving unit. It can't turn around mid-way: it first reaches NextField,
+	// so `newPath` starts there; just [NextField] (ordering it to the next field) stops it there.
+	public void Redirect(List<field> newPath)
+	{
+		if (!isMoving || newPath == null || newPath.Count == 0 || newPath[0] != NextField)
+			return;
+		path = newPath;
+		pathIndex = 0; // the leg to path[0] carries on as it is
 	}
 
 	private void MoveToNextNode()

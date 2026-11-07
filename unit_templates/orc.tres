@@ -1,4 +1,4 @@
-[gd_resource type="Resource" script_class="UnitTemplate" load_steps=13 format=3 uid="uid://bewribr222x3c"]
+[gd_resource type="Resource" script_class="UnitTemplate" load_steps=14 format=3 uid="uid://bewribr222x3c"]
 
 [ext_resource type="Script" path="res://game/units/BattleStats.cs" id="1_4tidt"]
 [ext_resource type="Texture2D" uid="uid://2emeyiwasn81" path="res://images/Units/orcIcon.png" id="1_jx0do"]
@@ -8,6 +8,7 @@
 [ext_resource type="Script" path="res://game/units/SpecialAttributes.cs" id="9_attrs"]
 [ext_resource type="Resource" uid="uid://2nlr2pmxihgv" path="res://resources/skill_trees/orc_skill_tree.tres" id="10_skills"]
 [ext_resource type="Texture2D" uid="uid://b70iayxwv87ox" path="res://images/Units/sprites/orc_battle.png" id="11_battle"]
+[ext_resource type="Texture2D" uid="uid://c74kw11vowmp4" path="res://images/Units/sprites/orc_attack_battle.png" id="12_attack"]
 [ext_resource type="Resource" path="res://resources/combat/roar.tres" id="c_roar"]
 [ext_resource type="Resource" path="res://resources/combat/stun.tres" id="c_stun"]
 
@@ -38,6 +39,7 @@ Biome = 0
 Icon = ExtResource("1_jx0do")
 MapSprite = ExtResource("4_frames")
 BattleSprite = ExtResource("11_battle")
+BattleAttackSprite = ExtResource("12_attack")
 SpriteScale = 1.0
 BattleAttackLean = true
 AttackProjectileColor = Color(1, 0.7, 0.3, 1)

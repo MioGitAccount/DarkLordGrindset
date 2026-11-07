@@ -10,12 +10,15 @@ Decisions below were picked by the user; items marked *(default)* are my proposa
    random quests available at once. Quests stay near the castle: a level L quest appears at most
    L + 5 steps (field connections) away (Lv1 = 6 ... Lv5 = 10), and each step away makes a field less likely
    (weight / (1 + 0.5 x steps)), so low quests cluster around the castle.
+   As the game goes on they move out: each level of the best agent above 1 pushes quests that are not on
+   the castle itself one step further out (nearest and farthest step both), up to 4 steps (agent Lv5).
    No repeats: random quests come from a shuffle bag. A quest leaves the bag when it appears, and only
    quests still in the bag can appear (and never one already open). When nothing left in the bag can
    appear, the bag is refilled. Each castle building with a quest pool has its own bag. Map files can also place fixed story quests (no timer) on fields.
 2. **Deadline** - most quests have a timer that starts when they appear; the whole quest must be done
    before it ends (the visitor leaves town). Running out mid-quest fails the current stage.
-   Some quests have no timer.
+   Some quests have no timer. Timers by level: Lv1 6:00, Lv2 7:00, Lv3 8:00, Lv4 9:00, Lv5 10:00
+   (`DEADLINE_PER_LEVEL` in tools/quests/make_quests.py).
 3. **Assign** - only agents standing on the quest field can be assigned. A quest says how many agents
    it takes (min/max, usually 1). Gates: minimum level and hard minimum attributes.
 4. **Work** - the quest runs through its stages in order. Assigned agents cannot move or use work
@@ -31,7 +34,9 @@ autumn forests, Mountain = caves and ore mines, Plains = grass, roads, crossroad
   Lv4 = 3 hard rolls, Lv5 = 4 stages. Difficulty about 3 at Lv1 up to 6 at Lv4-5.
 - Random quests appear up to **one level above your best agent** (level 1 agents: Lv1-2 quests).
 - Rewards scale: resources and XP x(1 + 0.5 per level above 1), so Lv3 = 2x, Lv5 = 3x the listed base.
-- Quest XP is also tripled on top (`QuestReward.ExperienceBonus` = 3); the XP in the tables below is before that bonus.
+- Quest XP is also multiplied by 10 on top (`QuestReward.ExperienceBonus`), because agents are busy for minutes;
+  the XP in the tables below is before that bonus. It is paid in equal parts, one for each stage passed or fight won
+  (a failed stage that the quest carries on past pays nothing).
 - The level shows on the map marker (corner number), the field panel, the hover card and the window.
 
 ## Stages
@@ -42,6 +47,7 @@ Each stage has a name, a flavour line, a duration *(default: ~20-40 s)* and one 
   Score = weighted sum of the agent's attributes. Chance: score = difficulty -> 75%, +10% per point
   above (100% at +3), -15% per point below, never under 5%. E.g. STR 8 vs 5 = 100%, STR 4 vs 5 = 60%.
   With a team, the best assigned agent for that stage rolls it.
+  A roll stage takes 90s of work, or 120s when it is the quest's only roll stage (`ROLL_SECONDS`).
 - **Battle** - spawns neutral enemies on the field; the quest waits with a **Fight!** button (deadline
   keeps running) and opens the normal battle screen with the quest's agents. Win = stage passed.
 
@@ -52,7 +58,7 @@ chance. Most quests fail with no consequence beyond lost time.
 ## Rewards (first version)
 
 Resources, XP to the agents, a new unit that joins (ignores agent caps), field perks added or removed,
-neutral guards removed from the field. Artifacts come later.
+neutral guards removed from the field, an item (a named one or a random one of a tier, see ITEMS_DESIGN.md).
 
 ## UI
 

@@ -63,6 +63,18 @@ public static class UIText
 		return text;
 	}
 
+	// What the field's guards sit on, as far as the player knows: null when there are no guards
+	public static string Loot(field f, bool guardsKnown)
+	{
+		if (!guardsKnown)
+			return null;
+		if (!f.LootRevealed)
+			return "Loot: unknown - move an agent here or next to it to scout";
+		if (f.Loot.Count == 0)
+			return "Loot: none";
+		return "Loot: " + string.Join(", ", System.Linq.Enumerable.Select(f.Loot, i => i.Name));
+	}
+
 	public static void ClearChildren(Node node)
 	{
 		foreach (var child in node.GetChildren())

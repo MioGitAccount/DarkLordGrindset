@@ -224,6 +224,9 @@ public class FieldData
 	public List<NeutralData> Neutrals { get; set; }
 	// Story quests on this field, no timer (files in resources/quests without .tres)
 	public List<string> Quests { get; set; }
+	// Items the guards sit on (ids from game/items/ItemCatalog.cs); claimed when the field is cleared.
+	// null = rolled from the guards' level at game start, [] = no loot.
+	public List<string> Loot { get; set; }
 	// Castle fields only: which faction bases stand at the start ("Chaos", "Stronghold",
 	// "DarkHumans", "Undead"); null = all of them
 	public List<string> Factions { get; set; }

@@ -174,7 +174,7 @@ public partial class QuestWindow : PanelContainer
 		if (definition.Reward != null)
 		{
 			_content.AddChild(new Label { Text = "Reward", ThemeTypeVariation = "HeaderLabel" });
-			var reward = Wrapped(string.Join("\n", definition.Reward.Lines(definition.RewardMultiplier)));
+			var reward = Wrapped(string.Join("\n", definition.Reward.Lines(definition.RewardMultiplier, definition.Stages.Count)));
 			reward.AddThemeColorOverride("font_color", BrightGold);
 			_content.AddChild(reward);
 		}
