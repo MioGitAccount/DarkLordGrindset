@@ -1,0 +1,138 @@
+[gd_resource type="Resource" script_class="SkillClass" load_steps=10 format=3 uid="uid://bo00xueml7gnl"]
+
+[ext_resource type="Script" path="res://game/units/skills/SkillClass.cs" id="1_class"]
+[ext_resource type="Script" path="res://game/units/skills/SkillDefinition.cs" id="2_skill"]
+[ext_resource type="Resource" path="res://resources/combat/taunt.tres" id="taunt"]
+
+[sub_resource type="Resource" id="Skill_thick_hide"]
+script = ExtResource("2_skill")
+Name = "Thick Hide"
+Description = "Tough skin that turns aside the first blows."
+Tier = 1
+Column = 0
+Cost = 1
+Requires = []
+BonusDeadliness = 0
+BonusStrength = 0
+BonusDurability = 1
+BonusCleverness = 0
+BonusQuickness = 0
+BonusAttack = 0
+BonusDefence = 0
+BonusHealth = 0
+BonusVision = 0.0
+FieldHealInterval = 0
+ExperienceBonus = 0.0
+ExperienceBonusAbilities = []
+
+[sub_resource type="Resource" id="Skill_iron_skin"]
+script = ExtResource("2_skill")
+Name = "Iron Skin"
+Description = "Blades just bounce off."
+Tier = 2
+Column = 0
+Cost = 1
+Requires = [SubResource("Skill_thick_hide")]
+BonusDeadliness = 0
+BonusStrength = 0
+BonusDurability = 1
+BonusCleverness = 0
+BonusQuickness = 0
+BonusAttack = 0
+BonusDefence = 0
+BonusHealth = 0
+BonusVision = 0.0
+FieldHealInterval = 0
+ExperienceBonus = 0.0
+ExperienceBonusAbilities = []
+
+[sub_resource type="Resource" id="Skill_stone_wall"]
+script = ExtResource("2_skill")
+Name = "Stone Wall"
+Description = "Holds the line no matter what."
+Tier = 3
+Column = 0
+Cost = 1
+Requires = [SubResource("Skill_iron_skin")]
+BonusDeadliness = 0
+BonusStrength = 0
+BonusDurability = 2
+BonusCleverness = 0
+BonusQuickness = 0
+BonusAttack = 0
+BonusDefence = 0
+BonusHealth = 0
+BonusVision = 0.0
+FieldHealInterval = 0
+ExperienceBonus = 0.0
+ExperienceBonusAbilities = []
+
+[sub_resource type="Resource" id="Skill_provoke"]
+script = ExtResource("2_skill")
+Name = "Provoke"
+Description = "Battle ability Taunt: for 2 turns every enemy that can reach it must aim its normal attacks at it. Ready every 4th turn."
+Tier = 3
+Column = 1
+Cost = 1
+Requires = [SubResource("Skill_iron_skin")]
+BonusDeadliness = 0
+BonusStrength = 0
+BonusDurability = 0
+BonusCleverness = 0
+BonusQuickness = 0
+BonusAttack = 0
+BonusDefence = 0
+BonusHealth = 0
+BonusVision = 0.0
+GrantedCombatAbility = ExtResource("taunt")
+FieldHealInterval = 0
+ExperienceBonus = 0.0
+ExperienceBonusAbilities = []
+
+[sub_resource type="Resource" id="Skill_unbreakable"]
+script = ExtResource("2_skill")
+Name = "Unbreakable"
+Description = "Refuses to fall."
+Tier = 4
+Column = 0
+Cost = 1
+Requires = [SubResource("Skill_stone_wall")]
+BonusDeadliness = 0
+BonusStrength = 1
+BonusDurability = 2
+BonusCleverness = 0
+BonusQuickness = 0
+BonusAttack = 0
+BonusDefence = 0
+BonusHealth = 0
+BonusVision = 0.0
+FieldHealInterval = 0
+ExperienceBonus = 0.0
+ExperienceBonusAbilities = []
+
+[sub_resource type="Resource" id="Skill_juggernaut"]
+script = ExtResource("2_skill")
+Name = "Juggernaut"
+Description = "A walking fortress."
+Tier = 5
+Column = 0
+Cost = 1
+Requires = [SubResource("Skill_unbreakable")]
+BonusDeadliness = 0
+BonusStrength = 0
+BonusDurability = 3
+BonusCleverness = 0
+BonusQuickness = 0
+BonusAttack = 0
+BonusDefence = 0
+BonusHealth = 0
+BonusVision = 0.0
+FieldHealInterval = 0
+ExperienceBonus = 0.0
+ExperienceBonusAbilities = []
+
+[resource]
+script = ExtResource("1_class")
+Name = "Tank"
+Description = "Thick hide, heavy armour, and the nerve to stand in front. Built on Durability."
+Skills = [SubResource("Skill_thick_hide"), SubResource("Skill_iron_skin"), SubResource("Skill_stone_wall"), SubResource("Skill_provoke"), SubResource("Skill_unbreakable"), SubResource("Skill_juggernaut")]

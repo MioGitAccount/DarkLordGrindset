@@ -1,0 +1,201 @@
+[gd_resource type="Resource" script_class="SkillClass" load_steps=22 format=3 uid="uid://duxe4p22rehc5"]
+
+[ext_resource type="Script" path="res://game/units/skills/SkillClass.cs" id="1_class"]
+[ext_resource type="Script" path="res://game/units/skills/SkillDefinition.cs" id="2_skill"]
+[ext_resource type="Resource" path="res://resources/combat/bleed.tres" id="bleed1"]
+[ext_resource type="Resource" path="res://resources/combat/bleed_2.tres" id="bleed2"]
+[ext_resource type="Resource" path="res://resources/combat/contempt_for_the_weak.tres" id="contempt1"]
+[ext_resource type="Resource" path="res://resources/combat/contempt_for_the_weak_2.tres" id="contempt2"]
+[ext_resource type="Texture2D" uid="uid://ci6e8iu62o32g" path="res://images/skills/assassin_bleed_1.png" id="i_assassin_bleed_1"]
+[ext_resource type="Texture2D" uid="uid://h2tijm0lrlva" path="res://images/skills/assassin_long_reach.png" id="i_assassin_long_reach"]
+[ext_resource type="Texture2D" uid="uid://c5ljh4t0x5imi" path="res://images/skills/assassin_scout.png" id="i_assassin_scout"]
+[ext_resource type="Texture2D" uid="uid://b3wpvph1o2ubr" path="res://images/skills/assassin_silent_killer.png" id="i_assassin_silent_killer"]
+[ext_resource type="Texture2D" uid="uid://bs6vb4rynwsm0" path="res://images/skills/assassin_slippery.png" id="i_assassin_slippery"]
+[ext_resource type="Texture2D" uid="uid://u82s6d1sabsy" path="res://images/skills/assassin_tormentor.png" id="i_assassin_tormentor"]
+[ext_resource type="Resource" path="res://resources/combat/long_reach.tres" id="longreach"]
+
+[sub_resource type="Resource" id="Skill_quick"]
+script = ExtResource("2_skill")
+Name = "Slippery"
+Description = "Hard to catch, harder to pin down."
+Icon = ExtResource("i_assassin_slippery")
+Tier = 1
+Column = 0
+Cost = 1
+Requires = []
+BonusDeadliness = 0
+BonusStrength = 0
+BonusDurability = 0
+BonusCleverness = 0
+BonusQuickness = 1
+BonusAttack = 0
+BonusDefence = 0
+BonusHealth = 0
+BonusVision = 0.0
+FieldHealInterval = 0
+ExperienceBonus = 0.0
+ExperienceBonusAbilities = []
+
+[sub_resource type="Resource" id="Skill_silent"]
+script = ExtResource("2_skill")
+Name = "Silent Killer"
+Description = "Strikes before the victim hears a thing."
+Icon = ExtResource("i_assassin_silent_killer")
+Tier = 3
+Column = 0
+Cost = 1
+Requires = [SubResource("Skill_quick")]
+BonusDeadliness = 1
+BonusStrength = 0
+BonusDurability = 0
+BonusCleverness = 0
+BonusQuickness = 1
+BonusAttack = 0
+BonusDefence = 0
+BonusHealth = 0
+BonusVision = 0.0
+FieldHealInterval = 0
+ExperienceBonus = 0.0
+ExperienceBonusAbilities = []
+
+[sub_resource type="Resource" id="Skill_bleed1"]
+script = ExtResource("2_skill")
+Name = "Bleed 1"
+Description = "Unlocks Bleed: a slashing strike that makes a reachable enemy bleed for 2 turns (half the attacker's Deadliness each turn)."
+Icon = ExtResource("i_assassin_bleed_1")
+Tier = 2
+Column = 1
+Cost = 1
+Requires = []
+BonusDeadliness = 0
+BonusStrength = 0
+BonusDurability = 0
+BonusCleverness = 0
+BonusQuickness = 0
+BonusAttack = 0
+BonusDefence = 0
+BonusHealth = 0
+BonusVision = 0.0
+GrantedCombatAbility = ExtResource("bleed1")
+FieldHealInterval = 0
+ExperienceBonus = 0.0
+ExperienceBonusAbilities = []
+
+[sub_resource type="Resource" id="Skill_bleed2"]
+script = ExtResource("2_skill")
+Name = "Bleed 2"
+Description = "Bleed becomes Bleed II: the target bleeds the full Deadliness for 3 turns and can't be healed meanwhile."
+Icon = ExtResource("i_assassin_bleed_1")
+Tier = 4
+Column = 1
+Cost = 1
+Requires = [SubResource("Skill_bleed1"), SubResource("Skill_silent")]
+BonusDeadliness = 0
+BonusStrength = 0
+BonusDurability = 0
+BonusCleverness = 0
+BonusQuickness = 0
+BonusAttack = 0
+BonusDefence = 0
+BonusHealth = 0
+BonusVision = 0.0
+GrantedCombatAbility = ExtResource("bleed2")
+FieldHealInterval = 0
+ExperienceBonus = 0.0
+ExperienceBonusAbilities = []
+
+[sub_resource type="Resource" id="Skill_scout"]
+script = ExtResource("2_skill")
+Name = "Scout"
+Description = "Climbs high and watches far. Longer range of vision."
+Icon = ExtResource("i_assassin_scout")
+Tier = 1
+Column = 2
+Cost = 1
+Requires = []
+BonusDeadliness = 0
+BonusStrength = 0
+BonusDurability = 0
+BonusCleverness = 0
+BonusQuickness = 0
+BonusAttack = 0
+BonusDefence = 0
+BonusHealth = 0
+BonusVision = 60.0
+FieldHealInterval = 0
+ExperienceBonus = 0.0
+ExperienceBonusAbilities = []
+
+[sub_resource type="Resource" id="Skill_longreach"]
+script = ExtResource("2_skill")
+Name = "Long Reach"
+Description = "A long reach and a longer blade. No attack penalty from the back row (melee units normally lose 35% attack there)."
+Icon = ExtResource("i_assassin_long_reach")
+Tier = 3
+Column = 2
+Cost = 1
+Requires = [SubResource("Skill_scout")]
+BonusDeadliness = 0
+BonusStrength = 0
+BonusDurability = 0
+BonusCleverness = 0
+BonusQuickness = 0
+BonusAttack = 0
+BonusDefence = 0
+BonusHealth = 0
+BonusVision = 0.0
+GrantedCombatPassive = ExtResource("longreach")
+FieldHealInterval = 0
+ExperienceBonus = 0.0
+ExperienceBonusAbilities = []
+
+[sub_resource type="Resource" id="Skill_contempt1"]
+script = ExtResource("2_skill")
+Name = "Bully"
+Description = "Kicks them while they're down: +2 attack on normal attacks against enemies below half health."
+Tier = 2
+Column = 3
+Cost = 1
+Requires = []
+BonusDeadliness = 0
+BonusStrength = 0
+BonusDurability = 0
+BonusCleverness = 0
+BonusQuickness = 0
+BonusAttack = 0
+BonusDefence = 0
+BonusHealth = 0
+BonusVision = 0.0
+GrantedCombatPassive = ExtResource("contempt1")
+FieldHealInterval = 0
+ExperienceBonus = 0.0
+ExperienceBonusAbilities = []
+
+[sub_resource type="Resource" id="Skill_contempt2"]
+script = ExtResource("2_skill")
+Name = "Tormentor"
+Description = "+4 attack (instead of +2) on normal attacks against enemies below half health."
+Icon = ExtResource("i_assassin_tormentor")
+Tier = 4
+Column = 3
+Cost = 1
+Requires = [SubResource("Skill_contempt1")]
+BonusDeadliness = 0
+BonusStrength = 0
+BonusDurability = 0
+BonusCleverness = 0
+BonusQuickness = 0
+BonusAttack = 0
+BonusDefence = 0
+BonusHealth = 0
+BonusVision = 0.0
+GrantedCombatPassive = ExtResource("contempt2")
+FieldHealInterval = 0
+ExperienceBonus = 0.0
+ExperienceBonusAbilities = []
+
+[resource]
+script = ExtResource("1_class")
+Name = "Assassin"
+Description = "Quick, sneaky killers who strike first and leave wounds that keep bleeding."
+Skills = [SubResource("Skill_quick"), SubResource("Skill_silent"), SubResource("Skill_bleed1"), SubResource("Skill_bleed2"), SubResource("Skill_scout"), SubResource("Skill_longreach"), SubResource("Skill_contempt1"), SubResource("Skill_contempt2")]

@@ -217,7 +217,7 @@ public partial class TrailerDirector : Node
 			while (learned)
 			{
 				learned = false;
-				foreach (var skill in newUnit.SkillTree.Skills)
+				foreach (var skill in newUnit.SkillTree.AllSkills())
 					learned |= newUnit.Progression.TryUnlock(skill);
 			}
 		}

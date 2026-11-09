@@ -31,6 +31,7 @@ public partial class BattleScreen : Control
 	private static readonly Color FireColor = new Color(1f, 0.45f, 0.15f);
 	private static readonly Color ManaColor = new Color(0.4f, 0.65f, 1f);
 	private static readonly Color FrostColor = new Color(0.55f, 0.85f, 1f);
+	private static readonly Color BleedColor = new Color(0.85f, 0.1f, 0.12f);
 	private static readonly Color HealColor = new Color(0.55f, 1f, 0.55f);
 	private static readonly Color CurseColor = new Color(0.75f, 0.45f, 1f);
 	private static readonly Color RootColor = new Color(0.6f, 0.8f, 0.3f);
@@ -238,6 +239,7 @@ public partial class BattleScreen : Control
 		if (quest?.Field == null || quest.Agents.Count == 0 || quest.Enemies.Count == 0)
 			return;
 		Open(quest.Field, quest.Agents, quest.Enemies, onFinished);
+		_sim.Arena = quest.Definition.Arena;
 		_title.Text = $"{quest.Title} - {quest.CurrentStage?.Name}";
 	}
 
@@ -1106,6 +1108,15 @@ public partial class BattleScreen : Control
 			case MoveEvent move:
 				await AnimateMove(move, actorView);
 				break;
+			case BleedTickEvent bleed:
+				actorView.ShownHealth = Math.Max(0, actorView.ShownHealth - bleed.Damage);
+				actorView.Flash(BleedColor);
+				Popup(actorView, $"Bleeding  -{bleed.Damage}", BleedColor, 20);
+				if (bleed.Killed)
+					actorView.SetDead();
+				actorView.Refresh();
+				await Wait(0.6, battleId);
+				break;
 			case SkipEvent:
 				Popup(actorView, "Stunned", new Color(0.75f, 0.55f, 1f), 18);
 				await Wait(0.7, battleId);
@@ -1168,6 +1179,7 @@ public partial class BattleScreen : Control
 	{
 		null or CombatAbilityKind.AimedShot => hit.Actor.ProjectileColor,
 		CombatAbilityKind.Fireball => FireColor,
+		CombatAbilityKind.Blizzard => FrostColor,
 		CombatAbilityKind.ManaSteal => ManaColor,
 		_ => SpellColor,
 	};
@@ -1178,7 +1190,12 @@ public partial class BattleScreen : Control
 	{
 		_fighters.MoveChild(attacker, -1);
 		bool spin = area.Ability.Kind == CombatAbilityKind.WhirlingBlades;
-		Color color = area.Ability.Kind == CombatAbilityKind.Fireball ? FireColor : Gold;
+		Color color = area.Ability.Kind switch
+		{
+			CombatAbilityKind.Fireball => FireColor,
+			CombatAbilityKind.Blizzard => FrostColor,
+			_ => Gold,
+		};
 		Popup(attacker, area.Ability.Name.ToUpper() + "!", color, 22);
 		float length = attacker.PlayAttack();
 		await Wait(length * 0.5f, battleId);
@@ -1191,7 +1208,7 @@ public partial class BattleScreen : Control
 			var flights = new List<Task>();
 			foreach (var hit in area.Hits)
 				if (_views.TryGetValue(hit.Target, out var target))
-					flights.Add(Projectile(attacker.Chest, target.Chest, area.Ability.Kind == CombatAbilityKind.Volley ? area.Actor.ProjectileColor : FireColor));
+					flights.Add(Projectile(attacker.Chest, target.Chest, area.Ability.Kind == CombatAbilityKind.Volley ? area.Actor.ProjectileColor : color));
 			await Task.WhenAll(flights);
 		}
 		if (battleId != _battleId)
@@ -1231,10 +1248,19 @@ public partial class BattleScreen : Control
 		}
 		if (hit.Stunned)
 			Popup(target, "Stunned!", new Color(0.75f, 0.55f, 1f), 18, 0.3f);
+		if (hit.Bleeding)
+			Popup(target, "Bleeding!", BleedColor, 18, 0.3f);
 		if (hit.Frozen)
 		{
 			target.Flash(FrostColor);
 			Popup(target, "Frozen!", FrostColor, 18, 0.3f);
+		}
+		if (hit.DefenceCrushed > 0)
+			Popup(target, $"Defence -{hit.DefenceCrushed}", new Color(1f, 0.6f, 0.2f), 18, 0.3f);
+		if (hit.AttackerFrozen && _views.TryGetValue(hit.Actor, out var frozenView))
+		{
+			frozenView.Flash(FrostColor);
+			Popup(frozenView, "Frost Armor: frozen!", FrostColor, 18, 0.35f);
 		}
 		if (hit.Killed)
 			target.SetDead();

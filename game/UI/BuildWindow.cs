@@ -12,6 +12,8 @@ using System.Linq;
 public partial class BuildWindow : PanelContainer
 {
 	private const float DetailsWidth = 330;
+	private const int PickerColumns = 3;
+	private static readonly Vector2 PickerCardSize = new Vector2(106, 124);
 
 	private static readonly Color BrightGold = new Color(1f, 0.82f, 0.4f);
 	private static readonly Color LockedGrey = new Color(0.35f, 0.33f, 0.33f);
@@ -32,7 +34,12 @@ public partial class BuildWindow : PanelContainer
 	private Label _detailInfo;
 	private Label _detailEffects;
 	private Label _detailStatus;
-	private HFlowContainer _picker;
+	// The building picker for an empty slot: a tab for the slot's faction and one for neutral
+	// buildings, each a row of picture cards
+	private VBoxContainer _picker;
+	private Button _factionTab, _neutralTab;
+	private GridContainer _pickerGrid;
+	private bool _pickerNeutral;
 	private Button _buildButton;
 	private Button _recruitButton;
 	private Button _demolishButton;
@@ -50,7 +57,7 @@ public partial class BuildWindow : PanelContainer
 	// Called on every Refresh to update one spot each
 	private readonly List<Action> _spotUpdates = new();
 	// The picker's buttons, rebuilt only when another slot is picked (Refresh runs every tick)
-	private readonly List<(Button button, BuildingDefinition option)> _pickerButtons = new();
+	private readonly List<(Button card, BuildingDefinition option)> _pickerCards = new();
 	private string _pickerKey;
 
 	public override void _Ready()
@@ -110,9 +117,21 @@ public partial class BuildWindow : PanelContainer
 		_detailEffects = new Label { AutowrapMode = TextServer.AutowrapMode.WordSmart, CustomMinimumSize = new Vector2(DetailsWidth, 0) };
 		_detailEffects.AddThemeColorOverride("font_color", BrightGold);
 		_detailStatus = new Label { ThemeTypeVariation = "MutedLabel", AutowrapMode = TextServer.AutowrapMode.WordSmart, CustomMinimumSize = new Vector2(DetailsWidth, 0) };
-		_picker = new HFlowContainer { CustomMinimumSize = new Vector2(DetailsWidth, 0) };
-		_picker.AddThemeConstantOverride("h_separation", 6);
-		_picker.AddThemeConstantOverride("v_separation", 6);
+		_picker = new VBoxContainer { CustomMinimumSize = new Vector2(DetailsWidth, 0) };
+		_picker.AddThemeConstantOverride("separation", 6);
+		var tabs = new HBoxContainer();
+		tabs.AddThemeConstantOverride("separation", 4);
+		_factionTab = new Button { FocusMode = FocusModeEnum.None, SizeFlagsHorizontal = SizeFlags.ExpandFill };
+		_factionTab.Pressed += () => ShowPickerTab(false);
+		_neutralTab = new Button { Text = "Neutral", FocusMode = FocusModeEnum.None, SizeFlagsHorizontal = SizeFlags.ExpandFill };
+		_neutralTab.Pressed += () => ShowPickerTab(true);
+		tabs.AddChild(_factionTab);
+		tabs.AddChild(_neutralTab);
+		_picker.AddChild(tabs);
+		_pickerGrid = new GridContainer { Columns = PickerColumns };
+		_pickerGrid.AddThemeConstantOverride("h_separation", 6);
+		_pickerGrid.AddThemeConstantOverride("v_separation", 6);
+		_picker.AddChild(_pickerGrid);
 		text.AddChild(_detailName);
 		text.AddChild(_picker);
 		text.AddChild(_detailInfo);
@@ -469,6 +488,7 @@ public partial class BuildWindow : PanelContainer
 		{
 			_candidate = null;
 			_confirmDemolish = false;
+			_pickerNeutral = false;
 		}
 		Refresh();
 	}
@@ -616,35 +636,36 @@ public partial class BuildWindow : PanelContainer
 
 		_detailName.Text = $"{Factions.Name(faction)} slot {slot + 1}: pick a building";
 		_picker.Visible = true;
-		string key = $"{faction}/{slot}";
+		string key = $"{faction}/{slot}/{_pickerNeutral}";
 		if (key != _pickerKey)
 		{
 			_pickerKey = key;
-			UIText.ClearChildren(_picker);
-			_pickerButtons.Clear();
-			foreach (var option in _castle.SlotOptions(faction))
+			_factionTab.Text = Factions.Name(faction);
+			StyleTab(_factionTab, !_pickerNeutral);
+			StyleTab(_neutralTab, _pickerNeutral);
+			UIText.ClearChildren(_pickerGrid);
+			_pickerCards.Clear();
+			foreach (var option in _castle.SlotOptions(faction).Where(o => (o.Faction == Faction.None) == _pickerNeutral))
 			{
-				var button = new Button
-				{
-					Text = option.Faction == Faction.None ? $"{option.Name} (neutral)" : option.Name,
-					FocusMode = FocusModeEnum.None,
-					CustomMinimumSize = new Vector2(0, 30),
-				};
 				var picked = option;
-				button.Pressed += () =>
+				var card = MakePickerCard(option, () =>
 				{
 					_candidate = picked;
 					Refresh();
-				};
-				_picker.AddChild(button);
-				_pickerButtons.Add((button, option));
+				});
+				_pickerGrid.AddChild(card);
+				_pickerCards.Add((card, option));
 			}
+			if (_pickerCards.Count == 0)
+				_pickerGrid.AddChild(new Label { Text = "Nothing to build here yet.", ThemeTypeVariation = "MutedLabel" });
 		}
-		foreach (var (button, option) in _pickerButtons)
+		foreach (var (card, option) in _pickerCards)
 		{
 			var status = _castle.SlotStatus(option, faction);
-			button.TooltipText = status == BuildingStatus.Built ? "Already built in another slot" : option.Description;
-			StyleOption(button, status, option == _candidate);
+			card.TooltipText = $"{option.Name}\n{ResourceCost.Text(option.Cost)}\n{option.Description}";
+			StyleOption(card, status, option == _candidate);
+			card.GetNode<Label>("Box/Status").Text = ShortStatus(status, option);
+			card.GetNode<TextureRect>("Box/Picture").Modulate = status is BuildingStatus.Available or BuildingStatus.NoResources ? Colors.White : new Color(0.55f, 0.55f, 0.58f);
 		}
 		if (_candidate == null)
 		{
@@ -657,6 +678,91 @@ public partial class BuildWindow : PanelContainer
 		_buildButton.Visible = true;
 		_buildButton.Text = $"Build {_candidate.Name}";
 		_buildButton.Disabled = candidateStatus != BuildingStatus.Available;
+	}
+
+	private void ShowPickerTab(bool neutral)
+	{
+		if (_pickerNeutral == neutral)
+			return;
+		_pickerNeutral = neutral;
+		if (_candidate != null && (_candidate.Faction == Faction.None) != neutral)
+			_candidate = null;
+		Refresh();
+	}
+
+	// A card with the building's picture, its name and one status line
+	private Button MakePickerCard(BuildingDefinition option, Action pressed)
+	{
+		var card = new Button { FocusMode = FocusModeEnum.None, CustomMinimumSize = PickerCardSize };
+		card.Pressed += pressed;
+		var box = new VBoxContainer { Name = "Box", MouseFilter = MouseFilterEnum.Ignore };
+		box.SetAnchorsAndOffsetsPreset(LayoutPreset.FullRect);
+		box.AddThemeConstantOverride("separation", 0);
+		box.AddChild(new TextureRect
+		{
+			Name = "Picture",
+			Texture = option.Icon ?? _placeholderArt,
+			ExpandMode = TextureRect.ExpandModeEnum.IgnoreSize,
+			StretchMode = TextureRect.StretchModeEnum.KeepAspectCentered,
+			SizeFlagsVertical = SizeFlags.ExpandFill,
+			MouseFilter = MouseFilterEnum.Ignore,
+		});
+		var name = new Label
+		{
+			Text = option.Name,
+			HorizontalAlignment = HorizontalAlignment.Center,
+			// Long names take two lines; the picture shrinks to make room
+			AutowrapMode = TextServer.AutowrapMode.WordSmart,
+			MouseFilter = MouseFilterEnum.Ignore,
+		};
+		name.AddThemeFontSizeOverride("font_size", 13);
+		name.AddThemeConstantOverride("line_spacing", -3);
+		box.AddChild(name);
+		var status = new Label
+		{
+			Name = "Status",
+			ThemeTypeVariation = "MutedLabel",
+			HorizontalAlignment = HorizontalAlignment.Center,
+			ClipText = true,
+			MouseFilter = MouseFilterEnum.Ignore,
+		};
+		status.AddThemeFontSizeOverride("font_size", 11);
+		box.AddChild(status);
+		card.AddChild(box);
+		return card;
+	}
+
+	// One short line for a picker card
+	private static string ShortStatus(BuildingStatus status, BuildingDefinition building) => status switch
+	{
+		BuildingStatus.Available => "Ready",
+		BuildingStatus.NoResources => "Need resources",
+		BuildingStatus.Built => "Already built",
+		BuildingStatus.NeedsTower => $"Needs Tower {building.RequiredTowerLevel}",
+		BuildingStatus.NeedsBase => $"Needs base lv {building.MinBaseLevel}",
+		BuildingStatus.Busy => "Builders busy",
+		BuildingStatus.UnderConstruction => "Being built",
+		_ => "Locked",
+	};
+
+	private static void StyleTab(Button tab, bool active)
+	{
+		var style = new StyleBoxFlat
+		{
+			BgColor = active ? new Color(0.24f, 0.17f, 0.12f) : new Color(0.1f, 0.09f, 0.09f),
+			BorderColor = active ? BrightGold : LockedGrey,
+		};
+		style.SetBorderWidthAll(1);
+		style.BorderWidthBottom = active ? 3 : 1;
+		style.SetCornerRadiusAll(4);
+		style.SetContentMarginAll(5);
+		var hover = (StyleBoxFlat)style.Duplicate();
+		hover.BgColor = style.BgColor.Lightened(0.08f);
+		tab.AddThemeStyleboxOverride("normal", style);
+		tab.AddThemeStyleboxOverride("hover", hover);
+		tab.AddThemeStyleboxOverride("pressed", hover);
+		tab.AddThemeColorOverride("font_color", active ? new Color(1f, 0.92f, 0.75f) : new Color(0.65f, 0.6f, 0.55f));
+		tab.AddThemeColorOverride("font_hover_color", new Color(1f, 0.92f, 0.75f));
 	}
 
 	private void StyleOption(Button button, BuildingStatus status, bool selected)

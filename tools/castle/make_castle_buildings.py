@@ -71,8 +71,6 @@ SLOTS = [
     dict(id="prison", name="Prison", faction="DarkHumans", level=1, cost={"ore": 60, "wood": 40},
          quests=["escaped_prisoner_find", "escaped_prisoner_kill", "escaped_prisoner_sheltered"],
          desc="Damp cells under the castle. Prisoners keep trying to get out, and someone has to bring them back."),
-    dict(id="healing_hut", name="Healing Hut", faction="DarkHumans", level=1, cost={"wood": 50, "mana": 20}, heal=8,
-         desc="Herbs, leeches and a witch who doesn't ask questions. Units on the castle field heal over time."),
     # Undead
     dict(id="graveyard", name="Graveyard", faction="Undead", level=1, cost={"ore": 60, "gold": 60, "mana": 30},
          bonus_for="skeleton", bonus=2, cap_for="skeleton", cap=1,
@@ -80,6 +78,8 @@ SLOTS = [
     # Neutral
     dict(id="bank", name="Bank", faction="None", level=1, cost={"gold": 120, "wood": 40}, gold=0.5,
          desc="A vault of stolen coin, lent out at cruel rates. Brings in gold every tick."),
+    dict(id="healing_fountain", name="Healing Fountain", faction="None", level=1, cost={"ore": 50, "mana": 20}, heal=8,
+         desc="Green water pours from a horned skull and closes any wound. Units on the castle field heal over time."),
     dict(id="dark_throne", name="Dark Throne", faction="None", level=3, cost={"gold": 200, "crystal": 80, "mana": 100},
          bonus=1, agents=2,
          desc="Every recruit kneels before the dark lord first. All units are recruited 1 level higher."),

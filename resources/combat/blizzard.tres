@@ -1,0 +1,13 @@
+[gd_resource type="Resource" script_class="CombatAbility" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://game/battle/CombatAbility.cs" id="1_script"]
+
+[resource]
+script = ExtResource("1_script")
+Name = "Blizzard"
+Description = "A howling storm of ice over every enemy: spell attack 1 + Deadliness + Intelligence/2 against half of each one's defence, and every enemy left standing is frozen and skips its next turn. Ready again 4 turns later."
+Kind = 19
+ManaCost = 0
+Cooldown = 4
+Amount = 1
+Duration = 1

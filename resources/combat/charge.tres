@@ -1,0 +1,13 @@
+[gd_resource type="Resource" script_class="CombatAbility" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://game/battle/CombatAbility.cs" id="1_script"]
+
+[resource]
+script = ExtResource("1_script")
+Name = "Charge"
+Description = "From the back row only: rushes into the front tile in front of it (swapping places with an ally standing there) and strikes the closest enemy from there. Ready again 3 turns later."
+Kind = 17
+ManaCost = 0
+Cooldown = 3
+Amount = 0
+Duration = 0

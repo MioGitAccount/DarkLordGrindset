@@ -1,0 +1,180 @@
+[gd_resource type="Resource" script_class="SkillClass" load_steps=21 format=3 uid="uid://dli11ng5bijgm"]
+
+[ext_resource type="Script" path="res://game/units/skills/SkillClass.cs" id="1_class"]
+[ext_resource type="Script" path="res://game/units/skills/SkillDefinition.cs" id="2_skill"]
+[ext_resource type="Resource" path="res://resources/combat/champion.tres" id="champion"]
+[ext_resource type="Resource" path="res://resources/combat/charge.tres" id="charge"]
+[ext_resource type="Resource" path="res://resources/combat/crush_defence.tres" id="crush"]
+[ext_resource type="Resource" uid="uid://eef4tg2vrqhq" path="res://resources/abilities/CuttingTrees.tres" id="cut"]
+[ext_resource type="Resource" path="res://resources/abilities/CuttingTreesII.tres" id="cut2"]
+[ext_resource type="Texture2D" path="res://images/skills/warrior_champion.png" id="i_warrior_champion"]
+[ext_resource type="Texture2D" path="res://images/skills/warrior_charge.png" id="i_warrior_charge"]
+[ext_resource type="Texture2D" path="res://images/skills/warrior_crush_defence.png" id="i_warrior_crush_defence"]
+[ext_resource type="Texture2D" path="res://images/skills/warrior_heavy_swing.png" id="i_warrior_heavy_swing"]
+[ext_resource type="Texture2D" path="res://images/skills/warrior_lumberjack_1.png" id="i_warrior_lumberjack_1"]
+[ext_resource type="Texture2D" path="res://images/skills/warrior_swift_stride.png" id="i_warrior_swift_stride"]
+
+[sub_resource type="Resource" id="Skill_lumberjack1"]
+script = ExtResource("2_skill")
+Name = "Lumberjack 1"
+Description = "Knows which end of the axe goes into the tree. Unlocks Cut: 1 wood per second; cutting teaches the unit until level 3."
+Icon = ExtResource("i_warrior_lumberjack_1")
+Tier = 1
+Column = 0
+Cost = 1
+Requires = []
+BonusDeadliness = 0
+BonusStrength = 0
+BonusDurability = 0
+BonusCleverness = 0
+BonusQuickness = 0
+BonusAttack = 0
+BonusDefence = 0
+BonusHealth = 0
+BonusVision = 0.0
+GrantedAbility = ExtResource("cut")
+FieldHealInterval = 0
+ExperienceBonus = 0.0
+ExperienceBonusAbilities = []
+
+[sub_resource type="Resource" id="Skill_swift"]
+script = ExtResource("2_skill")
+Name = "Swift Stride"
+Description = "Light on its feet, first into the fray."
+Icon = ExtResource("i_warrior_swift_stride")
+Tier = 1
+Column = 2
+Cost = 1
+Requires = []
+BonusDeadliness = 0
+BonusStrength = 0
+BonusDurability = 0
+BonusCleverness = 0
+BonusQuickness = 1
+BonusAttack = 0
+BonusDefence = 0
+BonusHealth = 0
+BonusVision = 0.0
+FieldHealInterval = 0
+ExperienceBonus = 0.0
+ExperienceBonusAbilities = []
+
+[sub_resource type="Resource" id="Skill_heavy"]
+script = ExtResource("2_skill")
+Name = "Heavy Swing"
+Description = "Arms hardened by the axe hit harder in battle."
+Icon = ExtResource("i_warrior_heavy_swing")
+Tier = 2
+Column = 1
+Cost = 1
+Requires = [SubResource("Skill_lumberjack1")]
+BonusDeadliness = 0
+BonusStrength = 1
+BonusDurability = 0
+BonusCleverness = 0
+BonusQuickness = 0
+BonusAttack = 1
+BonusDefence = 0
+BonusHealth = 0
+BonusVision = 0.0
+FieldHealInterval = 0
+ExperienceBonus = 0.0
+ExperienceBonusAbilities = []
+
+[sub_resource type="Resource" id="Skill_charge"]
+script = ExtResource("2_skill")
+Name = "Charge"
+Description = "Battle ability, back row only: rushes into the front tile ahead of it (swapping with an ally there) and strikes the closest enemy. Ready every 4th turn."
+Icon = ExtResource("i_warrior_charge")
+Tier = 2
+Column = 2
+Cost = 1
+Requires = [SubResource("Skill_swift")]
+BonusDeadliness = 0
+BonusStrength = 0
+BonusDurability = 0
+BonusCleverness = 0
+BonusQuickness = 0
+BonusAttack = 0
+BonusDefence = 0
+BonusHealth = 0
+BonusVision = 0.0
+GrantedCombatAbility = ExtResource("charge")
+FieldHealInterval = 0
+ExperienceBonus = 0.0
+ExperienceBonusAbilities = []
+
+[sub_resource type="Resource" id="Skill_lumberjack2"]
+script = ExtResource("2_skill")
+Name = "Lumberjack 2"
+Description = "Fells trees twice as fast. Cut becomes Cut II: 2 wood per second; cutting teaches the unit until level 5."
+Icon = ExtResource("i_warrior_lumberjack_1")
+Tier = 3
+Column = 0
+Cost = 1
+Requires = [SubResource("Skill_lumberjack1")]
+BonusDeadliness = 0
+BonusStrength = 0
+BonusDurability = 0
+BonusCleverness = 0
+BonusQuickness = 0
+BonusAttack = 0
+BonusDefence = 0
+BonusHealth = 0
+BonusVision = 0.0
+GrantedAbility = ExtResource("cut2")
+FieldHealInterval = 0
+ExperienceBonus = 0.0
+ExperienceBonusAbilities = []
+
+[sub_resource type="Resource" id="Skill_crush"]
+script = ExtResource("2_skill")
+Name = "Crush Defence"
+Description = "Battle ability: a blow that smashes armour - the target loses defence equal to this unit's Deadliness for 2 turns. Ready every 4th turn."
+Icon = ExtResource("i_warrior_crush_defence")
+Tier = 4
+Column = 1
+Cost = 1
+Requires = [SubResource("Skill_heavy")]
+BonusDeadliness = 0
+BonusStrength = 0
+BonusDurability = 0
+BonusCleverness = 0
+BonusQuickness = 0
+BonusAttack = 0
+BonusDefence = 0
+BonusHealth = 0
+BonusVision = 0.0
+GrantedCombatAbility = ExtResource("crush")
+FieldHealInterval = 0
+ExperienceBonus = 0.0
+ExperienceBonusAbilities = []
+
+[sub_resource type="Resource" id="Skill_champion"]
+script = ExtResource("2_skill")
+Name = "Champion"
+Description = "A born duellist. +1 attack, +1 defence, +3 health - doubled while it is the last one standing on its side, or in the Arena."
+Icon = ExtResource("i_warrior_champion")
+Tier = 5
+Column = 1
+Cost = 1
+Requires = [SubResource("Skill_crush")]
+BonusDeadliness = 0
+BonusStrength = 0
+BonusDurability = 0
+BonusCleverness = 0
+BonusQuickness = 0
+BonusAttack = 1
+BonusDefence = 1
+BonusHealth = 3
+BonusVision = 0.0
+GrantedCombatPassive = ExtResource("champion")
+FieldHealInterval = 0
+ExperienceBonus = 0.0
+ExperienceBonusAbilities = []
+
+[resource]
+script = ExtResource("1_class")
+Name = "Warrior"
+Description = "Axes, brawn and the front line. Shared by orcs and skeletons."
+Skills = [SubResource("Skill_lumberjack1"), SubResource("Skill_swift"), SubResource("Skill_heavy"), SubResource("Skill_charge"), SubResource("Skill_lumberjack2"), SubResource("Skill_crush"), SubResource("Skill_champion")]

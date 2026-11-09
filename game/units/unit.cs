@@ -113,7 +113,7 @@ public partial class unit : Node2D
 	{
 		var skills = new List<SkillDefinition>();
 		if (SkillTree != null)
-			foreach (var skill in SkillTree.Skills)
+			foreach (var skill in SkillTree.AllSkills())
 				if (Progression.IsUnlocked(skill))
 					skills.Add(skill);
 
@@ -162,6 +162,13 @@ public partial class unit : Node2D
 		int levelHealth = UnitProgression.HealthPerLevel * (Progression.Level - 1);
 		stats.maxHealth += levelHealth;
 		stats.health += levelHealth;
+		foreach (var skill in skills)
+		{
+			stats.attack += skill.BonusAttack;
+			stats.defence += skill.BonusDefence;
+			stats.maxHealth += skill.BonusHealth;
+			stats.health += skill.BonusHealth;
+		}
 		foreach (var item in _equipment.Values)
 		{
 			stats.attack += item.Definition.Attack;

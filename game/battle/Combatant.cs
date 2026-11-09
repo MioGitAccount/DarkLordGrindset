@@ -46,6 +46,8 @@ public class Combatant
 	public int Deadliness, Cleverness;
 	// Set once a Lord's bonus has been added to this unit
 	public bool HasLordBonus;
+	// Set once Champion's doubled bonus has been added to this unit
+	public bool HasChampionBonus;
 	public bool Ranged;
 	public readonly List<CombatPassive> Passives = new();
 	public readonly List<CombatAbility> Abilities = new();
@@ -54,6 +56,10 @@ public class Combatant
 	public int StunnedTurns;
 	// Entangling Roots: turns left held (no abilities, ranged attacks only), and the damage taken on each
 	public int RootedTurns, RootDamage;
+	// Bleed: turns left bleeding, the damage lost at the end of each, and whether heals are blocked meanwhile
+	public int BleedTurns, BleedDamage;
+	public bool BleedBlocksHealing;
+	public bool CanBeHealed => !(BleedTurns > 0 && BleedBlocksHealing);
 	// Taunt: the enemy this unit's normal attacks must go to (while it can reach it), for TauntTurns more turns
 	public Combatant TauntedBy;
 	public int TauntTurns;

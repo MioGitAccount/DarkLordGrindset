@@ -1,0 +1,106 @@
+[gd_resource type="Resource" script_class="SkillClass" load_steps=17 format=3]
+
+[ext_resource type="Script" path="res://game/units/skills/SkillClass.cs" id="1_class"]
+[ext_resource type="Script" path="res://game/units/skills/SkillDefinition.cs" id="2_skill"]
+[ext_resource type="Resource" path="res://resources/combat/defender.tres" id="defender"]
+[ext_resource type="Resource" path="res://resources/combat/shield_block.tres" id="shield_block"]
+[ext_resource type="Resource" path="res://resources/combat/frost_spear.tres" id="frost_spear"]
+[ext_resource type="Resource" path="res://resources/combat/frost_armor.tres" id="frost_armor"]
+[ext_resource type="Resource" path="res://resources/combat/blizzard.tres" id="blizzard"]
+
+[sub_resource type="Resource" id="Skill_grave_strength"]
+script = ExtResource("2_skill")
+Name = "Grave Strength"
+Description = "Dug its own way out of the grave."
+Tier = 1
+Column = 0
+Cost = 1
+Requires = []
+BonusStrength = 1
+
+[sub_resource type="Resource" id="Skill_hardened_bones"]
+script = ExtResource("2_skill")
+Name = "Hardened Bones"
+Description = "Frost-hardened bones shrug off blows."
+Tier = 1
+Column = 2
+Cost = 1
+Requires = []
+BonusDurability = 1
+
+[sub_resource type="Resource" id="Skill_cold_fury"]
+script = ExtResource("2_skill")
+Name = "Cold Fury"
+Description = "The cold rage of the dead sharpens every thrust."
+Tier = 2
+Column = 0
+Cost = 1
+Requires = [SubResource("Skill_grave_strength")]
+BonusDeadliness = 1
+
+[sub_resource type="Resource" id="Skill_shield_block"]
+script = ExtResource("2_skill")
+Name = "Shield Block"
+Description = "Raises its old shield in time: 20% chance to block all damage of a weapon hit."
+Tier = 2
+Column = 2
+Cost = 1
+Requires = [SubResource("Skill_hardened_bones")]
+GrantedCombatPassive = ExtResource("shield_block")
+
+[sub_resource type="Resource" id="Skill_frost_spear"]
+script = ExtResource("2_skill")
+Name = "Frost Spear"
+Description = "An icy thrust that freezes the target for a turn. Battle ability, ready every 4th turn."
+Tier = 3
+Column = 0
+Cost = 1
+Requires = [SubResource("Skill_cold_fury")]
+GrantedCombatAbility = ExtResource("frost_spear")
+
+[sub_resource type="Resource" id="Skill_defender"]
+script = ExtResource("2_skill")
+Name = "Defender"
+Description = "Holds the line: +2 defence against every hit while standing in the front row."
+Tier = 3
+Column = 1
+Cost = 1
+Requires = [SubResource("Skill_hardened_bones")]
+GrantedCombatPassive = ExtResource("defender")
+
+[sub_resource type="Resource" id="Skill_deathless"]
+script = ExtResource("2_skill")
+Name = "Deathless"
+Description = "Put it down, it gets back up."
+Tier = 3
+Column = 2
+Cost = 1
+Requires = [SubResource("Skill_shield_block")]
+BonusStrength = 1
+BonusDurability = 1
+
+[sub_resource type="Resource" id="Skill_frost_armor"]
+script = ExtResource("2_skill")
+Name = "Frost Armor"
+Description = "A crust of grave-ice: an enemy that strikes it in melee has a 25% chance to be frozen for a turn."
+Tier = 4
+Column = 1
+Cost = 1
+Requires = [SubResource("Skill_frost_spear")]
+GrantedCombatPassive = ExtResource("frost_armor")
+
+[sub_resource type="Resource" id="Skill_blizzard"]
+script = ExtResource("2_skill")
+Name = "Blizzard"
+Description = "Battle ability: a storm of ice hits every enemy and freezes all who survive for a turn. Ready every 5th turn."
+Tier = 5
+Column = 1
+Cost = 1
+Requires = [SubResource("Skill_frost_armor")]
+GrantedCombatAbility = ExtResource("blizzard")
+
+[resource]
+script = ExtResource("1_class")
+Name = "Frost Revenant"
+Description = "Grave-cold bones that will not stay down. The skeleton's own class."
+Skills = [SubResource("Skill_grave_strength"), SubResource("Skill_hardened_bones"), SubResource("Skill_cold_fury"), SubResource("Skill_shield_block"), SubResource("Skill_frost_spear"), SubResource("Skill_defender"), SubResource("Skill_deathless"), SubResource("Skill_frost_armor"), SubResource("Skill_blizzard")]

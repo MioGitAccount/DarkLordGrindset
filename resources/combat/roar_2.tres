@@ -1,0 +1,15 @@
+[gd_resource type="Resource" script_class="CombatAbility" load_steps=3 format=3]
+
+[ext_resource type="Script" path="res://game/battle/CombatAbility.cs" id="1_script"]
+[ext_resource type="Resource" path="res://resources/combat/roar.tres" id="2_roar"]
+
+[resource]
+script = ExtResource("1_script")
+Name = "Roar II"
+Description = "A war cry that shakes the ground: +3 attack to every ally (and itself) for their next 2 turns. Ready again 3 turns later."
+Kind = 0
+ManaCost = 0
+Cooldown = 3
+Amount = 3
+Duration = 2
+Replaces = ExtResource("2_roar")

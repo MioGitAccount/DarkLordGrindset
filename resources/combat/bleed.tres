@@ -1,0 +1,14 @@
+[gd_resource type="Resource" script_class="CombatAbility" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://game/battle/CombatAbility.cs" id="1_script"]
+
+[resource]
+script = ExtResource("1_script")
+Name = "Bleed"
+Description = "A slashing strike at an enemy it can reach. Unless blocked or dodged, the target bleeds for its next 2 turns, losing half the attacker's Deadliness (at least 1) each turn, ignoring defence. Ready again 3 turns later."
+Kind = 16
+ManaCost = 0
+Cooldown = 3
+Amount = 50
+Duration = 2
+PreventsHealing = false

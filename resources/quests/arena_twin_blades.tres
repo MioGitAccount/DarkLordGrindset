@@ -79,6 +79,7 @@ RemoveNeutrals = []
 
 [resource]
 script = ExtResource("def")
+Arena = true
 Title = "Arena: Twin Blades"
 Story = "Two rounds of two on two. The second pair has fought together for years."
 Level = 3

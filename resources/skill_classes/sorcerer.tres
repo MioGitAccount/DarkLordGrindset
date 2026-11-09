@@ -1,0 +1,175 @@
+[gd_resource type="Resource" script_class="SkillClass" load_steps=18 format=3 uid="uid://bejtlvggya1ct"]
+
+[ext_resource type="Script" path="res://game/units/skills/SkillClass.cs" id="1_class"]
+[ext_resource type="Script" path="res://game/units/skills/SkillDefinition.cs" id="2_skill"]
+[ext_resource type="Resource" path="res://resources/abilities/ChannelMana.tres" id="channel"]
+[ext_resource type="Resource" path="res://resources/combat/fireball.tres" id="fireball"]
+[ext_resource type="Resource" path="res://resources/combat/firebolt.tres" id="firebolt1"]
+[ext_resource type="Resource" path="res://resources/combat/firebolt_2.tres" id="firebolt2"]
+[ext_resource type="Texture2D" uid="uid://hg66iwjnv6c1" path="res://images/skills/sorcerer_devious_cunning.png" id="i_sorcerer_devious_cunning"]
+[ext_resource type="Texture2D" uid="uid://b7jcyr5gjsl4o" path="res://images/skills/sorcerer_fire_bolt_1.png" id="i_sorcerer_fire_bolt_1"]
+[ext_resource type="Texture2D" uid="uid://bbkw082hbuun6" path="res://images/skills/sorcerer_wicked_mind.png" id="i_sorcerer_wicked_mind"]
+[ext_resource type="Resource" path="res://resources/combat/mana_steal.tres" id="manasteal"]
+
+[sub_resource type="Resource" id="Skill_int1"]
+script = ExtResource("2_skill")
+Name = "Devious Cunning"
+Description = "Always three schemes ahead."
+Icon = ExtResource("i_sorcerer_devious_cunning")
+Tier = 1
+Column = 0
+Cost = 1
+Requires = []
+BonusDeadliness = 0
+BonusStrength = 0
+BonusDurability = 0
+BonusCleverness = 1
+BonusQuickness = 0
+BonusAttack = 0
+BonusDefence = 0
+BonusHealth = 0
+BonusVision = 0.0
+FieldHealInterval = 0
+ExperienceBonus = 0.0
+ExperienceBonusAbilities = []
+
+[sub_resource type="Resource" id="Skill_firebolt1"]
+script = ExtResource("2_skill")
+Name = "Fire Bolt 1"
+Description = "Unlocks Firebolt: hurl fire at any enemy in battle."
+Icon = ExtResource("i_sorcerer_fire_bolt_1")
+Tier = 2
+Column = 0
+Cost = 1
+Requires = [SubResource("Skill_int1")]
+BonusDeadliness = 0
+BonusStrength = 0
+BonusDurability = 0
+BonusCleverness = 0
+BonusQuickness = 0
+BonusAttack = 0
+BonusDefence = 0
+BonusHealth = 0
+BonusVision = 0.0
+GrantedCombatAbility = ExtResource("firebolt1")
+FieldHealInterval = 0
+ExperienceBonus = 0.0
+ExperienceBonusAbilities = []
+
+[sub_resource type="Resource" id="Skill_wicked"]
+script = ExtResource("2_skill")
+Name = "Wicked Mind"
+Description = "Every clever thought is a cruel one."
+Icon = ExtResource("i_sorcerer_wicked_mind")
+Tier = 3
+Column = 1
+Cost = 1
+Requires = [SubResource("Skill_int1")]
+BonusDeadliness = 1
+BonusStrength = 0
+BonusDurability = 0
+BonusCleverness = 1
+BonusQuickness = 0
+BonusAttack = 0
+BonusDefence = 0
+BonusHealth = 0
+BonusVision = 0.0
+FieldHealInterval = 0
+ExperienceBonus = 0.0
+ExperienceBonusAbilities = []
+
+[sub_resource type="Resource" id="Skill_firebolt2"]
+script = ExtResource("2_skill")
+Name = "Fire Bolt 2"
+Description = "Firebolt becomes Firebolt II: spell base power 8 instead of 5."
+Icon = ExtResource("i_sorcerer_fire_bolt_1")
+Tier = 4
+Column = 0
+Cost = 1
+Requires = [SubResource("Skill_firebolt1"), SubResource("Skill_wicked")]
+BonusDeadliness = 0
+BonusStrength = 0
+BonusDurability = 0
+BonusCleverness = 0
+BonusQuickness = 0
+BonusAttack = 0
+BonusDefence = 0
+BonusHealth = 0
+BonusVision = 0.0
+GrantedCombatAbility = ExtResource("firebolt2")
+FieldHealInterval = 0
+ExperienceBonus = 0.0
+ExperienceBonusAbilities = []
+
+[sub_resource type="Resource" id="Skill_fireball"]
+script = ExtResource("2_skill")
+Name = "Fireball"
+Description = "Unlocks Fireball: burn every enemy at once."
+Icon = ExtResource("i_sorcerer_fire_bolt_1")
+Tier = 5
+Column = 0
+Cost = 1
+Requires = [SubResource("Skill_firebolt2")]
+BonusDeadliness = 0
+BonusStrength = 0
+BonusDurability = 0
+BonusCleverness = 0
+BonusQuickness = 0
+BonusAttack = 0
+BonusDefence = 0
+BonusHealth = 0
+BonusVision = 0.0
+GrantedCombatAbility = ExtResource("fireball")
+FieldHealInterval = 0
+ExperienceBonus = 0.0
+ExperienceBonusAbilities = []
+
+[sub_resource type="Resource" id="Skill_manadrain"]
+script = ExtResource("2_skill")
+Name = "Mana Drain"
+Description = "If it isn't nailed down, it gets taken - even magic. Unlocks Channel Mana: drain mana from a field into your pool."
+Tier = 2
+Column = 2
+Cost = 1
+Requires = [SubResource("Skill_int1")]
+BonusDeadliness = 0
+BonusStrength = 0
+BonusDurability = 0
+BonusCleverness = 0
+BonusQuickness = 0
+BonusAttack = 0
+BonusDefence = 0
+BonusHealth = 0
+BonusVision = 0.0
+GrantedAbility = ExtResource("channel")
+FieldHealInterval = 0
+ExperienceBonus = 0.0
+ExperienceBonusAbilities = []
+
+[sub_resource type="Resource" id="Skill_manasteal"]
+script = ExtResource("2_skill")
+Name = "Mana Steal"
+Description = "Unlocks Mana Steal: suck mana out of an enemy in battle (or its health, if it has none)."
+Tier = 3
+Column = 2
+Cost = 1
+Requires = [SubResource("Skill_manadrain")]
+BonusDeadliness = 0
+BonusStrength = 0
+BonusDurability = 0
+BonusCleverness = 0
+BonusQuickness = 0
+BonusAttack = 0
+BonusDefence = 0
+BonusHealth = 0
+BonusVision = 0.0
+GrantedCombatAbility = ExtResource("manasteal")
+FieldHealInterval = 0
+ExperienceBonus = 0.0
+ExperienceBonusAbilities = []
+
+[resource]
+script = ExtResource("1_class")
+Name = "Sorcerer"
+Description = "Wielders of fire and stolen mana."
+Skills = [SubResource("Skill_int1"), SubResource("Skill_firebolt1"), SubResource("Skill_firebolt2"), SubResource("Skill_fireball"), SubResource("Skill_wicked"), SubResource("Skill_manadrain"), SubResource("Skill_manasteal")]

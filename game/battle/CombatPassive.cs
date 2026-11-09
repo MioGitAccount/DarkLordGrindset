@@ -12,6 +12,10 @@ public enum CombatPassiveKind
 	Evasion,     // Chance to dodge all damage of a weapon hit, like ShieldBlock
 	BarkSkin,    // +Amount defence against every hit
 	Defender,    // +Amount defence against every hit while standing in the front row
+	FrostArmor,  // Chance that an enemy striking this unit in melee is frozen and skips its next Amount turns
+	Champion,    // +Amount attack and defence and +HealthBonus health once more (on top of the skill's own
+	             // bonus) while it is the only living unit on its side, or in every Arena fight
+	Berserk,     // +Amount attack while below half its health
 }
 
 // A combat trait that works on its own (no order needed). Units get them from their
@@ -23,11 +27,13 @@ public partial class CombatPassive : Resource
 	[Export(PropertyHint.MultilineText)] public string Description = "";
 	[Export] public Texture2D Icon;
 	[Export] public CombatPassiveKind Kind;
-	// 0-1, for Critical, Stun, ShieldBlock and Evasion
+	// 0-1, for Critical, Stun, ShieldBlock, Evasion and FrostArmor
 	[Export(PropertyHint.Range, "0,1,0.05")] public float Chance = 0.2f;
-	// Attack bonus (PackHunter, ContemptForTheWeak), turns stunned (Stun), attribute bonus (Lord)
+	// Attack bonus (PackHunter, ContemptForTheWeak, Berserk), turns stunned (Stun), attribute bonus (Lord)
 	// or defence bonus (BarkSkin, Defender)
 	[Export] public int Amount = 1;
+	// Extra health (Champion)
+	[Export] public int HealthBonus;
 	// Damage multiplier (Critical)
 	[Export] public float Multiplier = 2f;
 	// A weaker version of this passive; a unit that has both keeps only this one

@@ -1,0 +1,16 @@
+[gd_resource type="Resource" script_class="CombatAbility" load_steps=3 format=3]
+
+[ext_resource type="Script" path="res://game/battle/CombatAbility.cs" id="1_script"]
+[ext_resource type="Resource" path="res://resources/combat/bleed.tres" id="bleed1"]
+
+[resource]
+script = ExtResource("1_script")
+Name = "Bleed II"
+Description = "A deep, dirty cut at an enemy it can reach. Unless blocked or dodged, the target bleeds for its next 3 turns, losing the attacker's full Deadliness each turn, ignoring defence, and it can't be healed until the bleeding stops. Ready again 3 turns later."
+Kind = 16
+ManaCost = 0
+Cooldown = 3
+Amount = 100
+Duration = 3
+PreventsHealing = true
+Replaces = ExtResource("bleed1")

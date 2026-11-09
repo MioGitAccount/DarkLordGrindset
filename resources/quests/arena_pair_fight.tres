@@ -60,6 +60,7 @@ RemoveNeutrals = []
 
 [resource]
 script = ExtResource("def")
+Arena = true
 Title = "Arena: Pair Fight"
 Story = "Two on two in the pit. Bring a partner you trust."
 Level = 2

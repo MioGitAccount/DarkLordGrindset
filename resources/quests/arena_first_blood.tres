@@ -60,6 +60,7 @@ RemoveNeutrals = []
 
 [resource]
 script = ExtResource("def")
+Arena = true
 Title = "Arena: First Blood"
 Story = "The pit is open to anyone who signs the roll. One fight, one on one, and the crowd pays the winner."
 Level = 2

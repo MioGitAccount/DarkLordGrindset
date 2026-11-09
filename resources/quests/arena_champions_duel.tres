@@ -80,6 +80,7 @@ RemoveNeutrals = []
 
 [resource]
 script = ExtResource("def")
+Arena = true
 Title = "Arena: Champion's Duel"
 Story = "Three rounds, one on one, ending against the reigning champion. Win, and the whole town knows your name."
 Level = 4

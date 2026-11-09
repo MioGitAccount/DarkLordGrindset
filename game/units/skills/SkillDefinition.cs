@@ -28,6 +28,10 @@ public partial class SkillDefinition : Resource
 	[Export(PropertyHint.Range, "0,5,1")] public int BonusDurability;
 	[Export(PropertyHint.Range, "0,5,1")] public int BonusCleverness;
 	[Export(PropertyHint.Range, "0,5,1")] public int BonusQuickness;
+	// Flat battle stats on top of what the attributes give (Heavy Swing, Champion)
+	[Export(PropertyHint.Range, "0,10,1")] public int BonusAttack;
+	[Export(PropertyHint.Range, "0,10,1")] public int BonusDefence;
+	[Export(PropertyHint.Range, "0,20,1")] public int BonusHealth;
 	// Added to the unit's VisibilityRadius (fog of war)
 	[Export] public float BonusVision;
 	// Ability the unit can use once this skill is unlocked
@@ -62,6 +66,12 @@ public partial class SkillDefinition : Resource
 		for (int i = 0; i < SpecialAttributes.Count; i++)
 			if (BonusAttribute(i) != 0)
 				lines.Add($"+{BonusAttribute(i)} {SpecialAttributes.Names[i]}");
+		if (BonusAttack != 0)
+			lines.Add($"+{BonusAttack} attack");
+		if (BonusDefence != 0)
+			lines.Add($"+{BonusDefence} defence");
+		if (BonusHealth != 0)
+			lines.Add($"+{BonusHealth} health");
 		if (BonusVision != 0)
 			lines.Add($"+{BonusVision:0} vision range");
 		if (GrantedAbility != null)

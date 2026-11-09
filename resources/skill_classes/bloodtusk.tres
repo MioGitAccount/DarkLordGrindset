@@ -1,0 +1,209 @@
+[gd_resource type="Resource" script_class="SkillClass" load_steps=17 format=3 uid="uid://h6usqnpekmvq"]
+
+[ext_resource type="Script" path="res://game/units/skills/SkillClass.cs" id="1_class"]
+[ext_resource type="Script" path="res://game/units/skills/SkillDefinition.cs" id="2_skill"]
+[ext_resource type="Resource" path="res://resources/combat/berserk.tres" id="berserk"]
+[ext_resource type="Resource" path="res://resources/abilities/MineOre.tres" id="mine"]
+[ext_resource type="Resource" path="res://resources/abilities/Raid.tres" id="raid"]
+[ext_resource type="Resource" path="res://resources/combat/roar_2.tres" id="roar2"]
+[ext_resource type="Resource" path="res://resources/combat/stun_2.tres" id="stun2"]
+
+[sub_resource type="Resource" id="Skill_brawler"]
+script = ExtResource("2_skill")
+Name = "Brawler"
+Description = "Grew up fighting for scraps."
+Tier = 1
+Column = 0
+Cost = 1
+Requires = []
+BonusDeadliness = 0
+BonusStrength = 1
+BonusDurability = 0
+BonusCleverness = 0
+BonusQuickness = 0
+BonusAttack = 0
+BonusDefence = 0
+BonusHealth = 0
+BonusVision = 0.0
+FieldHealInterval = 0
+ExperienceBonus = 0.0
+ExperienceBonusAbilities = []
+
+[sub_resource type="Resource" id="Skill_miner"]
+script = ExtResource("2_skill")
+Name = "Miner"
+Description = "Swings a pick as well as an axe. Unlocks Mine: dig ore from a field."
+Tier = 1
+Column = 1
+Cost = 1
+Requires = []
+BonusDeadliness = 0
+BonusStrength = 0
+BonusDurability = 0
+BonusCleverness = 0
+BonusQuickness = 0
+BonusAttack = 0
+BonusDefence = 0
+BonusHealth = 0
+BonusVision = 0.0
+GrantedAbility = ExtResource("mine")
+FieldHealInterval = 0
+ExperienceBonus = 0.0
+ExperienceBonusAbilities = []
+
+[sub_resource type="Resource" id="Skill_berserker"]
+script = ExtResource("2_skill")
+Name = "Berserker"
+Description = "Fights harder the angrier it gets: +2 attack in battle while below half health."
+Tier = 2
+Column = 0
+Cost = 1
+Requires = [SubResource("Skill_brawler")]
+BonusDeadliness = 1
+BonusStrength = 0
+BonusDurability = 0
+BonusCleverness = 0
+BonusQuickness = 0
+BonusAttack = 0
+BonusDefence = 0
+BonusHealth = 0
+BonusVision = 0.0
+GrantedCombatPassive = ExtResource("berserk")
+FieldHealInterval = 0
+ExperienceBonus = 0.0
+ExperienceBonusAbilities = []
+
+[sub_resource type="Resource" id="Skill_raider"]
+script = ExtResource("2_skill")
+Name = "Raider"
+Description = "Burn, loot, repeat. Unlocks Raid: plunder gold fast, but the field stops producing for a while."
+Tier = 2
+Column = 1
+Cost = 1
+Requires = [SubResource("Skill_miner")]
+BonusDeadliness = 0
+BonusStrength = 0
+BonusDurability = 0
+BonusCleverness = 0
+BonusQuickness = 0
+BonusAttack = 0
+BonusDefence = 0
+BonusHealth = 0
+BonusVision = 0.0
+GrantedAbility = ExtResource("raid")
+FieldHealInterval = 0
+ExperienceBonus = 0.0
+ExperienceBonusAbilities = []
+
+[sub_resource type="Resource" id="Skill_war_cry"]
+script = ExtResource("2_skill")
+Name = "War Cry"
+Description = "A roar that shakes the enemy's courage. Roar becomes Roar II: +3 attack to every ally instead of +2."
+Tier = 3
+Column = 0
+Cost = 1
+Requires = [SubResource("Skill_berserker")]
+BonusDeadliness = 0
+BonusStrength = 0
+BonusDurability = 0
+BonusCleverness = 0
+BonusQuickness = 0
+BonusAttack = 0
+BonusDefence = 0
+BonusHealth = 0
+BonusVision = 0.0
+GrantedCombatAbility = ExtResource("roar2")
+FieldHealInterval = 0
+ExperienceBonus = 0.0
+ExperienceBonusAbilities = []
+
+[sub_resource type="Resource" id="Skill_forced_march"]
+script = ExtResource("2_skill")
+Name = "Forced March"
+Description = "Marches day and night without rest."
+Tier = 3
+Column = 1
+Cost = 1
+Requires = [SubResource("Skill_raider")]
+BonusDeadliness = 0
+BonusStrength = 0
+BonusDurability = 0
+BonusCleverness = 0
+BonusQuickness = 1
+BonusAttack = 0
+BonusDefence = 0
+BonusHealth = 0
+BonusVision = 0.0
+FieldHealInterval = 0
+ExperienceBonus = 0.0
+ExperienceBonusAbilities = []
+
+[sub_resource type="Resource" id="Skill_bone_crusher"]
+script = ExtResource("2_skill")
+Name = "Bone Crusher"
+Description = "Hits so hard that bones give way. Stun becomes Stun II: 35% chance instead of 20%."
+Tier = 4
+Column = 0
+Cost = 1
+Requires = [SubResource("Skill_war_cry")]
+BonusDeadliness = 1
+BonusStrength = 2
+BonusDurability = 0
+BonusCleverness = 0
+BonusQuickness = 0
+BonusAttack = 0
+BonusDefence = 0
+BonusHealth = 0
+BonusVision = 0.0
+GrantedCombatPassive = ExtResource("stun2")
+FieldHealInterval = 0
+ExperienceBonus = 0.0
+ExperienceBonusAbilities = []
+
+[sub_resource type="Resource" id="Skill_scouter"]
+script = ExtResource("2_skill")
+Name = "Scouter"
+Description = "Learned to look before charging. Longer range of vision."
+Tier = 4
+Column = 1
+Cost = 1
+Requires = [SubResource("Skill_forced_march")]
+BonusDeadliness = 0
+BonusStrength = 0
+BonusDurability = 0
+BonusCleverness = 0
+BonusQuickness = 0
+BonusAttack = 0
+BonusDefence = 0
+BonusHealth = 0
+BonusVision = 60.0
+FieldHealInterval = 0
+ExperienceBonus = 0.0
+ExperienceBonusAbilities = []
+
+[sub_resource type="Resource" id="Skill_warchief"]
+script = ExtResource("2_skill")
+Name = "Warchief"
+Description = "Born to lead the horde."
+Tier = 5
+Column = 0
+Cost = 1
+Requires = [SubResource("Skill_bone_crusher")]
+BonusDeadliness = 2
+BonusStrength = 2
+BonusDurability = 0
+BonusCleverness = 0
+BonusQuickness = 0
+BonusAttack = 0
+BonusDefence = 0
+BonusHealth = 0
+BonusVision = 0.0
+FieldHealInterval = 0
+ExperienceBonus = 0.0
+ExperienceBonusAbilities = []
+
+[resource]
+script = ExtResource("1_class")
+Name = "Bloodtusk"
+Description = "Rage, plunder and leading the horde. The orc's own class."
+Skills = [SubResource("Skill_brawler"), SubResource("Skill_miner"), SubResource("Skill_berserker"), SubResource("Skill_raider"), SubResource("Skill_war_cry"), SubResource("Skill_forced_march"), SubResource("Skill_bone_crusher"), SubResource("Skill_scouter"), SubResource("Skill_warchief")]

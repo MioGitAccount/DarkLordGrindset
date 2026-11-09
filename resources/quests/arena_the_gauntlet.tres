@@ -79,6 +79,7 @@ RemoveNeutrals = []
 
 [resource]
 script = ExtResource("def")
+Arena = true
 Title = "Arena: The Gauntlet"
 Story = "Two opponents, back to back, one on one. No healing between rounds."
 Level = 3

@@ -384,12 +384,20 @@ public partial class BattleFighterView : Control
 			effects += "STUNNED  ";
 		if (c.RootedTurns > 0)
 			effects += "ROOTED  ";
+		if (c.BleedTurns > 0)
+			effects += "BLEEDING  ";
 		if (c.TauntTurns > 0 && c.TauntedBy?.IsAlive == true)
 			effects += "TAUNTED  ";
 		if (c.BuffAttack > 0)
 			effects += $"+{c.BuffAttack} ATK  ";
 		if (c.BuffDefence > 0)
 			effects += $"+{c.BuffDefence} DEF  ";
+		else if (c.BuffDefence < 0)
+			effects += $"{c.BuffDefence} DEF  ";
+		if (c.HasChampionBonus)
+			effects += "CHAMPION  ";
+		if (BattleSimulation.IsBerserk(c))
+			effects += "BERSERK  ";
 		if (Status != "")
 			effects += Status;
 		if (effects != "")

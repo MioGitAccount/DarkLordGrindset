@@ -31,7 +31,7 @@ KEY_PURE = 30
 DARK_KEY_NEAR = 22
 DARK_KEY_FAR = 55
 # Enclosed black areas larger than this (pixels in the raw image) stay see-through
-DARK_HOLE_MAX = 600
+DARK_HOLE_MAX = 8000
 FRAMES = [["tower_1", "tower_2", "tower_3"]]
 
 
@@ -41,6 +41,12 @@ def key_alpha(rgb):
     key = np.median(corners, axis=0)
     dist = np.sqrt(((rgb.astype(float) - key) ** 2).sum(axis=2))
     dark = key.sum() < 90
+    if key.min() > 230:
+        # A white key may really be a fake transparency checkerboard painted in: light neutral
+        # greys count as key too (they only go when connected to the edge, see below)
+        channels = rgb.astype(int)
+        checker = (channels.min(axis=2) > 180) & (channels.max(axis=2) - channels.min(axis=2) < 10)
+        dist = np.where(checker, 0.0, dist)
     key_near, key_far = (DARK_KEY_NEAR, DARK_KEY_FAR) if dark else (KEY_NEAR, KEY_FAR)
     # Background = near-key areas that touch the border, or that hold pure key colour (gaps
     # between roofs); near-key shading inside the building stays

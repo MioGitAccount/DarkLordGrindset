@@ -1,0 +1,13 @@
+[gd_resource type="Resource" script_class="CombatPassive" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://game/battle/CombatPassive.cs" id="1_script"]
+
+[resource]
+script = ExtResource("1_script")
+Name = "Champion"
+Description = "Fights best alone: while it is the only one left standing on its side, or in any Arena fight, it gets +1 attack, +1 defence and +3 health once more."
+Kind = 11
+Chance = 0.0
+Amount = 1
+HealthBonus = 3
+Multiplier = 1.0

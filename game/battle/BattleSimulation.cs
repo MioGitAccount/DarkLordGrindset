@@ -20,12 +20,18 @@ public class HitEvent : BattleEvent
 	public bool Stunned;
 	// Frost Spear: the target skips its next turns
 	public bool Frozen;
+	// Bleed: the target bleeds from now on
+	public bool Bleeding;
 	public bool Killed;
 	// The target's Shield Block or Evasion stopped the whole hit
 	public bool ShieldBlocked;
 	public bool Dodged;
 	// Mana Steal: mana taken from the target
 	public int ManaStolen;
+	// Crush Defence: defence the target lost for a few turns
+	public int DefenceCrushed;
+	// The target's Frost Armor froze the attacker
+	public bool AttackerFrozen;
 }
 
 // One action hitting several enemies at once (Fireball, Volley, Whirling Blades)
@@ -64,6 +70,13 @@ public class RootedTurnEvent : BattleEvent
 
 public class SkipEvent : BattleEvent { }
 
+// A bleeding unit loses health at the end of its turn
+public class BleedTickEvent : BattleEvent
+{
+	public int Damage;
+	public bool Killed;
+}
+
 // The actor moved to another slot of its side; SwappedWith (alive or fallen) took its old slot
 public class MoveEvent : BattleEvent
 {
@@ -89,6 +102,8 @@ public class BattleSimulation
 	// Player units without an order pick abilities on their own, like the enemies (trailer recording)
 	public bool AutoCastPlayerAbilities;
 	public int Wave { get; private set; } = 1;
+	// An Arena fight: Champion's bonus counts double for everyone who has it
+	public bool Arena;
 
 	private readonly Random _rng = new();
 	private readonly Queue<Combatant> _turnOrder = new();
@@ -139,6 +154,7 @@ public class BattleSimulation
 		if (_turnOrder.Count == 0)
 		{
 			ApplyLordBonuses();
+			ApplyChampionBonuses();
 			Round++;
 			foreach (var combatant in All.Where(c => c.IsAlive).OrderByDescending(c => c.Initiative)
 					.ThenByDescending(c => c.Quickness).ThenBy(_ => _rng.Next()))
@@ -160,6 +176,9 @@ public class BattleSimulation
 	private Combatant MostWounded(Combatant caster) =>
 		AlliesOf(caster).Where(ally => ally != null && ally.IsAlive)
 			.OrderBy(ally => ally.Health / (float)ally.MaxHealth).FirstOrDefault();
+
+	// Bleed damage per turn: Amount% of the attacker's Deadliness, at least 1
+	public static int BleedPerTurn(Combatant attacker, CombatAbility ability) => Math.Max(1, attacker.Deadliness * ability.Amount / 100);
 
 	public static int HealAmount(Combatant caster, CombatAbility ability) => ability.Amount + caster.Cleverness / 2;
 
@@ -185,6 +204,8 @@ public class BattleSimulation
 		var packHunter = combatant.GetPassive(CombatPassiveKind.PackHunter);
 		if (packHunter != null && AlliesOf(combatant).Any(ally => ally != null && ally != combatant && ally.IsAlive && ally.TypeKey == combatant.TypeKey))
 			attack += packHunter.Amount;
+		if (IsBerserk(combatant))
+			attack += combatant.GetPassive(CombatPassiveKind.Berserk).Amount;
 		if (HasBackRowPenalty(combatant))
 			attack = (int)MathF.Round(attack * BackRowMeleeFactor);
 		return Math.Max(0, attack);
@@ -198,6 +219,9 @@ public class BattleSimulation
 		ability.Amount + caster.Deadliness + caster.Cleverness / 2;
 
 	public static bool IsWeak(Combatant target) => target.Health < target.MaxHealth * WeakHealthShare;
+
+	// Berserk: below half health and raging
+	public static bool IsBerserk(Combatant combatant) => combatant.IsAlive && IsWeak(combatant) && combatant.GetPassive(CombatPassiveKind.Berserk) != null;
 
 	// Lord: every unit of the Lord's type on its side gets +Amount Deadliness and Strength, once per battle.
 	// Several Lords don't stack.
@@ -223,6 +247,39 @@ public class BattleSimulation
 		}
 	}
 
+	// Champion: a unit fighting alone on its side (or in the Arena) gets its Champion bonus once more,
+	// once per battle; checked at the start of every round, so it kicks in when the last ally falls
+	private void ApplyChampionBonuses()
+	{
+		foreach (var side in new[] { BattleSide.Player, BattleSide.Enemy })
+		{
+			var units = SlotsOf(side).Where(c => c != null && c.IsAlive).ToList();
+			foreach (var champion in units)
+			{
+				var passive = champion.GetPassive(CombatPassiveKind.Champion);
+				if (passive == null || champion.HasChampionBonus || (units.Count > 1 && !Arena))
+					continue;
+				champion.HasChampionBonus = true;
+				champion.Attack += passive.Amount;
+				champion.Defence += passive.Amount;
+				champion.MaxHealth += passive.HealthBonus;
+				champion.Health += passive.HealthBonus;
+			}
+		}
+	}
+
+	// Charge: the front tile a back-row unit steps into - an empty one first, then one held by an
+	// archer (who is better off in the back), otherwise the upper one; -1 when it isn't in the back row
+	public int ChargeSlot(Combatant actor)
+	{
+		if (!BattleFormation.IsBack(actor.Slot))
+			return -1;
+		var allies = AlliesOf(actor);
+		return BattleFormation.GuardsOf(actor.Slot)
+			.OrderBy(slot => allies[slot] == null || !allies[slot].IsAlive ? 0 : allies[slot].Ranged ? 1 : 2)
+			.First();
+	}
+
 	// Empty when the ability can be used now, otherwise why not
 	public string WhyCantUse(Combatant caster, CombatAbility ability)
 	{
@@ -232,6 +289,8 @@ public class BattleSimulation
 			return $"Ready in {caster.CooldownLeft(ability)} turns";
 		if (caster.Mana < ability.ManaCost)
 			return $"Needs {ability.ManaCost} mana";
+		if (ability.Kind == CombatAbilityKind.Charge && !BattleFormation.IsBack(caster.Slot))
+			return "Only from the back row";
 		return "";
 	}
 
@@ -390,6 +449,9 @@ public class BattleSimulation
 		CombatAbilityKind.Volley => OpponentsOf(actor).Count(enemy => enemy != null && enemy.IsAlive) > 1,
 		CombatAbilityKind.WhirlingBlades => ReachableTargets(actor).Count > 1,
 		CombatAbilityKind.Freeze => ReachableTargets(actor).Any(enemy => enemy.StunnedTurns == 0),
+		CombatAbilityKind.Bleed => ReachableTargets(actor).Any(enemy => enemy.BleedTurns == 0),
+		CombatAbilityKind.CrushDefence => ReachableTargets(actor).Any(enemy => !enemy.Buffs.Any(buff => buff.Source == ability.Name)),
+		CombatAbilityKind.Charge => ChargeSlot(actor) >= 0,
 		CombatAbilityKind.Roots => OpponentsOf(actor).Any(enemy => enemy != null && enemy.IsAlive && enemy.RootedTurns == 0),
 		CombatAbilityKind.Taunt => OpponentsOf(actor).Any(enemy => enemy != null && enemy.IsAlive && (enemy.TauntTurns == 0 || enemy.TauntedBy?.IsAlive != true)),
 		CombatAbilityKind.Rejuvenation => AlliesOf(actor).Any(ally => ally != null && ally.IsAlive && ally.Health < ally.MaxHealth
@@ -431,8 +493,19 @@ public class BattleSimulation
 			case CombatAbilityKind.Firebolt:
 			case CombatAbilityKind.AimedShot:
 			case CombatAbilityKind.Freeze:
+			case CombatAbilityKind.Bleed:
+			case CombatAbilityKind.CrushDefence:
 				events.Add(Hit(actor, target, ability));
 				break;
+			case CombatAbilityKind.Charge:
+				int chargeSlot = ChargeSlot(actor);
+				if (chargeSlot >= 0)
+					Move(actor, chargeSlot, events);
+				var charged = PlannedTarget(actor);
+				if (charged != null)
+					events.Add(Hit(actor, charged, ability));
+				break;
+			case CombatAbilityKind.Blizzard:
 			case CombatAbilityKind.Fireball:
 			case CombatAbilityKind.Volley:
 			case CombatAbilityKind.WhirlingBlades:
@@ -453,6 +526,8 @@ public class BattleSimulation
 				var patients = ability.Kind == CombatAbilityKind.Heal ? new[] { target } : AlliesOf(actor).Where(ally => ally != null && ally.IsAlive).ToArray();
 				foreach (var patient in patients)
 				{
+					if (!patient.CanBeHealed)
+						continue;
 					int healed = Math.Min(HealAmount(actor, ability), patient.MaxHealth - patient.Health);
 					patient.Health += healed;
 					heal.Healed.Add((patient, healed));
@@ -525,6 +600,8 @@ public class BattleSimulation
 		int defence = target.Defence + target.BuffDefence + (target.GetPassive(CombatPassiveKind.BarkSkin)?.Amount ?? 0);
 		if (!BattleFormation.IsBack(target.Slot))
 			defence += target.GetPassive(CombatPassiveKind.Defender)?.Amount ?? 0;
+		// Crush Defence can take it below 0; it never goes under nothing
+		defence = Math.Max(0, defence);
 		bool contempt = false;
 		if (ability != null && ability.IsSpell)
 		{
@@ -538,7 +615,7 @@ public class BattleSimulation
 		}
 		else if (ability?.Kind == CombatAbilityKind.Volley)
 			attack = Math.Max(0, attack - ability.Amount);
-		else if (ability?.Kind == CombatAbilityKind.WhirlingBlades || ability?.Kind == CombatAbilityKind.Freeze)
+		else if (ability?.Kind is CombatAbilityKind.WhirlingBlades or CombatAbilityKind.Freeze or CombatAbilityKind.Charge or CombatAbilityKind.CrushDefence)
 			attack += ability.Amount;
 		else if (ability == null && IsWeak(target))
 		{
@@ -581,10 +658,34 @@ public class BattleSimulation
 			hit.Stunned = true;
 			target.StunnedTurns = Math.Max(target.StunnedTurns, stun.Amount);
 		}
-		if (ability?.Kind == CombatAbilityKind.Freeze && !hit.ShieldBlocked && !hit.Dodged && !hit.Killed)
+		if (ability?.Kind is CombatAbilityKind.Freeze or CombatAbilityKind.Blizzard && !hit.ShieldBlocked && !hit.Dodged && !hit.Killed)
 		{
 			hit.Frozen = true;
 			target.StunnedTurns = Math.Max(target.StunnedTurns, ability.Duration);
+		}
+		if (ability?.Kind == CombatAbilityKind.Bleed && !hit.ShieldBlocked && !hit.Dodged && !hit.Killed)
+		{
+			// A stronger or longer bleed replaces a weaker one, it never stacks
+			int perTurn = BleedPerTurn(attacker, ability);
+			hit.Bleeding = true;
+			target.BleedTurns = Math.Max(target.BleedTurns, ability.Duration);
+			target.BleedDamage = Math.Max(target.BleedDamage, perTurn);
+			target.BleedBlocksHealing |= ability.PreventsHealing;
+		}
+		if (ability?.Kind == CombatAbilityKind.CrushDefence && !hit.ShieldBlocked && !hit.Dodged && !hit.Killed && attacker.Deadliness > 0)
+		{
+			// Refreshes, doesn't stack
+			hit.DefenceCrushed = attacker.Deadliness;
+			target.Buffs.RemoveAll(buff => buff.Source == ability.Name);
+			target.Buffs.Add(new CombatBuff { Source = ability.Name, DefenceBonus = -attacker.Deadliness, TurnsLeft = ability.Duration });
+		}
+		// Frost Armor: striking it in melee can freeze the attacker
+		var frostArmor = target.GetPassive(CombatPassiveKind.FrostArmor);
+		bool meleeStrike = !attacker.Ranged && (ability == null || ability.IsMeleeHit || ability.Kind == CombatAbilityKind.WhirlingBlades);
+		if (frostArmor != null && meleeStrike && !hit.Dodged && attacker.IsAlive && _rng.NextDouble() < frostArmor.Chance)
+		{
+			hit.AttackerFrozen = true;
+			attacker.StunnedTurns = Math.Max(attacker.StunnedTurns, frostArmor.Amount);
 		}
 
 		string how = ability == null ? "hits" : ability.IsSpell ? $"casts {ability.Name} at" : $"uses {ability.Name} on";
@@ -592,7 +693,7 @@ public class BattleSimulation
 			: hit.Dodged ? "0 (dodged)"
 			: hit.Critical ? $"{BattleMath.Damage(attack, hit.DefenceRoll)}, critical x{critical.Multiplier:0.#} = {hit.Damage}"
 			: hit.Damage.ToString();
-		hit.Message = $"{Label(attacker)} {how} {Label(target)}{(contempt ? " (contempt for the weak)" : "")}: {attack} attack - {hit.DefenceRoll} defence = {damage}" + (hit.Stunned ? ", stunned" : "") + (hit.Frozen ? ", frozen" : "") + (hit.Killed ? ", killed" : "");
+		hit.Message = $"{Label(attacker)} {how} {Label(target)}{(contempt ? " (contempt for the weak)" : "")}{(IsBerserk(attacker) && (ability == null || !ability.IsSpell) ? " (berserk)" : "")}: {attack} attack - {hit.DefenceRoll} defence = {damage}" + (hit.Stunned ? ", stunned" : "") + (hit.Frozen ? ", frozen" : "") + (hit.Bleeding ? $", bleeds {target.BleedDamage} for {target.BleedTurns} turns" : "") + (hit.DefenceCrushed > 0 ? $", -{hit.DefenceCrushed} defence for {ability.Duration} turns" : "") + (hit.Killed ? ", killed" : "") + (hit.AttackerFrozen ? $"; {Label(attacker)} is frozen by {Label(target)}'s {frostArmor.Name}" : "");
 		return hit;
 	}
 
@@ -620,8 +721,26 @@ public class BattleSimulation
 
 	private void EndTurn(Combatant actor, List<BattleEvent> events)
 	{
+		if (actor.IsAlive && actor.BleedTurns > 0)
+		{
+			actor.BleedTurns--;
+			int bled = Math.Min(actor.Health, actor.BleedDamage);
+			actor.Health -= bled;
+			events.Add(new BleedTickEvent
+			{
+				Actor = actor,
+				Damage = bled,
+				Killed = !actor.IsAlive,
+				Message = $"{Label(actor)} bleeds {bled} health" + (!actor.IsAlive ? ", killed" : ""),
+			});
+			if (actor.BleedTurns == 0)
+			{
+				actor.BleedDamage = 0;
+				actor.BleedBlocksHealing = false;
+			}
+		}
 		// Rejuvenation heals before counting down; not on the turn it was cast by this unit
-		int heal = actor.IsAlive ? actor.Buffs.Where(buff => !buff.SkipNextCountdown).Sum(buff => buff.HealPerTurn) : 0;
+		int heal = actor.IsAlive && actor.CanBeHealed ? actor.Buffs.Where(buff => !buff.SkipNextCountdown).Sum(buff => buff.HealPerTurn) : 0;
 		heal = Math.Min(heal, actor.MaxHealth - actor.Health);
 		if (heal > 0)
 		{

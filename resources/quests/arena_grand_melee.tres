@@ -83,6 +83,7 @@ RemoveNeutrals = []
 
 [resource]
 script = ExtResource("def")
+Arena = true
 Title = "Arena: Grand Melee"
 Story = "The finest pairs of the realm, three rounds of two on two. The prize purse is enormous."
 Level = 4

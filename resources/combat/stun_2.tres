@@ -1,0 +1,14 @@
+[gd_resource type="Resource" script_class="CombatPassive" load_steps=3 format=3]
+
+[ext_resource type="Script" path="res://game/battle/CombatPassive.cs" id="1_script"]
+[ext_resource type="Resource" path="res://resources/combat/stun.tres" id="2_stun"]
+
+[resource]
+script = ExtResource("1_script")
+Name = "Stun II"
+Description = "35% chance that a damaging hit makes the target skip its next turn."
+Kind = 2
+Chance = 0.35
+Amount = 1
+Multiplier = 2.0
+Replaces = ExtResource("2_stun")

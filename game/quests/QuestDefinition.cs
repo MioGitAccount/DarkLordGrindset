@@ -16,6 +16,8 @@ public partial class QuestDefinition : Resource
 	[Export] public Godot.Collections.Array<Biome> Biomes = new();
 	// Seconds from appearing until it must be finished; 0 = no timer
 	[Export] public int Deadline = 240;
+	// An Arena fight: Champion's bonus counts double in its battles
+	[Export] public bool Arena;
 	// How likely it is picked when a random quest appears; 0 = story quests only
 	[Export] public float SpawnWeight = 1;
 

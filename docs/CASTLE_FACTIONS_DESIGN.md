@@ -41,7 +41,7 @@ faction base L2 needs Tower II, base L3 needs Tower III.
 | Orc War Camp | Stronghold | base L2 *(default)* | orcs recruited +2 levels, +1 orc cap |
 | Warlord's Hall | Stronghold | base L3 | orcs recruited +2 more levels, +2 orc cap |
 | Prison | Dark Humans | - | own castle quest pool: prisoner quests (the Escaped Prisoner line moves here) |
-| Healing Hut | Dark Humans | - | units standing on the castle field heal over time (like a permanent Herbalist) |
+| Healing Fountain | neutral | - | units standing on the castle field heal over time (like a permanent Herbalist); replaced the Dark Humans Healing Hut |
 | Graveyard | Undead | - | skeletons (undead) recruited +2 levels |
 | Bank | neutral | - | +0.5 gold/tick *(default amount)* |
 | Dark Throne | neutral | Tower III | all units recruited +1 level, +2 agent cap |

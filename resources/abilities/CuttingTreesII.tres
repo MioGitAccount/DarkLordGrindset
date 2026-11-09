@@ -1,0 +1,15 @@
+[gd_resource type="Resource" script_class="ResourceDrainAbility" load_steps=4 format=3]
+
+[ext_resource type="Script" path="res://game/abilities/mapAbilities/ResourceDrainAbility.cs" id="1_2mtxx"]
+[ext_resource type="Texture2D" uid="uid://b0gygbitc8vij" path="res://images/resources/wood.png" id="1_8gxsi"]
+[ext_resource type="Resource" uid="uid://eef4tg2vrqhq" path="res://resources/abilities/CuttingTrees.tres" id="2_cut"]
+
+[resource]
+script = ExtResource("1_2mtxx")
+ResourceType = 1
+DrainAmount = 2.0
+Name = "Cut II"
+Description = "Cut trees on the field: 2 wood per second. Teaches the unit until it reaches level 5."
+Icon = ExtResource("1_8gxsi")
+Replaces = ExtResource("2_cut")
+MaxExperienceLevel = 5

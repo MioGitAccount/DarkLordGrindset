@@ -70,7 +70,7 @@ The ids are the file names. Drop the raw generated images into `art_src/castle/<
 | 24 | `orc_war_camp` | Stronghold | 1024x1024 |
 | 25 | `warlords_hall` | Stronghold | 1024x1024 |
 | 26 | `prison` | Dark Humans | 1024x1024 |
-| 27 | `healing_hut` | Dark Humans | 1024x1024 |
+| 27 | `healing_fountain` | neutral (was the Healing Hut) | 1024x1024 |
 | 28 | `graveyard` | Undead | 1024x1024 |
 | 29 | `bank` | neutral | 1024x1024 |
 | 30 | `dark_throne` | neutral | 1024x1024 |

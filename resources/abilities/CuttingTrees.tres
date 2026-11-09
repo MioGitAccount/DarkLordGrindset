@@ -8,5 +8,6 @@ script = ExtResource("1_2mtxx")
 ResourceType = 1
 DrainAmount = 1.0
 Name = "Cut"
-Description = "Cut trees on the field: 1 wood per second."
+Description = "Cut trees on the field: 1 wood per second. Teaches the unit until it reaches level 3."
 Icon = ExtResource("1_8gxsi")
+MaxExperienceLevel = 3

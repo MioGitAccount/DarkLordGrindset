@@ -1,0 +1,150 @@
+[gd_resource type="Resource" script_class="SkillClass" load_steps=16 format=3 uid="uid://cg84fkcgwj2di"]
+
+[ext_resource type="Script" path="res://game/units/skills/SkillClass.cs" id="1_class"]
+[ext_resource type="Script" path="res://game/units/skills/SkillDefinition.cs" id="2_skill"]
+[ext_resource type="Texture2D" path="res://images/skills/imp_greed.png" id="i_imp_greed"]
+[ext_resource type="Texture2D" path="res://images/skills/imp_mining.png" id="i_imp_mining"]
+[ext_resource type="Texture2D" path="res://images/skills/imp_tunnel_rat.png" id="i_imp_tunnel_rat"]
+[ext_resource type="Resource" path="res://resources/combat/lord.tres" id="lord"]
+[ext_resource type="Resource" path="res://resources/abilities/MineOre.tres" id="mine"]
+[ext_resource type="Resource" path="res://resources/abilities/Raid.tres" id="raid"]
+[ext_resource type="Resource" path="res://resources/abilities/RaidII.tres" id="raid2"]
+
+[sub_resource type="Resource" id="Skill_tunnelrat"]
+script = ExtResource("2_skill")
+Name = "Tunnel Rat"
+Description = "Squashed, scraped and buried alive - and still squirming."
+Icon = ExtResource("i_imp_tunnel_rat")
+Tier = 1
+Column = 0
+Cost = 1
+Requires = []
+BonusDeadliness = 0
+BonusStrength = 0
+BonusDurability = 1
+BonusCleverness = 0
+BonusQuickness = 0
+BonusAttack = 0
+BonusDefence = 0
+BonusHealth = 0
+BonusVision = 0.0
+FieldHealInterval = 0
+ExperienceBonus = 0.0
+ExperienceBonusAbilities = []
+
+[sub_resource type="Resource" id="Skill_mining1"]
+script = ExtResource("2_skill")
+Name = "Mining 1"
+Description = "Small claws, deep tunnels. Unlocks Mine: dig ore out of a field."
+Icon = ExtResource("i_imp_mining")
+Tier = 2
+Column = 0
+Cost = 1
+Requires = [SubResource("Skill_tunnelrat")]
+BonusDeadliness = 0
+BonusStrength = 0
+BonusDurability = 0
+BonusCleverness = 0
+BonusQuickness = 0
+BonusAttack = 0
+BonusDefence = 0
+BonusHealth = 0
+BonusVision = 0.0
+GrantedAbility = ExtResource("mine")
+FieldHealInterval = 0
+ExperienceBonus = 0.0
+ExperienceBonusAbilities = []
+
+[sub_resource type="Resource" id="Skill_raider1"]
+script = ExtResource("2_skill")
+Name = "Raider 1"
+Description = "Burn, loot, repeat. Unlocks Raid: plunder a town's gold fast, but it stops producing for a while."
+Tier = 1
+Column = 1
+Cost = 1
+Requires = []
+BonusDeadliness = 0
+BonusStrength = 0
+BonusDurability = 0
+BonusCleverness = 0
+BonusQuickness = 0
+BonusAttack = 0
+BonusDefence = 0
+BonusHealth = 0
+BonusVision = 0.0
+GrantedAbility = ExtResource("raid")
+FieldHealInterval = 0
+ExperienceBonus = 0.0
+ExperienceBonusAbilities = []
+
+[sub_resource type="Resource" id="Skill_greed"]
+script = ExtResource("2_skill")
+Name = "Greed"
+Description = "Every coin and nugget is a lesson. +50% experience from mining and raiding."
+Icon = ExtResource("i_imp_greed")
+Tier = 3
+Column = 0
+Cost = 1
+Requires = [SubResource("Skill_mining1"), SubResource("Skill_raider1")]
+BonusDeadliness = 0
+BonusStrength = 0
+BonusDurability = 0
+BonusCleverness = 0
+BonusQuickness = 0
+BonusAttack = 0
+BonusDefence = 0
+BonusHealth = 0
+BonusVision = 0.0
+FieldHealInterval = 0
+ExperienceBonus = 0.5
+ExperienceBonusAbilities = [ExtResource("mine"), ExtResource("raid"), ExtResource("raid2")]
+
+[sub_resource type="Resource" id="Skill_lord"]
+script = ExtResource("2_skill")
+Name = "Lord"
+Description = "The other imps bow. In battle every imp on its side (itself too) gets +1 Deadliness and +1 Strength."
+Tier = 5
+Column = 0
+Cost = 1
+Requires = [SubResource("Skill_greed")]
+BonusDeadliness = 0
+BonusStrength = 0
+BonusDurability = 0
+BonusCleverness = 0
+BonusQuickness = 0
+BonusAttack = 0
+BonusDefence = 0
+BonusHealth = 0
+BonusVision = 0.0
+GrantedCombatPassive = ExtResource("lord")
+FieldHealInterval = 0
+ExperienceBonus = 0.0
+ExperienceBonusAbilities = []
+
+[sub_resource type="Resource" id="Skill_raider2"]
+script = ExtResource("2_skill")
+Name = "Raider 2"
+Description = "Knows where the coin is hidden. Raid becomes Raid II: 15 gold per second."
+Tier = 3
+Column = 1
+Cost = 1
+Requires = [SubResource("Skill_raider1")]
+BonusDeadliness = 0
+BonusStrength = 0
+BonusDurability = 0
+BonusCleverness = 0
+BonusQuickness = 0
+BonusAttack = 0
+BonusDefence = 0
+BonusHealth = 0
+BonusVision = 0.0
+GrantedAbility = ExtResource("raid2")
+FieldHealInterval = 0
+ExperienceBonus = 0.0
+ExperienceBonusAbilities = []
+
+[resource]
+script = ExtResource("1_class")
+Name = "Demonic Imp"
+Description = "What every imp is born as: a tough little thief and digger who rises to lord over the others."
+Skills = [SubResource("Skill_tunnelrat"), SubResource("Skill_mining1"), SubResource("Skill_greed"), SubResource("Skill_lord"), SubResource("Skill_raider1"), SubResource("Skill_raider2")]

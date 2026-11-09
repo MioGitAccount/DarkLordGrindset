@@ -1,0 +1,13 @@
+[gd_resource type="Resource" script_class="CombatAbility" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://game/battle/CombatAbility.cs" id="1_script"]
+
+[resource]
+script = ExtResource("1_script")
+Name = "Crush Defence"
+Description = "A blow that smashes armour: a normal hit on an enemy it can reach, and unless blocked or dodged the target loses defence equal to the attacker's Deadliness for 2 turns. Ready again 3 turns later."
+Kind = 18
+ManaCost = 0
+Cooldown = 3
+Amount = 0
+Duration = 2

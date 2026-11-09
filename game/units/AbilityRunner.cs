@@ -54,6 +54,9 @@ public partial class AbilityRunner : Node
 	{
 		if (source == null)
 			return;
+		// e.g. cutting trees only teaches a unit up to level 3 (5 with Lumberjack 2)
+		if (_ability.MaxExperienceLevel > 0 && source.Progression.Level >= _ability.MaxExperienceLevel)
+			return;
 		_experienceCarry += ExperiencePerTick * source.ExperienceMultiplier(_ability);
 		int whole = (int)_experienceCarry;
 		_experienceCarry -= whole;
