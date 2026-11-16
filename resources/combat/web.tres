@@ -1,0 +1,13 @@
+[gd_resource type="Resource" script_class="CombatAbility" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://game/battle/CombatAbility.cs" id="1_script"]
+
+[resource]
+script = ExtResource("1_script")
+Name = "Web"
+Description = "Wraps one enemy, even behind guards, in web for its next 2 turns: it can't use abilities or strike in melee (ranged units can still shoot). Usable every fourth turn."
+Kind = 11
+ManaCost = 0
+Cooldown = 3
+Amount = 0
+Duration = 2

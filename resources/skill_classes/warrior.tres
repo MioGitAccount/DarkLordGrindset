@@ -7,12 +7,12 @@
 [ext_resource type="Resource" path="res://resources/combat/crush_defence.tres" id="crush"]
 [ext_resource type="Resource" uid="uid://eef4tg2vrqhq" path="res://resources/abilities/CuttingTrees.tres" id="cut"]
 [ext_resource type="Resource" path="res://resources/abilities/CuttingTreesII.tres" id="cut2"]
-[ext_resource type="Texture2D" path="res://images/skills/warrior_champion.png" id="i_warrior_champion"]
-[ext_resource type="Texture2D" path="res://images/skills/warrior_charge.png" id="i_warrior_charge"]
-[ext_resource type="Texture2D" path="res://images/skills/warrior_crush_defence.png" id="i_warrior_crush_defence"]
-[ext_resource type="Texture2D" path="res://images/skills/warrior_heavy_swing.png" id="i_warrior_heavy_swing"]
-[ext_resource type="Texture2D" path="res://images/skills/warrior_lumberjack_1.png" id="i_warrior_lumberjack_1"]
-[ext_resource type="Texture2D" path="res://images/skills/warrior_swift_stride.png" id="i_warrior_swift_stride"]
+[ext_resource type="Texture2D" uid="uid://d1php7sr3iw5a" path="res://images/skills/warrior_champion.png" id="i_warrior_champion"]
+[ext_resource type="Texture2D" uid="uid://cv70cinpbuklw" path="res://images/skills/warrior_charge.png" id="i_warrior_charge"]
+[ext_resource type="Texture2D" uid="uid://bfvvjgrcwprwc" path="res://images/skills/warrior_crush_defence.png" id="i_warrior_crush_defence"]
+[ext_resource type="Texture2D" uid="uid://xt4t6k7i7hpc" path="res://images/skills/warrior_heavy_swing.png" id="i_warrior_heavy_swing"]
+[ext_resource type="Texture2D" uid="uid://dcawd65o671b" path="res://images/skills/warrior_lumberjack_1.png" id="i_warrior_lumberjack_1"]
+[ext_resource type="Texture2D" uid="uid://bc6kas4rogqk2" path="res://images/skills/warrior_swift_stride.png" id="i_warrior_swift_stride"]
 
 [sub_resource type="Resource" id="Skill_lumberjack1"]
 script = ExtResource("2_skill")

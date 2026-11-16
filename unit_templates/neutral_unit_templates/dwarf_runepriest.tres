@@ -1,4 +1,4 @@
-[gd_resource type="Resource" script_class="UnitTemplate" load_steps=10 format=3]
+[gd_resource type="Resource" script_class="UnitTemplate" load_steps=11 format=3]
 
 [ext_resource type="Script" path="res://game/units/UnitTemplate.cs" id="1_template"]
 [ext_resource type="Script" path="res://game/units/BattleStats.cs" id="2_stats"]
@@ -6,6 +6,7 @@
 [ext_resource type="Texture2D" uid="uid://b4nyfkefafxub" path="res://images/Units/dwarf_runepriestIcon.png" id="4_icon"]
 [ext_resource type="SpriteFrames" path="res://images/Units/sprites/dwarf_runepriest_frames.tres" id="5_frames"]
 [ext_resource type="Texture2D" uid="uid://doxey3atyes6v" path="res://images/Units/sprites/dwarf_runepriest_battle.png" id="6_battle"]
+[ext_resource type="Texture2D" uid="uid://clidfet1l0ttx" path="res://images/Units/sprites/dwarf_runepriest_attack_battle.png" id="12_attack"]
 [ext_resource type="Resource" path="res://resources/combat/rune_of_stone.tres" id="c_rune_of_stone"]
 [ext_resource type="Resource" path="res://resources/combat/runic_mending.tres" id="c_runic_mending"]
 
@@ -36,6 +37,8 @@ Biome = 3
 Icon = ExtResource("4_icon")
 MapSprite = ExtResource("5_frames")
 BattleSprite = ExtResource("6_battle")
+SpriteScale = 0.8
+BattleAttackSprite = ExtResource("12_attack")
 BattleAttackLean = true
 DefaultStats = SubResource("Resource_stats")
 Attributes = SubResource("Resource_attrs")

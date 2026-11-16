@@ -1,0 +1,10 @@
+[gd_resource type="Resource" script_class="CombatPassive" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://game/battle/CombatPassive.cs" id="1_script"]
+
+[resource]
+script = ExtResource("1_script")
+Name = "Death Explosion"
+Description = "When it is killed by a melee strike, it bursts and the killer takes 3 damage (defence does not help)."
+Kind = 13
+Amount = 3

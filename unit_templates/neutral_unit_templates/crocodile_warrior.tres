@@ -1,0 +1,46 @@
+[gd_resource type="Resource" script_class="UnitTemplate" load_steps=14 format=3]
+
+[ext_resource type="Script" path="res://game/units/UnitTemplate.cs" id="1_template"]
+[ext_resource type="Script" path="res://game/units/BattleStats.cs" id="1_stats"]
+[ext_resource type="Script" path="res://game/units/SpecialAttributes.cs" id="9_attrs"]
+[ext_resource type="Texture2D" uid="uid://be080kcwl1808" path="res://images/Units/crocodile_warriorIcon.png" id="2_icon"]
+[ext_resource type="SpriteFrames" path="res://images/Units/sprites/crocodile_warrior_frames.tres" id="10_sprite"]
+[ext_resource type="Texture2D" uid="uid://bpotblgdae7p" path="res://images/Units/sprites/crocodile_warrior_battle.png" id="11_battle"]
+[ext_resource type="Texture2D" uid="uid://iujj53ltc4fp" path="res://images/Units/sprites/crocodile_warrior_attack_battle.png" id="12_attack"]
+[ext_resource type="Resource" path="res://resources/combat/swamp_regeneration.tres" id="p_regen"]
+[ext_resource type="Resource" path="res://resources/combat/rage.tres" id="p_rage"]
+[ext_resource type="Resource" path="res://resources/combat/cleave.tres" id="a_cleave"]
+
+[sub_resource type="Resource" id="Resource_attrs"]
+script = ExtResource("9_attrs")
+Deadliness = 5
+Strength = 5
+Durability = 4
+Cleverness = 1
+Quickness = 3
+
+[sub_resource type="Resource" id="Resource_stats"]
+script = ExtResource("1_stats")
+attack = 5
+defence = 3
+health = 32
+maxHealth = 32
+mana = 0
+maxMana = 0
+initiative = 0
+rangeUnit = false
+
+[resource]
+script = ExtResource("1_template")
+Name = "Crocodile Warrior"
+Level = 3
+Biome = 7
+Icon = ExtResource("2_icon")
+MapSprite = ExtResource("10_sprite")
+BattleSprite = ExtResource("11_battle")
+BattleAttackSprite = ExtResource("12_attack")
+SpriteScale = 1.35
+DefaultStats = SubResource("Resource_stats")
+Attributes = SubResource("Resource_attrs")
+CombatPassives = [ExtResource("p_regen"), ExtResource("p_rage")]
+CombatAbilities = [ExtResource("a_cleave")]

@@ -1,0 +1,11 @@
+[gd_resource type="Resource" script_class="CombatPassive" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://game/battle/CombatPassive.cs" id="1_script"]
+
+[resource]
+script = ExtResource("1_script")
+Name = "Swamp Regeneration"
+Description = "Once per battle, when it drops below half health, it heals 4 at the end of each of its next 3 turns."
+Kind = 15
+Amount = 4
+Duration = 3

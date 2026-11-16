@@ -27,6 +27,14 @@ public enum CombatAbilityKind
 	          // defence equal to the attacker's Deadliness for its next Duration turns
 	Blizzard, // Frost spell at every enemy at once (spell attack against half each one's defence); every
 	          // enemy that survives is frozen and skips its next Duration turns
+	PoisonSpit, // Venom at any enemy (guards don't block it): it loses Amount health (no defence) at the end of each
+	          // of its next Duration turns
+	SummonEgg, // Lays a Summon unit (an egg) on a free tile of the caster's side; it hatches into HatchInto after
+	          // Duration of its turns. Only one egg of the caster's side at a time.
+	HitAndRun, // Front row only: a normal attack (+Amount attack) on its target, then steps back into a back tile
+	          // (swapping with whoever stands there); the opposite of Charge
+	ShellGuard, // Doubles the caster's own defence for its next Duration turns
+	Cleave,   // Melee sweep: a normal hit (+Amount attack) on every enemy in the front row
 }
 
 // An action a unit takes instead of its normal attack. Player units use it when ordered to
@@ -46,10 +54,16 @@ public partial class CombatAbility : Resource
 	// mana taken (ManaSteal), base healing (Heal, HealAll), attack taken away (Curse, CurseAll)
 	// attack added to the hit (AimedShot, WhirlingBlades, Freeze), taken off each arrow (Volley),
 	// damage per rooted turn (Roots), healing per turn (Rejuvenation), % of Deadliness bled per turn (Bleed),
-	// attack added to the strike (Charge, CrushDefence) or spell base power (Blizzard)
+	// attack added to the strike (Charge, CrushDefence), spell base power (Blizzard) or poison per turn (PoisonSpit)
 	[Export] public int Amount = 2;
-	// Turns the effect lasts (Roar, Fortify, Freeze, Bleed, Curse, CurseAll, Roots, Rejuvenation, Taunt)
+	// Turns the effect lasts (Roar, Fortify, Freeze, Bleed, Curse, CurseAll, Roots, Rejuvenation, Taunt, PoisonSpit),
+	// or the egg's turns until it hatches (SummonEgg)
 	[Export] public int Duration = 2;
+	// Roar: initiative added on top of the attack (units with more initiative act earlier in each round)
+	[Export] public int Initiative;
+	// SummonEgg: the unit laid (the egg) and what it hatches into
+	[Export] public UnitTemplate Summon;
+	[Export] public UnitTemplate HatchInto;
 	// Bleed: the bleeding target can't be healed until the bleed ends
 	[Export] public bool PreventsHealing;
 	// Damage dealt (no defence) when Mana Steal hits an enemy without mana
@@ -58,12 +72,12 @@ public partial class CombatAbility : Resource
 	[Export] public CombatAbility Replaces;
 
 	// True when the ability needs an enemy picked as its target
-	public bool TargetsEnemy => Kind == CombatAbilityKind.Firebolt || Kind == CombatAbilityKind.ManaSteal || Kind == CombatAbilityKind.Curse || Kind == CombatAbilityKind.AimedShot || Kind == CombatAbilityKind.Roots || Kind == CombatAbilityKind.Freeze || Kind == CombatAbilityKind.Bleed || Kind == CombatAbilityKind.CrushDefence;
+	public bool TargetsEnemy => Kind == CombatAbilityKind.Firebolt || Kind == CombatAbilityKind.ManaSteal || Kind == CombatAbilityKind.Curse || Kind == CombatAbilityKind.AimedShot || Kind == CombatAbilityKind.Roots || Kind == CombatAbilityKind.Freeze || Kind == CombatAbilityKind.Bleed || Kind == CombatAbilityKind.CrushDefence || Kind == CombatAbilityKind.PoisonSpit;
 	// True when the ability needs an ally (or the caster) picked as its target
 	public bool TargetsAlly => Kind == CombatAbilityKind.Heal;
 	public bool NeedsTarget => TargetsEnemy || TargetsAlly;
 	public bool IsCurse => Kind == CombatAbilityKind.Curse || Kind == CombatAbilityKind.CurseAll;
 	// A weapon hit that has to reach its target like a normal melee attack (guards block it)
-	public bool IsMeleeHit => Kind == CombatAbilityKind.Freeze || Kind == CombatAbilityKind.Bleed || Kind == CombatAbilityKind.CrushDefence || Kind == CombatAbilityKind.Charge;
+	public bool IsMeleeHit => Kind == CombatAbilityKind.Freeze || Kind == CombatAbilityKind.Bleed || Kind == CombatAbilityKind.CrushDefence || Kind == CombatAbilityKind.Charge || Kind == CombatAbilityKind.HitAndRun;
 	public bool IsSpell => Kind == CombatAbilityKind.Firebolt || Kind == CombatAbilityKind.Fireball || Kind == CombatAbilityKind.Blizzard;
 }

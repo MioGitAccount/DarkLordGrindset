@@ -1,0 +1,46 @@
+[gd_resource type="Resource" script_class="UnitTemplate" load_steps=11 format=3]
+
+[ext_resource type="Script" path="res://game/units/UnitTemplate.cs" id="1_template"]
+[ext_resource type="Script" path="res://game/units/BattleStats.cs" id="1_stats"]
+[ext_resource type="Script" path="res://game/units/SpecialAttributes.cs" id="9_attrs"]
+[ext_resource type="Texture2D" uid="uid://cc84p4daucyi2" path="res://images/Units/blight_crawlerIcon.png" id="2_icon"]
+[ext_resource type="SpriteFrames" path="res://images/Units/sprites/blight_crawler_frames.tres" id="10_sprite"]
+[ext_resource type="Texture2D" uid="uid://c5o5esnhifvij" path="res://images/Units/sprites/blight_crawler_battle.png" id="11_battle"]
+[ext_resource type="Texture2D" uid="uid://btacohdkma5jb" path="res://images/Units/sprites/blight_crawler_attack_battle.png" id="12_attack"]
+[ext_resource type="Resource" path="res://resources/combat/death_explosion.tres" id="p_death_explosion"]
+
+[sub_resource type="Resource" id="Resource_attrs"]
+script = ExtResource("9_attrs")
+Deadliness = 3
+Strength = 2
+Durability = 1
+Cleverness = 1
+Quickness = 7
+
+[sub_resource type="Resource" id="Resource_stats"]
+script = ExtResource("1_stats")
+attack = 2
+defence = 0
+health = 10
+maxHealth = 10
+mana = 0
+maxMana = 0
+initiative = 0
+rangeUnit = false
+
+[resource]
+script = ExtResource("1_template")
+Name = "Blight Crawler"
+Level = 1
+Biome = 8
+Icon = ExtResource("2_icon")
+MapSprite = ExtResource("10_sprite")
+BattleSprite = ExtResource("11_battle")
+BattleAttackSprite = ExtResource("12_attack")
+BattleAttackLean = false
+SpriteScale = 1.15
+BattleSink = 6.0
+DefaultStats = SubResource("Resource_stats")
+Attributes = SubResource("Resource_attrs")
+CombatPassives = [ExtResource("p_death_explosion")]
+CombatAbilities = []

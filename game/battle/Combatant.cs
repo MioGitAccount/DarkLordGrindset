@@ -11,6 +11,7 @@ public class CombatBuff
 	public string Source;
 	public int AttackBonus;
 	public int DefenceBonus;
+	public int InitiativeBonus;
 	// Health given back at the end of each of the owner's turns
 	public int HealPerTurn;
 	public int TurnsLeft;
@@ -35,6 +36,8 @@ public class Combatant
 	public bool AttackLean = true;
 	// Drawn size compared with other units (UnitTemplate.SpriteScale)
 	public float SpriteScale = 1f;
+	// Pixels the battle image sits lower on its ring (UnitTemplate.BattleSink)
+	public float BattleSink;
 	// Bolt of a ranged unit's normal attack
 	public Color ProjectileColor = new Color(1f, 0.7f, 0.3f);
 	public BattleSide Side;
@@ -54,17 +57,30 @@ public class Combatant
 	public readonly Dictionary<CombatAbility, int> Cooldowns = new();
 	public readonly List<CombatBuff> Buffs = new();
 	public int StunnedTurns;
-	// Entangling Roots: turns left held (no abilities, ranged attacks only), and the damage taken on each
+	// Entangling Roots or Web: turns left held (no abilities, ranged attacks only), the damage taken on each,
+	// and the name of what holds it
 	public int RootedTurns, RootDamage;
-	// Bleed: turns left bleeding, the damage lost at the end of each, and whether heals are blocked meanwhile
+	public string RootName = "roots";
+	// Bleed or Poison Spit: turns left bleeding, the damage lost at the end of each, whether heals are blocked
+	// meanwhile, and whether it is poison (only the wording differs)
 	public int BleedTurns, BleedDamage;
-	public bool BleedBlocksHealing;
+	public bool BleedBlocksHealing, Poisoned;
+	// An egg (Summon Egg): what it hatches into, after HatchTurns more of its turns
+	public UnitTemplate HatchInto;
+	public int HatchTurns;
+	// Laid or hatched during the battle: not a guard of the field, gives no experience
+	public bool Spawned;
+	// Death Explosion: who killed it with a melee strike; set once its death passives have gone off
+	public Combatant KilledInMeleeBy;
+	public bool DeathHandled;
+	// Set once Regeneration has kicked in this battle
+	public bool RegenerationUsed;
 	public bool CanBeHealed => !(BleedTurns > 0 && BleedBlocksHealing);
 	// Taunt: the enemy this unit's normal attacks must go to (while it can reach it), for TauntTurns more turns
 	public Combatant TauntedBy;
 	public int TauntTurns;
 
-	// Where the outcome goes; exactly one of these is set
+	// Where the outcome goes; one of these is set, except for spawned units
 	public unit PlayerUnit;
 	public NeutralUnit Neutral;
 
@@ -86,6 +102,17 @@ public class Combatant
 			int bonus = 0;
 			foreach (var buff in Buffs)
 				bonus += buff.AttackBonus;
+			return bonus;
+		}
+	}
+
+	public int BuffInitiative
+	{
+		get
+		{
+			int bonus = 0;
+			foreach (var buff in Buffs)
+				bonus += buff.InitiativeBonus;
 			return bonus;
 		}
 	}
@@ -118,6 +145,7 @@ public class Combatant
 			BattleAttackSprite = playerUnit.Template?.BattleAttackSprite,
 			AttackLean = playerUnit.Template?.BattleAttackLean ?? true,
 			SpriteScale = playerUnit.Template?.SpriteScale ?? 1f,
+			BattleSink = playerUnit.Template?.BattleSink ?? 0,
 			ProjectileColor = playerUnit.Template?.AttackProjectileColor ?? new Color(1f, 0.7f, 0.3f),
 			Side = BattleSide.Player,
 			PlayerUnit = playerUnit,
@@ -142,6 +170,7 @@ public class Combatant
 			BattleAttackSprite = template?.BattleAttackSprite,
 			AttackLean = template?.BattleAttackLean ?? true,
 			SpriteScale = template?.SpriteScale ?? 1f,
+			BattleSink = template?.BattleSink ?? 0,
 			ProjectileColor = template?.AttackProjectileColor ?? new Color(1f, 0.7f, 0.3f),
 			Side = BattleSide.Enemy,
 			Neutral = neutral,
@@ -157,6 +186,16 @@ public class Combatant
 				if (ability != null)
 					combatant.Abilities.Add(ability);
 		}
+		return combatant;
+	}
+
+	// A unit that joins the battle on `side` without being a field guard (an egg, a hatchling)
+	public static Combatant Spawn(UnitTemplate template, BattleSide side)
+	{
+		var combatant = FromNeutral(new NeutralUnit { Template = template });
+		combatant.Neutral = null;
+		combatant.Side = side;
+		combatant.Spawned = true;
 		return combatant;
 	}
 

@@ -36,6 +36,9 @@ public partial class BattleScreen : Control
 	private static readonly Color CurseColor = new Color(0.75f, 0.45f, 1f);
 	private static readonly Color RootColor = new Color(0.6f, 0.8f, 0.3f);
 	private static readonly Color TauntColor = new Color(1f, 0.5f, 0.25f);
+	private static readonly Color PoisonColor = new Color(0.7f, 1f, 0.15f);
+	private static readonly Color WebColor = new Color(0.9f, 0.88f, 0.95f);
+	private static readonly Color BlastColor = new Color(0.8f, 0.4f, 1f);
 
 	private field _field;
 	// Painted backdrop of the field (see Battlegrounds); null draws the plain sky and ground
@@ -1046,7 +1049,7 @@ public partial class BattleScreen : Control
 				bool taunt = buff.Ability.Kind == CombatAbilityKind.Taunt;
 				bool fortify = buff.Ability.Kind == CombatAbilityKind.Fortify;
 				Color buffColor = curse ? CurseColor : regrowth ? HealColor : taunt ? TauntColor : Gold;
-				string effect = curse ? $"-{buff.Ability.Amount} ATK" : regrowth ? $"+{buff.Ability.Amount} HP/turn" : taunt ? "Taunted!" : fortify ? $"+{buff.Ability.Amount} DEF" : $"+{buff.Ability.Amount} ATK";
+				string effect = buff.Effect != "" ? buff.Effect : curse ? $"-{buff.Ability.Amount} ATK" : regrowth ? $"+{buff.Ability.Amount} HP/turn" : taunt ? "Taunted!" : fortify ? $"+{buff.Ability.Amount} DEF" : $"+{buff.Ability.Amount} ATK";
 				Popup(actorView, buff.Ability.Name.ToUpper() + "!", buffColor, 22);
 				actorView.PlayAttack();
 				await actorView.Pulse(Pace);
@@ -1069,22 +1072,26 @@ public partial class BattleScreen : Control
 				await Wait(0.4, battleId);
 				break;
 			case RootEvent root:
-				Popup(actorView, root.Ability.Name.ToUpper() + "!", HealColor, 22);
+				bool web = IsWeb(root.Target.RootName);
+				Color holdColor = web ? WebColor : RootColor;
+				Popup(actorView, root.Ability.Name.ToUpper() + "!", holdColor, 22);
 				actorView.PlayAttack();
 				if (_views.TryGetValue(root.Target, out var rootedView))
 				{
-					await Projectile(actorView.Chest, rootedView.Chest, RootColor);
-					rootedView.Flash(RootColor);
-					Popup(rootedView, "Rooted!", RootColor, 22);
+					await Projectile(actorView.Chest, rootedView.Chest, holdColor);
+					rootedView.Flash(holdColor);
+					Popup(rootedView, web ? "Webbed!" : "Rooted!", holdColor, 22);
 					rootedView.Refresh();
 				}
 				await Wait(0.6, battleId);
 				actorView.PlayIdle();
 				break;
 			case RootedTurnEvent rooted:
+				bool webbed = IsWeb(rooted.Actor.RootName);
+				string held = webbed ? "Webbed" : "Rooted";
 				actorView.ShownHealth = Math.Max(0, actorView.ShownHealth - rooted.Damage);
-				actorView.Flash(RootColor);
-				Popup(actorView, rooted.Damage > 0 ? $"Rooted  -{rooted.Damage}" : "Rooted", RootColor, 20);
+				actorView.Flash(webbed ? WebColor : RootColor);
+				Popup(actorView, rooted.Damage > 0 ? $"{held}  -{rooted.Damage}" : held, webbed ? WebColor : RootColor, 20);
 				if (rooted.Killed)
 					actorView.SetDead();
 				actorView.Refresh();
@@ -1110,12 +1117,67 @@ public partial class BattleScreen : Control
 				break;
 			case BleedTickEvent bleed:
 				actorView.ShownHealth = Math.Max(0, actorView.ShownHealth - bleed.Damage);
-				actorView.Flash(BleedColor);
-				Popup(actorView, $"Bleeding  -{bleed.Damage}", BleedColor, 20);
+				actorView.Flash(bleed.Poison ? PoisonColor : BleedColor);
+				Popup(actorView, $"{(bleed.Poison ? "Poison" : "Bleeding")}  -{bleed.Damage}", bleed.Poison ? PoisonColor : BleedColor, 20);
 				if (bleed.Killed)
 					actorView.SetDead();
 				actorView.Refresh();
 				await Wait(0.6, battleId);
+				break;
+			case PassiveEvent passive:
+				actorView.Flash(HealColor);
+				Popup(actorView, passive.Passive.Name.ToUpper() + "!", HealColor, 22);
+				actorView.Refresh();
+				await Wait(0.6, battleId);
+				break;
+			case ExplosionEvent explosion:
+				actorView.Flash(BlastColor);
+				Popup(actorView, explosion.Passive.Name.ToUpper() + "!", BlastColor, 22);
+				await Wait(0.25, battleId);
+				foreach (var (victim, damage, killed) in explosion.Hits)
+					if (_views.TryGetValue(victim, out var victimView))
+					{
+						victimView.ShownHealth = victim.Health;
+						victimView.Flash(BlastColor);
+						Popup(victimView, damage.ToString(), BlastColor, 24, 0.1f);
+						if (killed)
+							victimView.SetDead();
+						victimView.Refresh();
+					}
+				await Wait(0.6, battleId);
+				break;
+			case SummonEvent summon:
+				Popup(actorView, summon.Ability.Name.ToUpper() + "!", PoisonColor, 22);
+				actorView.PlayAttack();
+				await actorView.Pulse(Pace);
+				if (summon.Replaced != null)
+					RemoveView(summon.Replaced);
+				AddView(summon.Summoned);
+				Layout();
+				if (_views.TryGetValue(summon.Summoned, out var eggView))
+					await eggView.Pulse(Pace);
+				await Wait(0.4, battleId);
+				actorView.PlayIdle();
+				break;
+			case HatchEvent hatch:
+				if (hatch.Hatched == null)
+				{
+					Popup(actorView, $"Hatching in {hatch.TurnsLeft}", PoisonColor, 18);
+					await actorView.Pulse(Pace);
+					await Wait(0.3, battleId);
+					break;
+				}
+				actorView.Flash(PoisonColor);
+				await actorView.Pulse(Pace);
+				RemoveView(hatch.Actor);
+				AddView(hatch.Hatched);
+				Layout();
+				if (_views.TryGetValue(hatch.Hatched, out var hatchlingView))
+				{
+					Popup(hatchlingView, "Hatched!", PoisonColor, 22);
+					await hatchlingView.Pulse(Pace);
+				}
+				await Wait(0.4, battleId);
 				break;
 			case SkipEvent:
 				Popup(actorView, "Stunned", new Color(0.75f, 0.55f, 1f), 18);
@@ -1131,7 +1193,7 @@ public partial class BattleScreen : Control
 		_fighters.MoveChild(attacker, -1); // draw the attacker on top while it acts
 		bool melee = (hit.Ability == null || hit.Ability.IsMeleeHit) && !hit.Actor.Ranged;
 		Vector2 home = attacker.Position;
-		if (hit.Ability?.Kind == CombatAbilityKind.AimedShot || hit.Ability?.IsMeleeHit == true)
+		if (hit.Ability?.Kind is CombatAbilityKind.AimedShot or CombatAbilityKind.PoisonSpit || hit.Ability?.IsMeleeHit == true)
 			Popup(attacker, hit.Ability.Name.ToUpper() + "!", Gold, 22);
 		if (melee)
 		{
@@ -1175,12 +1237,16 @@ public partial class BattleScreen : Control
 		SortFighters();
 	}
 
+	// Web holds look white, roots green
+	private static bool IsWeb(string holdName) => holdName.Contains("web");
+
 	private static Color ProjectileColor(HitEvent hit) => hit.Ability?.Kind switch
 	{
 		null or CombatAbilityKind.AimedShot => hit.Actor.ProjectileColor,
 		CombatAbilityKind.Fireball => FireColor,
 		CombatAbilityKind.Blizzard => FrostColor,
 		CombatAbilityKind.ManaSteal => ManaColor,
+		CombatAbilityKind.PoisonSpit => PoisonColor,
 		_ => SpellColor,
 	};
 
@@ -1197,9 +1263,21 @@ public partial class BattleScreen : Control
 			_ => Gold,
 		};
 		Popup(attacker, area.Ability.Name.ToUpper() + "!", color, 22);
+		// Cleave: steps up to the middle of the front row it sweeps, swings, then walks back
+		bool cleave = area.Ability.Kind == CombatAbilityKind.Cleave;
+		Vector2 home = attacker.Position;
+		if (cleave)
+		{
+			var struck = area.Hits.Select(hit => _views.GetValueOrDefault(hit.Target)).Where(view => view != null).ToList();
+			if (struck.Count > 0)
+			{
+				var middle = new Vector2(struck.Average(view => view.Position.X), struck.Average(view => view.Position.Y));
+				await attacker.MoveTo(middle + new Vector2(area.Actor.IsPlayer ? -80 : 80, 6), 0.3, Pace);
+			}
+		}
 		float length = attacker.PlayAttack();
 		await Wait(length * 0.5f, battleId);
-		if (spin)
+		if (spin || cleave)
 		{
 			await attacker.Pulse(Pace);
 		}
@@ -1218,6 +1296,8 @@ public partial class BattleScreen : Control
 				ShowImpact(hit, target);
 		await Wait(Math.Max(0.35, length * 0.5f), battleId);
 		attacker.PlayIdle();
+		if (cleave)
+			await attacker.MoveTo(home, 0.3, Pace);
 		SortFighters();
 	}
 
@@ -1233,7 +1313,7 @@ public partial class BattleScreen : Control
 				casterView.Refresh();
 			}
 		}
-		else if (hit.Damage == 0)
+		else if (hit.Damage == 0 && hit.Ability?.Kind != CombatAbilityKind.PoisonSpit)
 		{
 			Popup(target, hit.ShieldBlocked ? "Shield block!" : hit.Dodged ? "Dodged!" : "Blocked", new Color(0.8f, 0.8f, 0.8f), hit.ShieldBlocked || hit.Dodged ? 22 : 18);
 		}
@@ -1249,7 +1329,7 @@ public partial class BattleScreen : Control
 		if (hit.Stunned)
 			Popup(target, "Stunned!", new Color(0.75f, 0.55f, 1f), 18, 0.3f);
 		if (hit.Bleeding)
-			Popup(target, "Bleeding!", BleedColor, 18, 0.3f);
+			Popup(target, hit.Target.Poisoned ? "Poisoned!" : "Bleeding!", hit.Target.Poisoned ? PoisonColor : BleedColor, hit.Target.Poisoned ? 22 : 18, 0.3f);
 		if (hit.Frozen)
 		{
 			target.Flash(FrostColor);

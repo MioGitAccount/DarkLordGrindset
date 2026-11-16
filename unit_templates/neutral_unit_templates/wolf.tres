@@ -1,10 +1,11 @@
-[gd_resource type="Resource" script_class="UnitTemplate" load_steps=10 format=3 uid="uid://cbo6rewdq70yj"]
+[gd_resource type="Resource" script_class="UnitTemplate" load_steps=11 format=3 uid="uid://cbo6rewdq70yj"]
 
 [ext_resource type="Script" path="res://game/units/UnitTemplate.cs" id="1_fw6kh"]
 [ext_resource type="Script" path="res://game/units/BattleStats.cs" id="1_si4nl"]
 [ext_resource type="Texture2D" uid="uid://dt828kslfubnx" path="res://images/Units/wolfIcon.png" id="2_p5xed"]
 [ext_resource type="Script" path="res://game/units/SpecialAttributes.cs" id="9_attrs"]
 [ext_resource type="Texture2D" uid="uid://c6r528bckoron" path="res://images/Units/sprites/wolf_battle.png" id="11_battle"]
+[ext_resource type="Texture2D" uid="uid://bcjt0nmldrhrk" path="res://images/Units/sprites/wolf_attack_battle.png" id="12_attack"]
 [ext_resource type="SpriteFrames" path="res://images/Units/sprites/wolf_frames.tres" id="10_sprite"]
 
 [ext_resource type="Resource" path="res://resources/combat/pack_hunter.tres" id="c_pack_hunter"]
@@ -36,6 +37,7 @@ Biome = 2
 Icon = ExtResource("2_p5xed")
 MapSprite = ExtResource("10_sprite")
 BattleSprite = ExtResource("11_battle")
+BattleAttackSprite = ExtResource("12_attack")
 BattleAttackLean = false
 DefaultStats = SubResource("Resource_pjfic")
 Attributes = SubResource("Resource_attrs")

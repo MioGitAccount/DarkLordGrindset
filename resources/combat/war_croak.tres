@@ -1,0 +1,14 @@
+[gd_resource type="Resource" script_class="CombatAbility" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://game/battle/CombatAbility.cs" id="1_script"]
+
+[resource]
+script = ExtResource("1_script")
+Name = "War Croak"
+Description = "Every unit on its side gets +1 attack and +3 initiative (acts earlier) for its next 3 turns. Usable every fourth turn."
+Kind = 0
+ManaCost = 0
+Cooldown = 3
+Amount = 1
+Duration = 3
+Initiative = 3

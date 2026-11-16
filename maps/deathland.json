@@ -19522,24 +19522,44 @@
       "pos": [576,1177.3],
       "neutrals": [
         {
-          "template": "skeleton",
-          "count": 1
+          "template": "dread_wolf",
+          "count": 2
         },
         {
-          "template": "witch",
-          "count": 1
+          "template": "blight_crawler",
+          "count": 2
         }
       ]
     },
     {
       "id": "F31",
       "type": "Swamp",
-      "pos": [503.3,1257.6]
+      "pos": [503.8,1257.6],
+      "neutrals": [
+        {
+          "template": "three_eyed_warrior",
+          "count": 2
+        },
+        {
+          "template": "three_eyed_shaman",
+          "count": 1
+        }
+      ]
     },
     {
       "id": "F33",
       "type": "Swamp",
-      "pos": [414.5,1220.9]
+      "pos": [415.5,1220.9],
+      "neutrals": [
+        {
+          "template": "three_eyed_shaman",
+          "count": 2
+        },
+        {
+          "template": "three_eyed_shellguard",
+          "count": 1
+        }
+      ]
     },
     {
       "id": "F34",
@@ -19574,7 +19594,25 @@
     {
       "id": "F38",
       "type": "Swamp",
-      "pos": [709.1,1429.8]
+      "pos": [709.1,1429.8],
+      "neutrals": [
+        {
+          "template": "three_eyed_warrior",
+          "count": 1
+        },
+        {
+          "template": "three_eyed_shaman",
+          "count": 1
+        },
+        {
+          "template": "three_eyed_shellguard",
+          "count": 1
+        },
+        {
+          "template": "crocodile_warrior",
+          "count": 1
+        }
+      ]
     },
     {
       "id": "F39",

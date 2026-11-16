@@ -1,0 +1,47 @@
+[gd_resource type="Resource" script_class="UnitTemplate" load_steps=12 format=3]
+
+[ext_resource type="Script" path="res://game/units/UnitTemplate.cs" id="1_template"]
+[ext_resource type="Script" path="res://game/units/BattleStats.cs" id="1_stats"]
+[ext_resource type="Script" path="res://game/units/SpecialAttributes.cs" id="9_attrs"]
+[ext_resource type="Texture2D" uid="uid://bekawraspbtdb" path="res://images/Units/venom_weaverIcon.png" id="2_icon"]
+[ext_resource type="SpriteFrames" path="res://images/Units/sprites/venom_weaver_frames.tres" id="10_sprite"]
+[ext_resource type="Texture2D" uid="uid://vnud2qssrnvw" path="res://images/Units/sprites/venom_weaver_battle.png" id="11_battle"]
+[ext_resource type="Texture2D" uid="uid://b214ys1if531p" path="res://images/Units/sprites/venom_weaver_attack_battle.png" id="12_attack"]
+[ext_resource type="Resource" path="res://resources/combat/death_explosion.tres" id="p_death_explosion"]
+[ext_resource type="Resource" path="res://resources/combat/spit_poison.tres" id="a_spit_poison"]
+
+[sub_resource type="Resource" id="Resource_attrs"]
+script = ExtResource("9_attrs")
+Deadliness = 4
+Strength = 3
+Durability = 2
+Cleverness = 2
+Quickness = 5
+
+[sub_resource type="Resource" id="Resource_stats"]
+script = ExtResource("1_stats")
+attack = 3
+defence = 1
+health = 16
+maxHealth = 16
+mana = 0
+maxMana = 0
+initiative = 0
+rangeUnit = false
+
+[resource]
+script = ExtResource("1_template")
+Name = "Venom Weaver"
+Level = 2
+Biome = 8
+Icon = ExtResource("2_icon")
+MapSprite = ExtResource("10_sprite")
+BattleSprite = ExtResource("11_battle")
+BattleAttackSprite = ExtResource("12_attack")
+BattleAttackLean = false
+SpriteScale = 1.4
+BattleSink = 12.0
+DefaultStats = SubResource("Resource_stats")
+Attributes = SubResource("Resource_attrs")
+CombatPassives = [ExtResource("p_death_explosion")]
+CombatAbilities = [ExtResource("a_spit_poison")]

@@ -1,9 +1,9 @@
 [gd_resource type="Resource" script_class="SkillTree" load_steps=5 format=3 uid="uid://dqn2enw377rth"]
 
 [ext_resource type="Script" path="res://game/units/skills/SkillTree.cs" id="1_tree"]
-[ext_resource type="Resource" path="res://resources/skill_classes/assassin.tres" id="assassin"]
-[ext_resource type="Resource" path="res://resources/skill_classes/demonic_imp.tres" id="main"]
-[ext_resource type="Resource" path="res://resources/skill_classes/sorcerer.tres" id="sorcerer"]
+[ext_resource type="Resource" uid="uid://duxe4p22rehc5" path="res://resources/skill_classes/assassin.tres" id="assassin"]
+[ext_resource type="Resource" uid="uid://cg84fkcgwj2di" path="res://resources/skill_classes/demonic_imp.tres" id="main"]
+[ext_resource type="Resource" uid="uid://bejtlvggya1ct" path="res://resources/skill_classes/sorcerer.tres" id="sorcerer"]
 
 [resource]
 script = ExtResource("1_tree")

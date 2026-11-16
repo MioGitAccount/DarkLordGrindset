@@ -45,6 +45,14 @@ public class BuffEvent : BattleEvent
 {
 	public CombatAbility Ability;
 	public List<Combatant> Affected = new();
+	// What each affected unit gets, for the popup; empty to describe it from the ability
+	public string Effect = "";
+}
+
+// A passive kicking in on its own (Regeneration); Actor is its owner
+public class PassiveEvent : BattleEvent
+{
+	public CombatPassive Passive;
 }
 
 // Health given back by Heal or HealAll, or by a Rejuvenation tick (Ability null; Actor is the healed unit)
@@ -75,6 +83,30 @@ public class BleedTickEvent : BattleEvent
 {
 	public int Damage;
 	public bool Killed;
+	// Poison Spit's poison, not a Bleed
+	public bool Poison;
+}
+
+// A fallen unit's Death Explosion or Death Blast (Actor is the fallen unit)
+public class ExplosionEvent : BattleEvent
+{
+	public CombatPassive Passive;
+	public List<(Combatant Target, int Damage, bool Killed)> Hits = new();
+}
+
+// Summon Egg: Summoned was laid in its slot, on top of Replaced (a fallen unit's body) if any
+public class SummonEvent : BattleEvent
+{
+	public CombatAbility Ability;
+	public Combatant Summoned;
+	public Combatant Replaced;
+}
+
+// An egg's turn: it counts down, or hatches into Hatched (which takes its slot)
+public class HatchEvent : BattleEvent
+{
+	public Combatant Hatched;
+	public int TurnsLeft;
 }
 
 // The actor moved to another slot of its side; SwappedWith (alive or fallen) took its old slot
@@ -156,7 +188,7 @@ public class BattleSimulation
 			ApplyLordBonuses();
 			ApplyChampionBonuses();
 			Round++;
-			foreach (var combatant in All.Where(c => c.IsAlive).OrderByDescending(c => c.Initiative)
+			foreach (var combatant in All.Where(c => c.IsAlive).OrderByDescending(c => c.Initiative + c.BuffInitiative)
 					.ThenByDescending(c => c.Quickness).ThenBy(_ => _rng.Next()))
 				_turnOrder.Enqueue(combatant);
 		}
@@ -280,17 +312,38 @@ public class BattleSimulation
 			.First();
 	}
 
+	// Hit and Run: the back tile a front-row unit steps back into - an empty one first, then one held by a
+	// melee ally (archers and casters stay in the back), closest to its lane; -1 when there is none or it
+	// isn't in the front row (then it only strikes)
+	public int RetreatSlot(Combatant actor)
+	{
+		if (BattleFormation.IsBack(actor.Slot))
+			return -1;
+		var allies = AlliesOf(actor);
+		bool Free(int slot) => allies[slot] == null || !allies[slot].IsAlive;
+		float lane = BattleFormation.Lane(actor.Slot);
+		return BattleFormation.BackSlots
+			.Where(slot => Free(slot) || !allies[slot].Ranged)
+			.OrderBy(slot => Free(slot) ? 0 : 1)
+			.ThenBy(slot => Math.Abs(BattleFormation.Lane(slot) - lane))
+			.DefaultIfEmpty(-1).First();
+	}
+
 	// Empty when the ability can be used now, otherwise why not
 	public string WhyCantUse(Combatant caster, CombatAbility ability)
 	{
 		if (caster.RootedTurns > 0)
-			return "Held by roots";
+			return $"Held by {caster.RootName}";
 		if (caster.CooldownLeft(ability) > 0)
 			return $"Ready in {caster.CooldownLeft(ability)} turns";
 		if (caster.Mana < ability.ManaCost)
 			return $"Needs {ability.ManaCost} mana";
 		if (ability.Kind == CombatAbilityKind.Charge && !BattleFormation.IsBack(caster.Slot))
 			return "Only from the back row";
+		if (ability.Kind == CombatAbilityKind.HitAndRun && BattleFormation.IsBack(caster.Slot))
+			return "Only from the front row";
+		if (ability.Kind == CombatAbilityKind.SummonEgg && (ability.Summon == null || FreeSlots(AlliesOf(caster)).Count == 0))
+			return "No free tile";
 		return "";
 	}
 
@@ -299,6 +352,13 @@ public class BattleSimulation
 	public List<BattleEvent> TakeTurn(Combatant actor)
 	{
 		var events = new List<BattleEvent>();
+		if (actor.HatchInto != null)
+		{
+			// An egg doesn't act: it counts down, then hatches in its own slot
+			Hatch(actor, events);
+			HandleDeaths(events);
+			return events;
+		}
 		if (actor.StunnedTurns > 0)
 		{
 			actor.StunnedTurns--;
@@ -316,7 +376,7 @@ public class BattleSimulation
 				Actor = actor,
 				Damage = damage,
 				Killed = !actor.IsAlive,
-				Message = $"{Label(actor)} is held by roots: takes {damage} damage" + (!actor.IsAlive ? ", killed" : shoots ? " and can only shoot" : " and can't strike"),
+				Message = $"{Label(actor)} is held by {actor.RootName}" + (damage > 0 ? $": takes {damage} damage" : "") + (!actor.IsAlive ? ", killed" : shoots ? " and can only shoot" : " and can't strike"),
 			});
 			actor.QueuedAbility = null;
 			actor.QueuedAbilityTarget = null;
@@ -336,8 +396,101 @@ public class BattleSimulation
 				ChooseAndAct(actor, events);
 		}
 		EndTurn(actor, events);
+		HandleDeaths(events);
 		return events;
 	}
+
+	private void Hatch(Combatant egg, List<BattleEvent> events)
+	{
+		egg.HatchTurns--;
+		if (egg.HatchTurns > 0)
+		{
+			events.Add(new HatchEvent { Actor = egg, TurnsLeft = egg.HatchTurns, Message = $"{Label(egg)} pulses: hatches in {egg.HatchTurns} turns" });
+			return;
+		}
+		var hatched = Combatant.Spawn(egg.HatchInto, egg.Side);
+		hatched.Slot = egg.Slot;
+		AlliesOf(egg)[egg.Slot] = hatched;
+		egg.HatchInto = null;
+		events.Add(new HatchEvent { Actor = egg, Hatched = hatched, Message = $"{Label(egg)} hatches: a {hatched.Name} crawls out" });
+	}
+
+	// Death Explosion and Death Blast of units that fell this turn; explosions can kill more units, so it repeats
+	private void HandleDeaths(List<BattleEvent> events)
+	{
+		bool again = true;
+		while (again)
+		{
+			again = false;
+			foreach (var fallen in All.Where(c => !c.IsAlive && !c.DeathHandled).ToList())
+			{
+				fallen.DeathHandled = true;
+				var explosion = fallen.GetPassive(CombatPassiveKind.DeathExplosion);
+				var killer = fallen.KilledInMeleeBy;
+				if (explosion != null && killer != null && killer.IsAlive)
+				{
+					events.Add(Explode(fallen, explosion, new[] { killer }, "explodes on"));
+					again = true;
+				}
+				var blast = fallen.GetPassive(CombatPassiveKind.DeathBlast);
+				if (blast != null)
+				{
+					var opponents = OpponentsOf(fallen);
+					var front = FrontRow(opponents);
+					if (front.Count > 0)
+					{
+						events.Add(Explode(fallen, blast, front, "bursts over"));
+						again = true;
+					}
+				}
+			}
+		}
+		CheckRegeneration(events);
+	}
+
+	// Regeneration: units that dropped below half health this turn start healing, once per battle
+	private void CheckRegeneration(List<BattleEvent> events)
+	{
+		foreach (var unit in All.Where(c => c.IsAlive && !c.RegenerationUsed && IsWeak(c)))
+		{
+			var regeneration = unit.GetPassive(CombatPassiveKind.Regeneration);
+			if (regeneration == null)
+				continue;
+			unit.RegenerationUsed = true;
+			unit.Buffs.Add(new CombatBuff { Source = regeneration.Name, HealPerTurn = regeneration.Amount, TurnsLeft = regeneration.Duration });
+			events.Add(new PassiveEvent
+			{
+				Actor = unit,
+				Passive = regeneration,
+				Message = $"{Label(unit)}'s {regeneration.Name} kicks in: +{regeneration.Amount} health at the end of each of its next {regeneration.Duration} turns",
+			});
+		}
+	}
+
+	private ExplosionEvent Explode(Combatant fallen, CombatPassive passive, IEnumerable<Combatant> victims, string verb)
+	{
+		var explosion = new ExplosionEvent { Actor = fallen, Passive = passive };
+		foreach (var victim in victims)
+		{
+			int damage = Math.Min(victim.Health, passive.Amount);
+			victim.Health -= damage;
+			explosion.Hits.Add((victim, damage, !victim.IsAlive));
+		}
+		explosion.Message = $"{Label(fallen)}'s {passive.Name} {verb} " + string.Join(", ", explosion.Hits.Select(h => $"{Label(h.Target)} ({h.Damage}" + (h.Killed ? ", killed)" : ")")));
+		return explosion;
+	}
+
+	// Free tiles of `side` for an egg: empty ones, then fallen units' bodies; back row first
+	private List<int> FreeSlots(Combatant[] slots) =>
+		Enumerable.Range(0, BattleFormation.SlotCount)
+			.Where(slot => slots[slot] == null || !slots[slot].IsAlive)
+			.OrderBy(slot => slots[slot] == null ? 0 : 1).ThenBy(slot => BattleFormation.IsBack(slot) ? 0 : 1).ToList();
+
+	// Living units in the front row of `slots` (Cleave, Death Blast)
+	private static List<Combatant> FrontRow(Combatant[] slots) =>
+		BattleFormation.FrontSlots.Select(slot => slots[slot]).Where(c => c != null && c.IsAlive).ToList();
+
+	private bool HasEgg(Combatant caster) => AlliesOf(caster).Any(c => c != null && c.IsAlive && c.HatchInto != null);
 
 	// The actor's turn goes on swapping places with whoever stands in `slot` (a fallen unit's body too).
 	// Their other orders stay for the next turn, unless the new places put the targets out of reach.
@@ -423,6 +576,8 @@ public class BattleSimulation
 						: actor.IsPlayer ? BattleFormation.DefaultTarget(actor, OpponentsOf(actor), true)
 						// Neutrals root the strongest melee enemy that isn't held already (rooted archers still shoot), and shoot the weakest
 						: ability.Kind == CombatAbilityKind.Roots ? valid.Where(enemy => enemy.RootedTurns == 0).OrderBy(enemy => enemy.Ranged).ThenByDescending(enemy => enemy.Attack).FirstOrDefault()
+						// and poison someone who isn't poisoned yet, the healthiest first (the poison has time to work)
+						: ability.Kind == CombatAbilityKind.PoisonSpit ? valid.Where(enemy => enemy.BleedTurns == 0).OrderByDescending(enemy => enemy.Health).FirstOrDefault()
 						: valid.OrderBy(enemy => enemy.Health).FirstOrDefault();
 				if (target != null)
 				{
@@ -448,10 +603,15 @@ public class BattleSimulation
 	{
 		CombatAbilityKind.Volley => OpponentsOf(actor).Count(enemy => enemy != null && enemy.IsAlive) > 1,
 		CombatAbilityKind.WhirlingBlades => ReachableTargets(actor).Count > 1,
+		CombatAbilityKind.Cleave => FrontRow(OpponentsOf(actor)).Count > 1,
 		CombatAbilityKind.Freeze => ReachableTargets(actor).Any(enemy => enemy.StunnedTurns == 0),
 		CombatAbilityKind.Bleed => ReachableTargets(actor).Any(enemy => enemy.BleedTurns == 0),
+		CombatAbilityKind.PoisonSpit => ValidTargets(actor, ability).Any(enemy => enemy.BleedTurns == 0),
+		CombatAbilityKind.SummonEgg => !HasEgg(actor),
 		CombatAbilityKind.CrushDefence => ReachableTargets(actor).Any(enemy => !enemy.Buffs.Any(buff => buff.Source == ability.Name)),
 		CombatAbilityKind.Charge => ChargeSlot(actor) >= 0,
+		CombatAbilityKind.HitAndRun => PlannedTarget(actor) != null,
+		CombatAbilityKind.ShellGuard => !actor.Buffs.Any(buff => buff.Source == ability.Name) && OpponentsOf(actor).Any(enemy => enemy != null && enemy.IsAlive),
 		CombatAbilityKind.Roots => OpponentsOf(actor).Any(enemy => enemy != null && enemy.IsAlive && enemy.RootedTurns == 0),
 		CombatAbilityKind.Taunt => OpponentsOf(actor).Any(enemy => enemy != null && enemy.IsAlive && (enemy.TauntTurns == 0 || enemy.TauntedBy?.IsAlive != true)),
 		CombatAbilityKind.Rejuvenation => AlliesOf(actor).Any(ally => ally != null && ally.IsAlive && ally.Health < ally.MaxHealth
@@ -482,12 +642,16 @@ public class BattleSimulation
 						Source = ability.Name,
 						AttackBonus = fortify ? 0 : ability.Amount,
 						DefenceBonus = fortify ? ability.Amount : 0,
+						InitiativeBonus = fortify ? 0 : ability.Initiative,
 						TurnsLeft = ability.Duration,
 						SkipNextCountdown = ally == actor,
 					});
 					buff.Affected.Add(ally);
 				}
-				buff.Message = $"{Label(actor)} uses {ability.Name}: +{ability.Amount} {(fortify ? "defence" : "attack")} to {buff.Affected.Count} allies for {ability.Duration} turns";
+				string gain = $"+{ability.Amount} {(fortify ? "defence" : "attack")}" + (!fortify && ability.Initiative > 0 ? $" and +{ability.Initiative} initiative" : "");
+				if (!fortify && ability.Initiative > 0)
+					buff.Effect = $"+{ability.Amount} ATK  +{ability.Initiative} INI";
+				buff.Message = $"{Label(actor)} uses {ability.Name}: {gain} to {buff.Affected.Count} allies for {ability.Duration} turns";
 				events.Add(buff);
 				break;
 			case CombatAbilityKind.Firebolt:
@@ -509,8 +673,10 @@ public class BattleSimulation
 			case CombatAbilityKind.Fireball:
 			case CombatAbilityKind.Volley:
 			case CombatAbilityKind.WhirlingBlades:
+			case CombatAbilityKind.Cleave:
 				var area = new AreaEvent { Actor = actor, Ability = ability };
 				var struck = ability.Kind == CombatAbilityKind.WhirlingBlades ? ReachableTargets(actor)
+					: ability.Kind == CombatAbilityKind.Cleave ? FrontRow(OpponentsOf(actor))
 					: OpponentsOf(actor).Where(enemy => enemy != null && enemy.IsAlive).ToList();
 				foreach (var enemy in struck)
 					area.Hits.Add(Hit(actor, enemy, ability));
@@ -538,12 +704,62 @@ public class BattleSimulation
 			case CombatAbilityKind.Roots:
 				target.RootedTurns = Math.Max(target.RootedTurns, ability.Duration);
 				target.RootDamage = ability.Amount;
+				target.RootName = ability.Name.ToLower();
 				events.Add(new RootEvent
 				{
 					Actor = actor,
 					Ability = ability,
 					Target = target,
-					Message = $"{Label(actor)} casts {ability.Name} at {Label(target)}: held for {ability.Duration} turns, {ability.Amount} damage each",
+					Message = $"{Label(actor)} casts {ability.Name} at {Label(target)}: held for {ability.Duration} turns" + (ability.Amount > 0 ? $", {ability.Amount} damage each" : ""),
+				});
+				break;
+			case CombatAbilityKind.HitAndRun:
+				var struckTarget = PlannedTarget(actor);
+				if (struckTarget != null)
+					events.Add(Hit(actor, struckTarget, ability));
+				int retreat = RetreatSlot(actor);
+				if (actor.IsAlive && retreat >= 0)
+					Move(actor, retreat, events);
+				break;
+			case CombatAbilityKind.ShellGuard:
+				int doubled = Math.Max(0, actor.Defence);
+				actor.Buffs.RemoveAll(b => b.Source == ability.Name); // refresh, don't stack
+				actor.Buffs.Add(new CombatBuff { Source = ability.Name, DefenceBonus = doubled, TurnsLeft = ability.Duration, SkipNextCountdown = true });
+				var shell = new BuffEvent { Actor = actor, Ability = ability, Effect = $"+{doubled} DEF" };
+				shell.Affected.Add(actor);
+				shell.Message = $"{Label(actor)} uses {ability.Name}: defence doubled (+{doubled}) for {ability.Duration} turns";
+				events.Add(shell);
+				break;
+			case CombatAbilityKind.PoisonSpit:
+				// A stronger or longer poison replaces a weaker one, it never stacks
+				target.BleedTurns = Math.Max(target.BleedTurns, ability.Duration);
+				target.BleedDamage = Math.Max(target.BleedDamage, ability.Amount);
+				target.Poisoned = true;
+				events.Add(new HitEvent
+				{
+					Actor = actor,
+					Target = target,
+					Ability = ability,
+					Bleeding = true,
+					Message = $"{Label(actor)} uses {ability.Name} on {Label(target)}: poisoned, {target.BleedDamage} damage for {target.BleedTurns} turns",
+				});
+				break;
+			case CombatAbilityKind.SummonEgg:
+				var allies = AlliesOf(actor);
+				int eggSlot = FreeSlots(allies).First();
+				var egg = Combatant.Spawn(ability.Summon, actor.Side);
+				egg.HatchInto = ability.HatchInto;
+				egg.HatchTurns = ability.Duration;
+				egg.Slot = eggSlot;
+				var replaced = allies[eggSlot];
+				allies[eggSlot] = egg;
+				events.Add(new SummonEvent
+				{
+					Actor = actor,
+					Ability = ability,
+					Summoned = egg,
+					Replaced = replaced,
+					Message = $"{Label(actor)} uses {ability.Name}: a {egg.Name} appears in the {BattleFormation.SlotName(eggSlot)}, hatching in {ability.Duration} turns",
 				});
 				break;
 			case CombatAbilityKind.Taunt:
@@ -615,7 +831,7 @@ public class BattleSimulation
 		}
 		else if (ability?.Kind == CombatAbilityKind.Volley)
 			attack = Math.Max(0, attack - ability.Amount);
-		else if (ability?.Kind is CombatAbilityKind.WhirlingBlades or CombatAbilityKind.Freeze or CombatAbilityKind.Charge or CombatAbilityKind.CrushDefence)
+		else if (ability?.Kind is CombatAbilityKind.WhirlingBlades or CombatAbilityKind.Freeze or CombatAbilityKind.Charge or CombatAbilityKind.CrushDefence or CombatAbilityKind.HitAndRun or CombatAbilityKind.Cleave)
 			attack += ability.Amount;
 		else if (ability == null && IsWeak(target))
 		{
@@ -671,6 +887,7 @@ public class BattleSimulation
 			target.BleedTurns = Math.Max(target.BleedTurns, ability.Duration);
 			target.BleedDamage = Math.Max(target.BleedDamage, perTurn);
 			target.BleedBlocksHealing |= ability.PreventsHealing;
+			target.Poisoned = false;
 		}
 		if (ability?.Kind == CombatAbilityKind.CrushDefence && !hit.ShieldBlocked && !hit.Dodged && !hit.Killed && attacker.Deadliness > 0)
 		{
@@ -681,12 +898,15 @@ public class BattleSimulation
 		}
 		// Frost Armor: striking it in melee can freeze the attacker
 		var frostArmor = target.GetPassive(CombatPassiveKind.FrostArmor);
-		bool meleeStrike = !attacker.Ranged && (ability == null || ability.IsMeleeHit || ability.Kind == CombatAbilityKind.WhirlingBlades);
+		bool meleeStrike = !attacker.Ranged && (ability == null || ability.IsMeleeHit || ability.Kind is CombatAbilityKind.WhirlingBlades or CombatAbilityKind.Cleave);
 		if (frostArmor != null && meleeStrike && !hit.Dodged && attacker.IsAlive && _rng.NextDouble() < frostArmor.Chance)
 		{
 			hit.AttackerFrozen = true;
 			attacker.StunnedTurns = Math.Max(attacker.StunnedTurns, frostArmor.Amount);
 		}
+		// Death Explosion goes off on the melee killer once the turn's blows are done (see HandleDeaths)
+		if (hit.Killed && meleeStrike)
+			target.KilledInMeleeBy = attacker;
 
 		string how = ability == null ? "hits" : ability.IsSpell ? $"casts {ability.Name} at" : $"uses {ability.Name} on";
 		string damage = hit.ShieldBlocked ? "0 (shield block)"
@@ -731,12 +951,14 @@ public class BattleSimulation
 				Actor = actor,
 				Damage = bled,
 				Killed = !actor.IsAlive,
-				Message = $"{Label(actor)} bleeds {bled} health" + (!actor.IsAlive ? ", killed" : ""),
+				Poison = actor.Poisoned,
+				Message = $"{Label(actor)} {(actor.Poisoned ? "loses" : "bleeds")} {bled} health{(actor.Poisoned ? " to poison" : "")}" + (!actor.IsAlive ? ", killed" : ""),
 			});
 			if (actor.BleedTurns == 0)
 			{
 				actor.BleedDamage = 0;
 				actor.BleedBlocksHealing = false;
+				actor.Poisoned = false;
 			}
 		}
 		// Rejuvenation heals before counting down; not on the turn it was cast by this unit

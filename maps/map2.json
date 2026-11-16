@@ -5076,6 +5076,18 @@
         {
           "template": "orc",
           "count": 2
+        },
+        {
+          "template": "dread_wolf",
+          "count": 2
+        },
+        {
+          "template": "blight_crawler",
+          "count": 2
+        },
+        {
+          "template": "venom_weaver",
+          "count": 1
         }
       ]
     },
@@ -5107,6 +5119,22 @@
         },
         {
           "template": "witch",
+          "count": 1
+        },
+        {
+          "template": "dread_wolf",
+          "count": 2
+        },
+        {
+          "template": "blight_crawler",
+          "count": 2
+        },
+        {
+          "template": "venom_weaver",
+          "count": 1
+        },
+        {
+          "template": "brood_matriarch",
           "count": 1
         }
       ]

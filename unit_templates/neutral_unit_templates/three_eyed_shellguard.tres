@@ -1,0 +1,45 @@
+[gd_resource type="Resource" script_class="UnitTemplate" load_steps=12 format=3]
+
+[ext_resource type="Script" path="res://game/units/UnitTemplate.cs" id="1_template"]
+[ext_resource type="Script" path="res://game/units/BattleStats.cs" id="1_stats"]
+[ext_resource type="Script" path="res://game/units/SpecialAttributes.cs" id="9_attrs"]
+[ext_resource type="Texture2D" uid="uid://ci3ij87ahia66" path="res://images/Units/three_eyed_shellguardIcon.png" id="2_icon"]
+[ext_resource type="SpriteFrames" path="res://images/Units/sprites/three_eyed_shellguard_frames.tres" id="10_sprite"]
+[ext_resource type="Texture2D" uid="uid://kcylre6ot621" path="res://images/Units/sprites/three_eyed_shellguard_battle.png" id="11_battle"]
+[ext_resource type="Texture2D" uid="uid://ol233m2ah4do" path="res://images/Units/sprites/three_eyed_shellguard_attack_battle.png" id="12_attack"]
+[ext_resource type="Resource" path="res://resources/combat/swamp_regeneration.tres" id="p_swamp_regeneration"]
+[ext_resource type="Resource" path="res://resources/combat/shell_guard.tres" id="a_shell_guard"]
+
+[sub_resource type="Resource" id="Resource_attrs"]
+script = ExtResource("9_attrs")
+Deadliness = 4
+Strength = 4
+Durability = 3
+Cleverness = 1
+Quickness = 4
+
+[sub_resource type="Resource" id="Resource_stats"]
+script = ExtResource("1_stats")
+attack = 3
+defence = 3
+health = 18
+maxHealth = 18
+mana = 0
+maxMana = 0
+initiative = 0
+rangeUnit = false
+
+[resource]
+script = ExtResource("1_template")
+Name = "Three-eyed Shellguard"
+Level = 2
+Biome = 7
+Icon = ExtResource("2_icon")
+MapSprite = ExtResource("10_sprite")
+BattleSprite = ExtResource("11_battle")
+BattleAttackSprite = ExtResource("12_attack")
+SpriteScale = 1.1
+DefaultStats = SubResource("Resource_stats")
+Attributes = SubResource("Resource_attrs")
+CombatPassives = [ExtResource("p_swamp_regeneration")]
+CombatAbilities = [ExtResource("a_shell_guard")]

@@ -1,5 +1,7 @@
 {
 	"source": "res://tools/sprites/source/villager_archer_concept.png",
+	"attack_source": "res://tools/sprites/source/villager_archer_attack_concept.webp",
+	"attack_scale": 0.62,
 	"output_dir": "res://images/Units/sprites",
 	"size": 64,
 	"bg_tolerance": 0.09,

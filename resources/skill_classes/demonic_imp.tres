@@ -2,9 +2,9 @@
 
 [ext_resource type="Script" path="res://game/units/skills/SkillClass.cs" id="1_class"]
 [ext_resource type="Script" path="res://game/units/skills/SkillDefinition.cs" id="2_skill"]
-[ext_resource type="Texture2D" path="res://images/skills/imp_greed.png" id="i_imp_greed"]
-[ext_resource type="Texture2D" path="res://images/skills/imp_mining.png" id="i_imp_mining"]
-[ext_resource type="Texture2D" path="res://images/skills/imp_tunnel_rat.png" id="i_imp_tunnel_rat"]
+[ext_resource type="Texture2D" uid="uid://c6hco60i8l1mq" path="res://images/skills/imp_greed.png" id="i_imp_greed"]
+[ext_resource type="Texture2D" uid="uid://dbp0u54nylxol" path="res://images/skills/imp_mining.png" id="i_imp_mining"]
+[ext_resource type="Texture2D" uid="uid://dgnlp13ccivyy" path="res://images/skills/imp_tunnel_rat.png" id="i_imp_tunnel_rat"]
 [ext_resource type="Resource" path="res://resources/combat/lord.tres" id="lord"]
 [ext_resource type="Resource" path="res://resources/abilities/MineOre.tres" id="mine"]
 [ext_resource type="Resource" path="res://resources/abilities/Raid.tres" id="raid"]

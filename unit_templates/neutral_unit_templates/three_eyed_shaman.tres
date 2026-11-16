@@ -1,0 +1,45 @@
+[gd_resource type="Resource" script_class="UnitTemplate" load_steps=12 format=3]
+
+[ext_resource type="Script" path="res://game/units/UnitTemplate.cs" id="1_template"]
+[ext_resource type="Script" path="res://game/units/BattleStats.cs" id="1_stats"]
+[ext_resource type="Script" path="res://game/units/SpecialAttributes.cs" id="9_attrs"]
+[ext_resource type="Texture2D" uid="uid://by8au7e700tjf" path="res://images/Units/three_eyed_shamanIcon.png" id="2_icon"]
+[ext_resource type="SpriteFrames" path="res://images/Units/sprites/three_eyed_shaman_frames.tres" id="10_sprite"]
+[ext_resource type="Texture2D" uid="uid://clj024uqhbehs" path="res://images/Units/sprites/three_eyed_shaman_battle.png" id="11_battle"]
+[ext_resource type="Texture2D" uid="uid://c1nkd2w0no3a8" path="res://images/Units/sprites/three_eyed_shaman_attack_battle.png" id="12_attack"]
+[ext_resource type="Resource" path="res://resources/combat/swamp_regeneration.tres" id="p_swamp_regeneration"]
+[ext_resource type="Resource" path="res://resources/combat/war_croak.tres" id="a_war_croak"]
+
+[sub_resource type="Resource" id="Resource_attrs"]
+script = ExtResource("9_attrs")
+Deadliness = 2
+Strength = 1
+Durability = 1
+Cleverness = 4
+Quickness = 4
+
+[sub_resource type="Resource" id="Resource_stats"]
+script = ExtResource("1_stats")
+attack = 2
+defence = 0
+health = 10
+maxHealth = 10
+mana = 0
+maxMana = 0
+initiative = 0
+rangeUnit = true
+
+[resource]
+script = ExtResource("1_template")
+Name = "Three-eyed Shaman"
+Level = 1
+Biome = 7
+Icon = ExtResource("2_icon")
+MapSprite = ExtResource("10_sprite")
+BattleSprite = ExtResource("11_battle")
+BattleAttackSprite = ExtResource("12_attack")
+AttackProjectileColor = Color(0.4, 1, 0.9, 1)
+DefaultStats = SubResource("Resource_stats")
+Attributes = SubResource("Resource_attrs")
+CombatPassives = [ExtResource("p_swamp_regeneration")]
+CombatAbilities = [ExtResource("a_war_croak")]

@@ -39,6 +39,7 @@ MapSprite = ExtResource("4_frames")
 BattleSprite = ExtResource("3_battle")
 BattleAttackSprite = ExtResource("8_attack")
 SpriteScale = 1.0
+BattleSink = 0.0
 BattleAttackLean = true
 AttackProjectileColor = Color(0.45, 1, 0.35, 1)
 SelectSound = ExtResource("5_sound")

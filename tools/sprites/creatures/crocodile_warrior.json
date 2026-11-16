@@ -1,0 +1,83 @@
+{
+	"source": "res://tools/sprites/source/crocodile_warrior_concept.webp",
+	"attack_source": "res://tools/sprites/source/crocodile_warrior_attack_concept.webp",
+	"attack_scale": 1.0,
+	"output_dir": "res://images/Units/sprites",
+	"size": 64,
+	"bg_tolerance": 0.09,
+	"palette_size": 32,
+	"outline": [
+		20,
+		24,
+		16
+	],
+	"ground_y": 64,
+	"min_island": 16,
+	"enhance": {
+		"saturation": 1.1,
+		"value_offset": 0.0,
+		"value_gain": 1.05
+	},
+	"eyes": [],
+	"parts": {},
+	"animations": [
+		{
+			"name": "idle",
+			"speed": 2.5,
+			"frames": [
+				{},
+				{
+					"body": [
+						0,
+						1
+					]
+				}
+			]
+		},
+		{
+			"name": "walk",
+			"speed": 7.0,
+			"frames": [
+				{},
+				{
+					"body": [
+						0,
+						1
+					]
+				},
+				{},
+				{
+					"body": [
+						0,
+						-1
+					]
+				}
+			]
+		},
+		{
+			"name": "attack",
+			"speed": 8.0,
+			"loop": false,
+			"frames": [
+				{
+					"body": [
+						-1,
+						1
+					]
+				},
+				{
+					"body": [
+						2,
+						0
+					]
+				},
+				{
+					"body": [
+						1,
+						0
+					]
+				}
+			]
+		}
+	]
+}

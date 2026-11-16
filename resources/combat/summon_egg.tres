@@ -1,0 +1,17 @@
+[gd_resource type="Resource" script_class="CombatAbility" load_steps=4 format=3]
+
+[ext_resource type="Script" path="res://game/battle/CombatAbility.cs" id="1_script"]
+[ext_resource type="Resource" path="res://unit_templates/summoned/spider_egg.tres" id="2_egg"]
+[ext_resource type="Resource" path="res://unit_templates/neutral_unit_templates/blight_crawler.tres" id="3_hatch"]
+
+[resource]
+script = ExtResource("1_script")
+Name = "Summon Egg"
+Description = "Lays a spider egg on a free tile of its side. After 2 of its turns the egg hatches into a Blight Crawler. Only one egg at a time; usable every fourth turn."
+Kind = 21
+ManaCost = 0
+Cooldown = 3
+Amount = 0
+Duration = 2
+Summon = ExtResource("2_egg")
+HatchInto = ExtResource("3_hatch")

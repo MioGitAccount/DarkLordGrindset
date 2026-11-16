@@ -16,6 +16,9 @@ public enum CombatPassiveKind
 	Champion,    // +Amount attack and defence and +HealthBonus health once more (on top of the skill's own
 	             // bonus) while it is the only living unit on its side, or in every Arena fight
 	Berserk,     // +Amount attack while below half its health
+	DeathExplosion, // When killed by a melee strike, the killer takes Amount damage (no defence)
+	DeathBlast,     // When killed by anything, every enemy in the front row takes Amount damage (no defence)
+	Regeneration,   // Once per battle, when it drops below half health: heals Amount at the end of each of its next Duration turns
 }
 
 // A combat trait that works on its own (no order needed). Units get them from their
@@ -30,8 +33,10 @@ public partial class CombatPassive : Resource
 	// 0-1, for Critical, Stun, ShieldBlock, Evasion and FrostArmor
 	[Export(PropertyHint.Range, "0,1,0.05")] public float Chance = 0.2f;
 	// Attack bonus (PackHunter, ContemptForTheWeak, Berserk), turns stunned (Stun), attribute bonus (Lord)
-	// or defence bonus (BarkSkin, Defender)
+	// or defence bonus (BarkSkin, Defender), damage dealt on death (DeathExplosion, DeathBlast) or healing per turn (Regeneration)
 	[Export] public int Amount = 1;
+	// Turns the effect lasts (Regeneration)
+	[Export] public int Duration = 3;
 	// Extra health (Champion)
 	[Export] public int HealthBonus;
 	// Damage multiplier (Critical)

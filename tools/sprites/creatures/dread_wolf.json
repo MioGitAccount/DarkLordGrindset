@@ -1,0 +1,209 @@
+{
+	"source": "res://tools/sprites/source/dread_wolf_concept.webp",
+	"attack_source": "res://tools/sprites/source/dread_wolf_attack_concept.webp",
+	"attack_scale": 1.0,
+	"output_dir": "res://images/Units/sprites",
+	"size": 64,
+	"bg_tolerance": 0.09,
+	"palette_size": 24,
+	"outline": [
+		18,
+		22,
+		20
+	],
+	"ground_y": 64,
+	"min_island": 16,
+	"enhance": {
+		"saturation": 1.0,
+		"value_offset": 0.03,
+		"value_gain": 1.15
+	},
+	"eyes": [
+		[
+			1157,
+			378
+		]
+	],
+	"eye_colour": [
+		255,
+		60,
+		40
+	],
+	"eye_rim": [
+		120,
+		10,
+		10
+	],
+	"parts": {
+		"back_far_leg": [
+			9,
+			52,
+			8,
+			12
+		],
+		"back_near_leg": [
+			18,
+			52,
+			10,
+			12
+		],
+		"front_far_leg": [
+			36,
+			52,
+			6,
+			12
+		],
+		"front_near_leg": [
+			42,
+			52,
+			11,
+			12
+		],
+		"tail": [
+			0,
+			38,
+			9,
+			22
+		],
+		"head": [
+			44,
+			13,
+			20,
+			22
+		]
+	},
+	"animations": [
+		{
+			"name": "idle",
+			"speed": 2.5,
+			"frames": [
+				{},
+				{
+					"body": [
+						0,
+						1
+					],
+					"head": [
+						0,
+						1
+					],
+					"tail": [
+						0,
+						1
+					]
+				}
+			]
+		},
+		{
+			"name": "walk",
+			"speed": 7.0,
+			"frames": [
+				{
+					"front_near_leg": [
+						0,
+						-2
+					],
+					"back_far_leg": [
+						0,
+						-2
+					],
+					"tail": [
+						0,
+						-1
+					]
+				},
+				{
+					"body": [
+						0,
+						1
+					],
+					"head": [
+						0,
+						1
+					],
+					"tail": [
+						0,
+						1
+					]
+				},
+				{
+					"front_far_leg": [
+						0,
+						-2
+					],
+					"back_near_leg": [
+						0,
+						-2
+					],
+					"tail": [
+						0,
+						1
+					]
+				},
+				{
+					"body": [
+						0,
+						1
+					],
+					"head": [
+						0,
+						1
+					],
+					"tail": [
+						0,
+						1
+					]
+				}
+			]
+		},
+		{
+			"name": "attack",
+			"speed": 8.0,
+			"loop": false,
+			"frames": [
+				{
+					"body": [
+						-1,
+						1
+					],
+					"head": [
+						-1,
+						1
+					],
+					"tail": [
+						-1,
+						1
+					]
+				},
+				{
+					"body": [
+						2,
+						0
+					],
+					"head": [
+						2,
+						0
+					],
+					"tail": [
+						2,
+						0
+					]
+				},
+				{
+					"body": [
+						1,
+						0
+					],
+					"head": [
+						1,
+						0
+					],
+					"tail": [
+						1,
+						0
+					]
+				}
+			]
+		}
+	]
+}

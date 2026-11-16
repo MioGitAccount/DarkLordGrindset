@@ -13,6 +13,8 @@
 # With "attack_source" (the same creature in its attack pose), also <output_dir>/<name>_attack_battle.png:
 # cut at the same source-pixels-per-texel as the battle image, so the game can swap the two
 # at one scale. Its size follows the pose's bounding box; "attack_ground_y" defaults to 64 (off).
+# "attack_scale" (default 1) corrects the size when the pose art is drawn larger or smaller than the idle art.
+# "attack_enhance" replaces "enhance" for the pose when its art is lit differently.
 # With preview_dir it also writes <name>_preview.png (sheet at 5x) and
 # <name>_grid.png (first frame at 10x with a grid every 4px, red every 8px).
 extends SceneTree
@@ -95,17 +97,17 @@ func _initialize() -> void:
 		var attack_bg := _background_colour(attack_src)
 		mask_polygons.clear() # polygons trace the idle art only
 		var side := _square_crop(attack_src, attack_bg).size.x
-		size = int(round(int(cfg.get("battle_size", 256)) * float(side) / idle_side))
+		size = int(round(int(cfg.get("battle_size", 256)) * float(side) / idle_side * float(cfg.get("attack_scale", 1.0))))
 		work_size = size * 4
 		var attack_path := out_dir.path_join(creature + "_attack_battle.png")
-		_cutout(attack_src, attack_bg, false, cfg.get("attack_ground_y", 64)).save_png(attack_path)
+		_cutout(attack_src, attack_bg, false, cfg.get("attack_ground_y", 64), cfg.get("attack_enhance", null)).save_png(attack_path)
 		print("Saved ", attack_path, " (", size, "px)")
 	quit()
 
 
 # Cuts the creature out of the art at `size` px. Settings in sprite pixels (ground_y,
 # min_island) are given for 64px and scaled. `pixel` adds the palette reduction and eyes.
-func _cutout(src: Image, bg: Color, pixel: bool, ground_y = null) -> Image:
+func _cutout(src: Image, bg: Color, pixel: bool, ground_y = null, enhance = null) -> Image:
 	var scale := size / 64.0
 	var crop := _square_crop(src, bg)
 	var side := crop.size.x
@@ -119,7 +121,7 @@ func _cutout(src: Image, bg: Color, pixel: bool, ground_y = null) -> Image:
 	_remove_ground(base, int((ground_y if ground_y != null else cfg.get("ground_y", 64)) * scale))
 	_drop_hues(base)
 	_remove_islands(base, int(cfg.get("min_island", 16) * scale * scale))
-	_enhance(base, cfg.get("enhance", {}))
+	_enhance(base, enhance if enhance != null else cfg.get("enhance", {}))
 	if not pixel:
 		return base
 	_quantize(base, int(cfg.get("palette_size", 24)))

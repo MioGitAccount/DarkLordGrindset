@@ -1,4 +1,4 @@
-[gd_resource type="Resource" script_class="UnitTemplate" load_steps=11 format=3]
+[gd_resource type="Resource" script_class="UnitTemplate" load_steps=12 format=3]
 
 [ext_resource type="Script" path="res://game/units/UnitTemplate.cs" id="1_template"]
 [ext_resource type="Script" path="res://game/units/BattleStats.cs" id="2_stats"]
@@ -6,6 +6,7 @@
 [ext_resource type="Texture2D" uid="uid://bb6rubp6x6iwl" path="res://images/Units/village_sergeantIcon.png" id="4_icon"]
 [ext_resource type="SpriteFrames" path="res://images/Units/sprites/village_sergeant_frames.tres" id="5_frames"]
 [ext_resource type="Texture2D" uid="uid://cepfci8hyolme" path="res://images/Units/sprites/village_sergeant_battle.png" id="6_battle"]
+[ext_resource type="Texture2D" uid="uid://datqu3x8kx0qh" path="res://images/Units/sprites/village_sergeant_attack_battle.png" id="12_attack"]
 [ext_resource type="Resource" path="res://resources/combat/stun.tres" id="c_stun"]
 [ext_resource type="Resource" path="res://resources/combat/shield_block.tres" id="c_shield_block"]
 [ext_resource type="Resource" path="res://resources/combat/taunt.tres" id="c_taunt"]
@@ -37,6 +38,7 @@ Biome = 1
 Icon = ExtResource("4_icon")
 MapSprite = ExtResource("5_frames")
 BattleSprite = ExtResource("6_battle")
+BattleAttackSprite = ExtResource("12_attack")
 BattleAttackLean = true
 DefaultStats = SubResource("Resource_stats")
 Attributes = SubResource("Resource_attrs")

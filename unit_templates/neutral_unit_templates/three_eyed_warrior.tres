@@ -1,0 +1,44 @@
+[gd_resource type="Resource" script_class="UnitTemplate" load_steps=12 format=3]
+
+[ext_resource type="Script" path="res://game/units/UnitTemplate.cs" id="1_template"]
+[ext_resource type="Script" path="res://game/units/BattleStats.cs" id="1_stats"]
+[ext_resource type="Script" path="res://game/units/SpecialAttributes.cs" id="9_attrs"]
+[ext_resource type="Texture2D" uid="uid://sntvdx5wfk48" path="res://images/Units/three_eyed_warriorIcon.png" id="2_icon"]
+[ext_resource type="SpriteFrames" path="res://images/Units/sprites/three_eyed_warrior_frames.tres" id="10_sprite"]
+[ext_resource type="Texture2D" uid="uid://n01j6qfjbvqa" path="res://images/Units/sprites/three_eyed_warrior_battle.png" id="11_battle"]
+[ext_resource type="Texture2D" uid="uid://dqrbuqnyx6g56" path="res://images/Units/sprites/three_eyed_warrior_attack_battle.png" id="12_attack"]
+[ext_resource type="Resource" path="res://resources/combat/swamp_regeneration.tres" id="p_swamp_regeneration"]
+[ext_resource type="Resource" path="res://resources/combat/hit_and_run.tres" id="a_hit_and_run"]
+
+[sub_resource type="Resource" id="Resource_attrs"]
+script = ExtResource("9_attrs")
+Deadliness = 3
+Strength = 2
+Durability = 2
+Cleverness = 1
+Quickness = 6
+
+[sub_resource type="Resource" id="Resource_stats"]
+script = ExtResource("1_stats")
+attack = 2
+defence = 1
+health = 12
+maxHealth = 12
+mana = 0
+maxMana = 0
+initiative = 0
+rangeUnit = false
+
+[resource]
+script = ExtResource("1_template")
+Name = "Three-eyed Warrior"
+Level = 1
+Biome = 7
+Icon = ExtResource("2_icon")
+MapSprite = ExtResource("10_sprite")
+BattleSprite = ExtResource("11_battle")
+BattleAttackSprite = ExtResource("12_attack")
+DefaultStats = SubResource("Resource_stats")
+Attributes = SubResource("Resource_attrs")
+CombatPassives = [ExtResource("p_swamp_regeneration")]
+CombatAbilities = [ExtResource("a_hit_and_run")]

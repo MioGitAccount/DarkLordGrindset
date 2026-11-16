@@ -181,3 +181,21 @@ rerun until it wins if the video should end in victory. Run it first without
 `--write-movie` and with a screenshot dir (`-- Field14 <scratchpad>/rec`) to check each
 step. The output is MJPEG AVI (about 300 MB a minute at 1080p); there is no ffmpeg
 here to make an MP4 unless the user installs one.
+
+## Attack pose (battle)
+
+A second image of the same creature in its attack pose, facing right, full body, flat
+background, becomes `<name>_attack_battle.png`; the battle screen swaps to it at the strike
+(`BattleAttackSprite` on the template, wired like `BattleSprite` with id `12_attack`).
+In the config:
+- `"attack_source"`: the pose art (`source/<name>_attack_concept.<ext>`).
+- `"attack_scale"`: the pose is cut at the idle art's pixel scale, so if the pose art is
+  drawn bigger (idle split from a two-figure image, a portrait idle), it comes out too
+  big. Compare idle and pose side by side at the same scale and match head and body size,
+  not the bounding box: raised weapons and crouched lunges skew it. Most neutrals needed
+  0.55-0.7, the wolf 0.5.
+- `"attack_enhance"`: replaces `enhance` for the pose when its art is lit differently
+  (the wolf's dark portrait needed a boost that made its light pose art minty). Match the
+  average saturation and value of the two outputs.
+After importing, set `mipmaps/generate=true` in each `_attack_battle.png.import` and import
+again; check with `grep -L`, because a second editor run can reset it.

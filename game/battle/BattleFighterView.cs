@@ -38,6 +38,9 @@ public partial class BattleFighterView : Control
 	private AnimatedSprite2D _sprite;
 	// Painted sprite: a feet-anchored node animated with tweens (breathing, swings, knockback, falling)
 	private Node2D _rig;
+	// Top of the health bar in the view; lower for short units (see HeaderAbove)
+	private const float DefaultHeaderY = 14;
+	private float _headerY = DefaultHeaderY;
 	private Sprite2D _painted; // the painted cutout inside _rig
 	private Tween _motion;
 	private float _speed = 1;
@@ -75,11 +78,14 @@ public partial class BattleFighterView : Control
 			{
 				Centered = false,
 				Scale = new Vector2(scale, scale),
+				// Sprawling legs end below the body, so some art stands lower on its ring
+				Position = new Vector2(0, Combatant.BattleSink * Combatant.SpriteScale),
 				TextureFilter = TextureFilterEnum.LinearWithMipmaps,
 				// Art faces right; enemies stand on the right and face left
 				FlipH = !Combatant.IsPlayer,
 			};
 			ShowPose(Combatant.BattleSprite);
+			_headerY = HeaderAbove(Combatant.BattleSprite, scale, _painted.Position.Y);
 			_rig.AddChild(_painted);
 			_body.AddChild(_rig);
 			PlayIdle();
@@ -186,6 +192,17 @@ public partial class BattleFighterView : Control
 		_motion = CreateTween();
 		_motion.SetSpeedScale(_speed);
 		return _motion;
+	}
+
+	// Top of the health bar: just above the top of the painted figure, so short units (dwarves) keep it
+	// close and tall ones (the crocodile) keep it clear of their heads
+	private float HeaderAbove(Texture2D texture, float scale, float sink)
+	{
+		var image = texture.GetImage();
+		if (image == null)
+			return DefaultHeaderY;
+		float figureTop = Feet.Y + sink - (texture.GetHeight() * 0.976f - image.GetUsedRect().Position.Y) * scale;
+		return figureTop - 24;
 	}
 
 	private void ShowPose(Texture2D texture)
@@ -365,17 +382,21 @@ public partial class BattleFighterView : Control
 		// Name and health inside one bar, mana under it: a short header, so rows don't overlap
 		const float barWidth = 112;
 		float x = (ViewSize.X - barWidth) / 2;
-		var healthRect = new Rect2(x, 14, barWidth, 14);
+		var healthRect = new Rect2(x, _headerY, barWidth, 14);
 		_overlay.DrawRect(healthRect.Grow(1), HealthBack);
-		_overlay.DrawRect(new Rect2(x, 14, barWidth * Mathf.Clamp(ShownHealth / (float)c.MaxHealth, 0, 1), 14), HealthColor);
+		_overlay.DrawRect(new Rect2(x, _headerY, barWidth * Mathf.Clamp(ShownHealth / (float)c.MaxHealth, 0, 1), 14), HealthColor);
 		var label = $"{c.Name}  {ShownHealth}/{c.MaxHealth}";
-		var labelAt = new Vector2(0, 25.5f);
-		_overlay.DrawStringOutline(font, labelAt, label, HorizontalAlignment.Center, ViewSize.X, 11, 3, HealthBack);
-		_overlay.DrawString(font, labelAt, label, HorizontalAlignment.Center, ViewSize.X, 11, Colors.White);
+		var labelAt = new Vector2(0, _headerY + 11.5f);
+		// Long names shrink to fit the bar
+		int labelSize = 11;
+		while (labelSize > 8 && font.GetStringSize(label, HorizontalAlignment.Left, -1, labelSize).X > barWidth - 4)
+			labelSize--;
+		_overlay.DrawStringOutline(font, labelAt, label, HorizontalAlignment.Center, ViewSize.X, labelSize, 3, HealthBack);
+		_overlay.DrawString(font, labelAt, label, HorizontalAlignment.Center, ViewSize.X, labelSize, Colors.White);
 		if (c.MaxMana > 0)
 		{
-			_overlay.DrawRect(new Rect2(x, 30, barWidth, 3).Grow(1), HealthBack);
-			_overlay.DrawRect(new Rect2(x, 30, barWidth * Mathf.Clamp(c.Mana / (float)c.MaxMana, 0, 1), 3), ManaColor);
+			_overlay.DrawRect(new Rect2(x, _headerY + 16, barWidth, 3).Grow(1), HealthBack);
+			_overlay.DrawRect(new Rect2(x, _headerY + 16, barWidth * Mathf.Clamp(c.Mana / (float)c.MaxMana, 0, 1), 3), ManaColor);
 		}
 
 		// Effects just under the bars, outlined so they read over the sprite
@@ -383,13 +404,15 @@ public partial class BattleFighterView : Control
 		if (c.StunnedTurns > 0)
 			effects += "STUNNED  ";
 		if (c.RootedTurns > 0)
-			effects += "ROOTED  ";
+			effects += c.RootName.Contains("web") ? "WEBBED  " : "ROOTED  ";
 		if (c.BleedTurns > 0)
-			effects += "BLEEDING  ";
+			effects += c.Poisoned ? "POISONED  " : "BLEEDING  ";
 		if (c.TauntTurns > 0 && c.TauntedBy?.IsAlive == true)
 			effects += "TAUNTED  ";
 		if (c.BuffAttack > 0)
 			effects += $"+{c.BuffAttack} ATK  ";
+		if (c.BuffInitiative > 0)
+			effects += $"+{c.BuffInitiative} INI  ";
 		if (c.BuffDefence > 0)
 			effects += $"+{c.BuffDefence} DEF  ";
 		else if (c.BuffDefence < 0)
@@ -402,7 +425,7 @@ public partial class BattleFighterView : Control
 			effects += Status;
 		if (effects != "")
 		{
-			var at = new Vector2(-20, 55);
+			var at = new Vector2(-20, _headerY + 41);
 			_overlay.DrawStringOutline(font, at, effects.Trim(), HorizontalAlignment.Center, ViewSize.X + 40, 12, 4, Colors.Black);
 			_overlay.DrawString(font, at, effects.Trim(), HorizontalAlignment.Center, ViewSize.X + 40, 12, SelectedColor);
 		}

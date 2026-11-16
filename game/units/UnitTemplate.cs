@@ -19,6 +19,9 @@ public partial class UnitTemplate : Resource
 	[Export] public Texture2D BattleAttackSprite;
 	// Size of the map sprite and battle image compared with other units (1 = normal)
 	[Export(PropertyHint.Range, "0.5,2,0.05")] public float SpriteScale = 1f;
+	// Pixels the battle image is moved down on its ring (at SpriteScale 1), for art whose feet spread
+	// wide below the body (spiders), so it doesn't look like it hovers
+	[Export] public float BattleSink;
 	// Tilt the battle sprite when it attacks; off where bending looks wrong (four-legged creatures)
 	[Export] public bool BattleAttackLean = true;
 	// Colour of the bolt a ranged unit shoots with its normal attack
